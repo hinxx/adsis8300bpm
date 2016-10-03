@@ -1,0 +1,285 @@
+#=================================================================#
+# Template file: SIS8300bpm.template
+# Database for the records specific to the Struck SIS8300 BPM driver
+# Hinko Kocevar
+# September 22, 2016
+
+record(bi, "$(P)$(R)PulseDone") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_PULSE_DONE")
+    field(SCAN, "I/O Intr")
+}
+
+
+record(longin, "$(P)$(R)PulseCount") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_PULSE_COUNT")
+    field(SCAN, "I/O Intr")
+}
+
+record(longin, "$(P)$(R)PulseMissed") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_PULSE_MISSED")
+    field(SCAN, "I/O Intr")
+    field(HIHI, "1")
+    field(HHSV, "MAJOR")
+}
+
+
+# near IQ parameters
+
+record(longout, "$(P)$(R)NearIQM") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_NEARIQ_M")
+    field(DRVH, "255")
+    field(DRVL, "0")
+    field(PINI, "YES")
+    field(VAL,  "4")
+    info(autosaveFields, "VAL")
+}
+
+record(longin, "$(P)$(R)NearIQM_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_NEARIQ_M")
+    field(SCAN, "I/O Intr")
+}
+
+record(longout, "$(P)$(R)NearIQN") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_NEARIQ_N")
+    field(DRVH, "255")
+    field(DRVL, "0")
+    field(PINI, "YES")
+    field(VAL,  "15")
+    info(autosaveFields, "VAL")
+}
+
+record(longin, "$(P)$(R)NearIQN_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_NEARIQ_N")
+    field(SCAN, "I/O Intr")
+}
+
+record(longout, "$(P)$(R)NumIQSamples") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_NUM_IQ_SAMPLES")
+    field(PINI, "YES")
+    field(VAL,  "100")
+    info(autosaveFields, "VAL")
+}
+
+record(longin, "$(P)$(R)NumIQSamples_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_NUM_IQ_SAMPLES")
+    field(SCAN, "I/O Intr")
+}
+
+# channel data mux
+
+record(mbbo, "$(P)$(R)MemMux") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_MEM_MUX")
+    field(ZRVL, "0")
+    field(ZRST, "BPM1 AI, BPM INT")
+    field(ONVL, "1")
+    field(ONST, "BPM2 AI, BPM INT")
+    field(TWVL, "2")
+    field(TWST, "BPM1 AI, BPM2 AI")
+    field(THVL, "3")
+    field(THST, "BPM1 AI, BPM INT")
+    field(PINI, "YES")
+    field(VAL,  "0")
+    info(autosaveFields, "VAL")
+}
+
+record(mbbi, "$(P)$(R)MemMux_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_MEM_MUX")
+    field(SCAN, "I/O Intr")
+    field(ZRVL, "0")
+    field(ZRST, "BPM1 AI, BPM INT")
+    field(ONVL, "1")
+    field(ONST, "BPM2 AI, BPM INT")
+    field(TWVL, "2")
+    field(TWST, "BPM1 AI, BPM2 AI")
+    field(THVL, "3")
+    field(THST, "BPM1 AI, BPM INT")
+}
+
+record(mbbo, "$(P)$(R)MemMux10") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_MEM_MUX10")
+    field(ZRVL, "0")
+    field(ZRST, "POSITIONS")
+    field(ONVL, "1")
+    field(ONST, "SUMS")
+    field(TWVL, "2")
+    field(TWST, "MAGNITUDES")
+    field(THVL, "3")
+    field(THST, "ANGLES")
+    field(PINI, "YES")
+    field(VAL,  "0")
+    info(autosaveFields, "VAL")
+}
+
+record(mbbi, "$(P)$(R)MemMux10_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_MEM_MUX10")
+    field(SCAN, "I/O Intr")
+    field(ZRVL, "0")
+    field(ZRST, "POSITIONS")
+    field(ONVL, "1")
+    field(ONST, "SUMS")
+    field(TWVL, "2")
+    field(TWST, "MAGNITUDES")
+    field(THVL, "3")
+    field(THST, "ANGLES")
+}
+
+# filters
+
+record(bo, "$(P)$(R)FilterControl") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_CONTROL")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)FilterControl_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_CONTROL")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(P)$(R)FilterCoeff0") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_0")
+    field(DRVH, "0.999999999")
+    field(DRVL, "-1.0")
+    field(VAL,  "0.295731148152960")
+    field(PINI, "YES")
+    field(PREC, "12")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)FilterCoeff0_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_0")
+    field(SCAN, "I/O Intr")
+    field(PREC, "12")
+}
+
+record(ao, "$(P)$(R)FilterCoeff1") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_1")
+    field(DRVH, "0.999999999")
+    field(DRVL, "-1.0")
+    field(VAL,  "0.492273184395108")
+    field(PINI, "YES")
+    field(PREC, "12")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)FilterCoeff1_RBV") {
+    field(DESC, "BPM Filter const 1 rbv")
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_1")
+    field(SCAN, "I/O Intr")
+    field(PREC, "12")
+}
+
+record(ao, "$(P)$(R)FilterCoeff2") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_2")
+    field(DRVH, "0.999999999")
+    field(DRVL, "-1.0")
+    field(VAL,  "-0.053060037295737")
+    field(PINI, "YES")
+    field(PREC, "12")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)FilterCoeff2_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_2")
+    field(SCAN, "I/O Intr")
+    field(PREC, "12")
+}
+
+record(ao, "$(P)$(R)FilterCoeff3") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_3")
+    field(DRVH, "0.999999999")
+    field(DRVL, "-1.0")
+    field(VAL,  "0.005647590076694")
+    field(PINI, "YES")
+    field(PREC, "12")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)FilterCoeff3_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_3")
+    field(SCAN, "I/O Intr")
+    field(PREC, "12")
+}
+
+record(ao, "$(P)$(R)FilterCoeff4") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_4")
+    field(DRVH, "0.999999999")
+    field(DRVL, "-1.0")
+    field(VAL,  "0.007209976642777")
+    field(PINI, "YES")
+    field(PREC, "12")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)FilterCoeff4_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_4")
+    field(SCAN, "I/O Intr")
+    field(PREC, "12")
+}
+
+record(ao, "$(P)$(R)FilterCoeff5") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_5")
+    field(DRVH, "0.999999999")
+    field(DRVL, "-1.0")
+    field(VAL,  "-0.001953094774248")
+    field(PINI, "YES")
+    field(PREC, "12")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)FilterCoeff5_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_FILTER_COEFF_5")
+    field(SCAN, "I/O Intr")
+    field(PREC, "12")
+}
+
+
+
+record(bo, "$(P)$(R)Enable")
+{
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(STAT, "NO_ALARM")
+    field(SEVR, "NO_ALARM")
+    field(FLNK, "$(P)$(R)EnableSeq")
+}
+
+record(seq, "$(P)$(R)EnableSeq")
+{
+    field(SELM, "All")
+    field(LNK1, "$(P)$(R)BPM1:Enable PP")
+    field(LNK2, "$(P)$(R)BPM2:Enable PP")
+    field(DOL1, "$(P)$(R)Enable")
+    field(DOL2, "$(P)$(R)Enable")
+}

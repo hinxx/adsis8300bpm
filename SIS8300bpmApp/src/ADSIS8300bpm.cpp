@@ -1,4 +1,4 @@
-/* SIS8300bpm.cpp
+/* ADSIS8300bpm.cpp
  *
  * This is a driver for a Struck SIS8300 BPM digitizer.
  *
@@ -56,10 +56,10 @@ static const char *driverName = "ADSIS8300bpm";
 /**
  * Exit handler, delete the ADSIS8300 BPM object.
  */
-static void exitHandler(void *drvPvt) {
-	ADSIS8300bpm *pPvt = (ADSIS8300bpm *) drvPvt;
-	delete pPvt;
-}
+//static void exitHandler(void *drvPvt) {
+//	ADSIS8300bpm *pPvt = (ADSIS8300bpm *) drvPvt;
+//	delete pPvt;
+//}
 
 /** Constructor for SIS8300bpm; most parameters are simply passed to ADSIS8300::ADSIS8300.
   * After calling the base class constructor this method creates a thread to compute the simulated detector data,
@@ -97,7 +97,8 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     		SIS8300DRV_NUM_AI_CHANNELS+maxAddr,NUM_SIS8300BPM_PARAMS+numParams);
 
 	/* Create an EPICS exit handler */
-	epicsAtExit(exitHandler, this);
+    /* XXX: Base class does this.. */
+	//epicsAtExit(exitHandler, this);
 
     createParam(SisDummy1String,               asynParamInt32, &P_Dummy1);
     createParam(SisDummy2String,               asynParamInt32, &P_Dummy2);
@@ -176,9 +177,10 @@ template <typename epicsType> int ADSIS8300bpm::acquireArraysT()
 		getDoubleParam(ch, P_ConvFactor, &convFactor);
 		getDoubleParam(ch, P_ConvOffset, &convOffset);
 		this->unlock();
-		printf("CH %d [%d] CF %f, CO %f: ", ch, numTimePoints, convFactor, convOffset);
+		printf("%s::%s: CH %d [%d] CF %f, CO %f:\n", driverName, __func__,
+				ch, numTimePoints, convFactor, convOffset);
 		for (i = 0; i < numTimePoints; i++) {
-			//printf("%d ", *(pRawData + i));
+//			printf("%d ", *(pRawData + i));
 			pData[SIS8300DRV_NUM_AI_CHANNELS*i + ch] = (epicsType)((double)*(pRawData + i) * convFactor + convOffset);
 		}
 		printf("\n");
@@ -223,6 +225,83 @@ int ADSIS8300bpm::acquireArrays()
         	return -1;
         	break;
     }
+}
+
+int ADSIS8300bpm::initDeviceDone()
+{
+	int ret;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_init_done", sis8300llrfdrv_init_done(mSisDevice));
+
+	return ret;
+}
+
+int ADSIS8300bpm::armDevice()
+{
+	int ret;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_clear_latched_statuses", sis8300llrfdrv_clear_latched_statuses(mSisDevice, SIS8300LLRFDRV_STATUS_CLR_GENERAL));
+	if (ret) {
+		return ret;
+	}
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_clear_pulse_done_count", sis8300llrfdrv_clear_pulse_done_count(mSisDevice));
+	if (ret) {
+		return ret;
+	}
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_arm_device", sis8300llrfdrv_arm_device(mSisDevice));
+
+	return ret;
+}
+
+int ADSIS8300bpm::disarmDevice()
+{
+	int ret;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_sw_reset", sis8300llrfdrv_sw_reset(mSisDevice));
+	if (ret) {
+		return ret;
+	}
+
+	ret = ADSIS8300::disarmDevice();
+
+	return ret;
+}
+
+int ADSIS8300bpm::waitForDevice()
+{
+	int ret;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+//	ret = SIS8300DRV_CALL("sis8300llrfdrv_wait_pulse_done_pms", sis8300llrfdrv_wait_pulse_done_pms(mSisDevice, SIS8300BPM_IRQ_WAIT_TIME));
+// XXX: Debug!
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_wait_pulse_done_pms", sis8300llrfdrv_wait_pulse_done_pms(mSisDevice, 1000));
+
+	return ret;
+}
+
+int ADSIS8300bpm::deviceDone()
+{
+	int ret;
+	unsigned int pulseCount;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_get_pulse_done_count", sis8300llrfdrv_get_pulse_done_count(mSisDevice, &pulseCount));
+	printf("%s::%s: Pulse count = %d\n", driverName, __func__, pulseCount);
+
+	// XXX: Check for missed pulse
+	// XXX: Increment pulse count and do param callbacks
+
+	return ret;
 }
 
 /** Called when asyn clients call pasynInt32->write().
@@ -327,33 +406,51 @@ void ADSIS8300bpm::report(FILE *fp, int details)
 
 int ADSIS8300bpm::initDevice()
 {
+	int ret;
 
-	// XXX Add BPM specific init here
+	printf("%s::%s: Enter\n", driverName, __func__);
 
-	return 0;
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_sw_reset", sis8300llrfdrv_sw_reset(mSisDevice));
+	if (ret) {
+		return ret;
+	}
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_setup_dac", sis8300llrfdrv_setup_dac(mSisDevice));
+	if (ret) {
+		return ret;
+	}
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_setup_adc_tap_delay", sis8300llrfdrv_setup_adc_tap_delay(mSisDevice));
+	if (ret) {
+		return ret;
+	}
+
+	return ret;
 }
 
 int ADSIS8300bpm::destroyDevice()
 {
+
+	printf("%s::%s: Enter\n", driverName, __func__);
 
 	// XXX Add BPM specific destroy here
 
 	return 0;
 }
 
-int ADSIS8300bpm::enableChannel(unsigned int channel)
-{
-   	mBPMChannelMask |= (1 << channel);
-    printf("%s::%s: channel mask %X\n", driverName, __func__, mBPMChannelMask);
-	return 0;
-}
-
-int ADSIS8300bpm::disableChannel(unsigned int channel)
-{
-   	mBPMChannelMask &= ~(1 << channel);
-    printf("%s::%s: channel mask %X\n", driverName, __func__, mBPMChannelMask);
-	return 0;
-}
+//int ADSIS8300bpm::enableChannel(unsigned int channel)
+//{
+//   	mBPMChannelMask |= (1 << channel);
+//    printf("%s::%s: channel mask %X\n", driverName, __func__, mBPMChannelMask);
+//	return 0;
+//}
+//
+//int ADSIS8300bpm::disableChannel(unsigned int channel)
+//{
+//   	mBPMChannelMask &= ~(1 << channel);
+//    printf("%s::%s: channel mask %X\n", driverName, __func__, mBPMChannelMask);
+//	return 0;
+//}
 
 /** Configuration command, called directly or from iocsh */
 extern "C" int SIS8300BpmConfig(const char *portName, const char *devicePath,

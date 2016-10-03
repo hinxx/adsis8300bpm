@@ -1,4 +1,4 @@
-/* SIS8300bpm.h
+/* ADSIS8300bpm.h
  *
  * This is a driver for a Struck SIS8300 BPM digitizer.
  *
@@ -19,6 +19,8 @@
 
 #define SisDummy1String               "SIS_DUMMY1"
 #define SisDummy2String               "SIS_DUMMY2"
+
+#define SIS8300BPM_IRQ_WAIT_TIME      0
 
 /** Struck SIS8300 BPM driver; does 1-D waveforms on 12 channels.
   * Inherits from ADSIS8300 */
@@ -43,11 +45,16 @@ protected:
 
     /* These are the methods that are new to this class */
     template <typename epicsType> int acquireArraysT();
-    int acquireArrays();
-    int initDevice();
-    int destroyDevice();
-    int enableChannel(unsigned int channel);
-    int disableChannel(unsigned int channel);
+    virtual int acquireArrays();
+    virtual int initDevice();
+    virtual int destroyDevice();
+//    virtual int enableChannel(unsigned int channel);
+//    virtual int disableChannel(unsigned int channel);
+    virtual int initDeviceDone();
+    virtual int armDevice();
+    virtual int disarmDevice();
+    virtual int waitForDevice();
+    virtual int deviceDone();
 
 private:
 

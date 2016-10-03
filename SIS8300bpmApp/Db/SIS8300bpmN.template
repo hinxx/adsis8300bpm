@@ -1,0 +1,31 @@
+#=================================================================#
+# Template file: SIS8300N.template
+# Database for the records specific to the Struck SIS8300 BPM driver
+# Hinko Kocevar
+# September 22, 2016
+
+record(stringout, "$(P)$(R)Name")
+{
+    field(VAL,  "$(NAME)")
+    info(autosaveFields, "VAL")
+}
+
+record(ao, "$(P)$(R)ConvFactor")
+{
+    field(PINI, "YES")
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_CONV_FACTOR")
+    field(PREC, "8")
+    field(EGU,  "???")
+    field(VAL,  "1.0")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(P)$(R)ConvFactor_RBV")
+{
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_CONV_FACTOR")
+    field(PREC, "8")
+    field(EGU,  "???")
+    field(SCAN, "I/O Intr")
+}

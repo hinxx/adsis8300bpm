@@ -29,6 +29,7 @@ PROD_SYS_LIBS += rt m udev
 include $(ADCORE)/ADApp/commonDriverMakefile
 
 PROD_LIBS += sis8300drv
+PROD_LIBS += sis8300drvbpm
 
 #=============================
 

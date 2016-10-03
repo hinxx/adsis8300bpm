@@ -13,6 +13,7 @@ include $(TOP)/configure/CONFIG
 
 DB += SIS8300bpm.template
 DB += SIS8300bpmN.template
+DB += SIS8300bpmI.template
 
 #----------------------------------------------------
 # If <anyname>.db template is not named <anyname>*.template add
