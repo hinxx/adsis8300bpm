@@ -11,19 +11,19 @@ record(longin, "$(P)$(R)BPMFWVersion_RBV") {
     field(SCAN, "I/O Intr")
 }
 
-record(bi, "$(P)$(R)PulseDone") {
+record(bi, "$(P)$(R)PulseDone_RBV") {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_PULSE_DONE")
     field(SCAN, "I/O Intr")
 }
 
-record(longin, "$(P)$(R)PulseCount") {
+record(longin, "$(P)$(R)PulseCount_RBV") {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_PULSE_COUNT")
     field(SCAN, "I/O Intr")
 }
 
-record(longin, "$(P)$(R)PulseMissed") {
+record(longin, "$(P)$(R)PulseMissed_RBV") {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_PULSE_MISSED")
     field(SCAN, "I/O Intr")

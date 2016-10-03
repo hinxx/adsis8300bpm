@@ -123,6 +123,7 @@ private:
 
     /* Our data */
     uint32_t mBPMChannelMask;
+    bool mDoRegisterUpdate;
 };
 
 

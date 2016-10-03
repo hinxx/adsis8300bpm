@@ -130,6 +130,8 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     /* BPM channel wide parameters */
     createParam(BpmNConvFactorString,           asynParamFloat64, &P_NConvFactor);
 
+    mDoRegisterUpdate = false;
+
     if (status) {
         printf("%s::%s: unable to set parameters\n", driverName, __func__);
         return;
@@ -261,6 +263,13 @@ int ADSIS8300bpm::initDeviceDone()
 	printf("%s::%s: Enter\n", driverName, __func__);
 
 	ret = SIS8300DRV_CALL("sis8300llrfdrv_init_done", sis8300llrfdrv_init_done(mSisDevice));
+	if (ret) {
+		return ret;
+	}
+
+	setIntegerParam(P_PulseDone, 0);
+	setIntegerParam(P_PulseMissed, 0);
+	callParamCallbacks(0);
 
 	return ret;
 }
@@ -318,6 +327,7 @@ int ADSIS8300bpm::waitForDevice()
 int ADSIS8300bpm::deviceDone()
 {
 	int ret;
+	int oldCount;
 	unsigned int pulseCount;
 
 	printf("%s::%s: Enter\n", driverName, __func__);
@@ -325,8 +335,25 @@ int ADSIS8300bpm::deviceDone()
 	ret = SIS8300DRV_CALL("sis8300llrfdrv_get_pulse_done_count", sis8300llrfdrv_get_pulse_done_count(mSisDevice, &pulseCount));
 	printf("%s::%s: Pulse count = %d\n", driverName, __func__, pulseCount);
 
-	// XXX: Check for missed pulse
-	// XXX: Increment pulse count and do param callbacks
+	if (ret) {
+		setIntegerParam(P_PulseMissed, 1);
+	} else {
+
+		ret = SIS8300DRV_CALL("sis8300llrfdrv_get_pulse_done_count", sis8300llrfdrv_get_pulse_done_count(mSisDevice, &pulseCount));
+		if (pulseCount != 1) {
+			setIntegerParam(P_PulseMissed, pulseCount - 1);
+		}
+		getIntegerParam(P_PulseCount, &oldCount);
+		oldCount += pulseCount;
+		setIntegerParam(P_PulseCount, oldCount);
+		setIntegerParam(P_PulseDone, 1);
+	}
+
+	if (mDoRegisterUpdate) {
+		ret = SIS8300DRV_CALL("sis8300llrfdrv_update", sis8300llrfdrv_update(mSisDevice, SIS8300LLRFDRV_UPDATE_REASON_INIT_DONE));
+	}
+
+	callParamCallbacks(0);
 
 	return ret;
 }
@@ -351,7 +378,9 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     status = setIntegerParam(addr, function, value);
 
     if (function == P_NearIQM) {
+    	mDoRegisterUpdate = true;
     } else if (function == P_NearIQN) {
+    	mDoRegisterUpdate = true;
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
@@ -393,7 +422,9 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
     status = setDoubleParam(addr, function, value);
 
     if (function == P_FilterCoeff0) {
+    	mDoRegisterUpdate = true;
     } else if (function == P_FilterCoeff1) {
+    	mDoRegisterUpdate = true;
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
