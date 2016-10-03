@@ -96,12 +96,39 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     printf("%s::%s: %d channels, %d parameters\n", driverName, __func__,
     		SIS8300DRV_NUM_AI_CHANNELS+maxAddr,NUM_SIS8300BPM_PARAMS+numParams);
 
-	/* Create an EPICS exit handler */
-    /* XXX: Base class does this.. */
-	//epicsAtExit(exitHandler, this);
-
-    createParam(SisDummy1String,               asynParamInt32, &P_Dummy1);
-    createParam(SisDummy2String,               asynParamInt32, &P_Dummy2);
+    /* System wide parameters */
+    createParam(BpmPulseDoneString,               asynParamInt32, &P_PulseDone);
+    createParam(BpmPulseCountString,              asynParamInt32, &P_PulseCount);
+    createParam(BpmPulseMissedString,             asynParamInt32, &P_PulseMissed);
+    createParam(BpmNearIQMString,                 asynParamInt32, &P_NearIQM);
+    createParam(BpmNearIQNString,                 asynParamInt32, &P_NearIQN);
+    createParam(BpmNumSamplesString,              asynParamInt32, &P_NumSamples);
+    createParam(BpmNumIQSamplesString,            asynParamInt32, &P_NumIQSamples);
+    createParam(BpmMemMuxString,                  asynParamInt32, &P_MemMux);
+    createParam(BpmMemMux10String,                asynParamInt32, &P_MemMux10);
+    createParam(BpmFilterControlString,           asynParamInt32, &P_FilterControl);
+    createParam(BpmFilterCoeff0String,          asynParamFloat64, &P_FilterCoeff0);
+    createParam(BpmFilterCoeff1String,          asynParamFloat64, &P_FilterCoeff1);
+    createParam(BpmFilterCoeff2String,          asynParamFloat64, &P_FilterCoeff2);
+    createParam(BpmFilterCoeff3String,          asynParamFloat64, &P_FilterCoeff3);
+    createParam(BpmFilterCoeff4String,          asynParamFloat64, &P_FilterCoeff4);
+    createParam(BpmFilterCoeff5String,          asynParamFloat64, &P_FilterCoeff5);
+    createParam(BpmFilterGainString,            asynParamFloat64, &P_FilterGain);
+    createParam(BpmFilterApplyString,             asynParamInt32, &P_FilterApply);
+    createParam(BpmFirmwareVersionString,         asynParamInt32, &P_BPMFirmwareVersion);
+    /* BPM instance wide parameters (BPM1 or BPM2)*/
+    createParam(BpmIEnableString,                 asynParamInt32, &P_IEnable);
+    createParam(BpmIThrXPosLowString,           asynParamFloat64, &P_IThrXPosLow);
+    createParam(BpmIThrXPosHighString,          asynParamFloat64, &P_IThrXPosHigh);
+    createParam(BpmIThrYPosLowString,           asynParamFloat64, &P_IThrYPosLow);
+    createParam(BpmIThrYPosHighString,          asynParamFloat64, &P_IThrYPosHigh);
+    createParam(BpmIThrMagnitudeString,         asynParamFloat64, &P_IThrMagnitude);
+    createParam(BpmIThrSelectString,              asynParamInt32, &P_IThrSelect);
+    createParam(BpmIIlkControlString,             asynParamInt32, &P_IIlkControl);
+    createParam(BpmIIlkClearString,               asynParamInt32, &P_IIlkClear);
+    createParam(BpmIIlkStatusString,              asynParamInt32, &P_IIlkStatus);
+    /* BPM channel wide parameters */
+    createParam(BpmNConvFactorString,           asynParamFloat64, &P_NConvFactor);
 
     if (status) {
         printf("%s::%s: unable to set parameters\n", driverName, __func__);
@@ -323,8 +350,8 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
      * status at the end, but that's OK */
     status = setIntegerParam(addr, function, value);
 
-    if (function == P_Dummy1) {
-    } else if (function == P_Dummy2) {
+    if (function == P_NearIQM) {
+    } else if (function == P_NearIQN) {
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
@@ -365,8 +392,8 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
      * status at the end, but that's OK */
     status = setDoubleParam(addr, function, value);
 
-    if (function == P_Dummy1) {
-    } else if (function == P_Dummy2) {
+    if (function == P_FilterCoeff0) {
+    } else if (function == P_FilterCoeff1) {
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
@@ -407,8 +434,17 @@ void ADSIS8300bpm::report(FILE *fp, int details)
 int ADSIS8300bpm::initDevice()
 {
 	int ret;
+	unsigned int ver_device;
+	unsigned int ver_major;
+	unsigned int ver_minor;
 
 	printf("%s::%s: Enter\n", driverName, __func__);
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_get_fw_version", sis8300llrfdrv_get_fw_version(mSisDevice, &ver_device, &ver_major, &ver_minor));
+	if (ret) {
+		return ret;
+	}
+	setIntegerParam(P_BPMFirmwareVersion, ver_major << 8 | ver_minor);
 
 	ret = SIS8300DRV_CALL("sis8300llrfdrv_sw_reset", sis8300llrfdrv_sw_reset(mSisDevice));
 	if (ret) {

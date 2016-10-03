@@ -14,7 +14,7 @@ record(bo, "$(P)$(R)Enable")
 {
     field(PINI, "YES")
     field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_ENABLE")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ENABLE")
     field(ZNAM, "Disabled")
     field(ONAM, "Enabled")
     field(PINI, "YES")
@@ -25,7 +25,7 @@ record(bo, "$(P)$(R)Enable")
 record(bi, "$(P)$(R)Enable_RBV")
 {
     field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_ENABLE")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ENABLE")
     field(SCAN, "I/O Intr")
     field(ZNAM, "Disabled")
     field(ONAM, "Enabled")
@@ -33,89 +33,89 @@ record(bi, "$(P)$(R)Enable_RBV")
 
 # interlock
 
-record(longout, "$(P)$(R)ThrXPosLow") {
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_XPOS_LOW")
-    field(DRVL, "-16384")
-    field(DRVH, "16383")
-    field(VAL,  "16383")
+record(ao, "$(P)$(R)ThrXPosLow") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_XPOS_LOW")
+    field(DRVL, "-1.0")
+    field(DRVH, "0.99")
+    field(VAL,  "0.0")
     field(PINI, "YES")
     info(autosaveFields, "VAL")
 }
 
-record(longin, "$(P)$(R)ThrXPosLow_RBV") {
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_XPOS_LOW")
+record(ai, "$(P)$(R)ThrXPosLow_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_XPOS_LOW")
     field(SCAN, "I/O Intr")
 }
 
-record(longout, "$(P)$(R)ThrXPosHigh") {
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_XPOS_HIGH")
-    field(DRVL, "-16384")
-    field(DRVH, "16383")
-    field(VAL,  "16383")
+record(ao, "$(P)$(R)ThrXPosHigh") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_XPOS_HIGH")
+    field(DRVL, "-1.0")
+    field(DRVH, "0.99")
+    field(VAL,  "0.0")
     field(PINI, "YES")
     info(autosaveFields, "VAL")
 }
 
-record(longin, "$(P)$(R)ThrXPosHigh_RBV") {
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_XPOS_HIGH")
+record(ai, "$(P)$(R)ThrXPosHigh_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_XPOS_HIGH")
     field(SCAN, "I/O Intr")
 }
 
-record(longout, "$(P)$(R)ThrYPosLow") {
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_YPOS_LOW")
-    field(DRVL, "-16384")
-    field(DRVH, "16383")
-    field(VAL,  "16383")
+record(ao, "$(P)$(R)ThrYPosLow") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_YPOS_LOW")
+    field(DRVL, "-1.0")
+    field(DRVH, "0.99")
+    field(VAL,  "0.0")
     field(PINI, "YES")
     info(autosaveFields, "VAL")
 }
 
-record(longin, "$(P)$(R)ThrYPosLow_RBV") {
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_YPOS_LOW")
+record(ai, "$(P)$(R)ThrYPosLow_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_YPOS_LOW")
     field(SCAN, "I/O Intr")
 }
 
-record(longout, "$(P)$(R)ThrYPosHigh") {
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_YPOS_HIGH")
-    field(DRVL, "-16384")
-    field(DRVH, "16383")
-    field(VAL,  "16383")
+record(ao, "$(P)$(R)ThrYPosHigh") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_YPOS_HIGH")
+    field(DRVL, "-1.0")
+    field(DRVH, "0.99")
+    field(VAL,  "0.0")
     field(PINI, "YES")
     info(autosaveFields, "VAL")
 }
 
-record(longin, "$(P)$(R)ThrYPosHigh_RBV") {
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_YPOS_HIGH")
+record(ai, "$(P)$(R)ThrYPosHigh_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_YPOS_HIGH")
     field(SCAN, "I/O Intr")
 }
 
-record(longout, "$(P)$(R)ThrMagnitude") {
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_MAGNITUDE")
-    field(DRVL, "0")
-    field(DRVH, "32767")
-    field(VAL,  "32767")
+record(ao, "$(P)$(R)ThrMagnitude") {
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_MAGNITUDE")
+    field(DRVL, "0.0")
+    field(DRVH, "1.0")
+    field(VAL,  "0.5")
     field(PINI, "YES")
     info(autosaveFields, "VAL")
 }
 
-record(longin, "$(P)$(R)ThrMagnitude_RBV") {
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_MAGNITUDE")
+record(ai, "$(P)$(R)ThrMagnitude_RBV") {
+    field(DTYP, "asynFloat64")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_MAGNITUDE")
     field(SCAN, "I/O Intr")
 }
 
 record(bo, "$(P)$(R)ThrSelect") {
     field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_SELECT")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_SELECT")
     field(ZNAM, "XY Threshold")
     field(ONAM, "MAG Threshold")
     field(VAL,  "0")
@@ -125,7 +125,7 @@ record(bo, "$(P)$(R)ThrSelect") {
 
 record(bi, "$(P)$(R)ThrSelect_RBV") {
     field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_THR_SELECT")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_SELECT")
     field(SCAN, "I/O Intr")
     field(ZNAM, "XY Threshold")
     field(ONAM, "MAG Threshold")
@@ -133,7 +133,7 @@ record(bi, "$(P)$(R)ThrSelect_RBV") {
 
 record(bo, "$(P)$(R)IlkControl") {
     field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_ILK_CTRL")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_CONTROL")
     field(ZNAM, "Disabled")
     field(ONAM, "Enabled")
     field(VAL,  "0")
@@ -143,28 +143,24 @@ record(bo, "$(P)$(R)IlkControl") {
 
 record(bi, "$(P)$(R)IlkControl_RBV") {
     field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_ILK_CTRL")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_CONTROL")
     field(SCAN, "I/O Intr")
     field(ZNAM, "Disabled")
     field(ONAM, "Enabled")
-    field(VAL,  "0")
-    field(PINI, "YES")
 }
 
 record(bo, "$(P)$(R)IlkClear") {
     field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_ILK_CLEAR")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_CLEAR")
     field(ZNAM, "Idle")
     field(ONAM, "Clear")
     info(autosaveFields, "VAL")
 }
 
-record(bi, "$(P)$(R)IlkStatus") {
+record(bi, "$(P)$(R)IlkStatus_RBV") {
     field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SISBPM_ILK_STATUS")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_STATUS")
     field(SCAN, "I/O Intr")
     field(ZNAM, "No interlock")
     field(ONAM, "Interlock")
-    field(VAL,  "0")
-    field(PINI, "YES")
 }

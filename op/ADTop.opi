@@ -136,7 +136,7 @@ $(pv_value)</tooltip>
     <wuid>-7341a290:157038013ee:-740f</wuid>
     <transparent>true</transparent>
     <auto_size>false</auto_size>
-    <text>SIS8300</text>
+    <text>SIS8300bpm</text>
     <scripts />
     <height>20</height>
     <border_width>1</border_width>
@@ -155,8 +155,8 @@ $(pv_value)</tooltip>
     <background_color>
       <color red="255" green="255" blue="255" />
     </background_color>
-    <width>96</width>
-    <x>46</x>
+    <width>123</width>
+    <x>19</x>
     <name>Label_6</name>
     <y>91</y>
     <foreground_color>
@@ -248,14 +248,14 @@ $(pv_value)</tooltip>
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="OPEN_DISPLAY">
-        <path>SIS8300.opi</path>
+        <path>SIS8300bpm.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <P>SIS8300:</P>
           <R></R>
         </macros>
         <replace>0</replace>
-        <description>SIS8300</description>
+        <description>SIS8300bpm</description>
       </action>
     </actions>
     <font>

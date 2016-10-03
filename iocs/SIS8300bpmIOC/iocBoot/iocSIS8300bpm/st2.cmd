@@ -97,7 +97,7 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS:10:,PORT=
 
 dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpm.template",  "P=$(PREFIX),R=,                   PORT=$(PORT),ADDR=0,TIMEOUT=1")
 
-dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmI.template", "P=$(PREFIX),R=$(BPM1),            PORT=$(PORT),ADDR=10,TIMEOUT=1,NAME=$(BPM1)")
+dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmI.template", "P=$(PREFIX),R=$(BPM1):,            PORT=$(PORT),ADDR=10,TIMEOUT=1,NAME=$(BPM1)")
 dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):$(BPMCH1):, PORT=$(PORT),ADDR=10,TIMEOUT=1,NAME=$(BPM1):$(BPMCH1)")
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):$(BPMCH2):, PORT=$(PORT),ADDR=11,TIMEOUT=1,NAME=$(BPM1):$(BPMCH2)")
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):$(BPMCH3):, PORT=$(PORT),ADDR=12,TIMEOUT=1,NAME=$(BPM1):$(BPMCH3)")
@@ -111,7 +111,7 @@ dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):$(BPMCH11):,PORT=$(PORT),ADDR=20,TIMEOUT=1,NAME=$(BPM1):$(BPMCH11)")
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):$(BPMCH12):,PORT=$(PORT),ADDR=21,TIMEOUT=1,NAME=$(BPM1):$(BPMCH12)")
 
-#dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmI.template", "P=$(PREFIX),R=$(BPM2),            PORT=$(PORT),ADDR=22,TIMEOUT=1,NAME=$(BPM2)")
+#dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmI.template", "P=$(PREFIX),R=$(BPM2):,            PORT=$(PORT),ADDR=22,TIMEOUT=1,NAME=$(BPM2)")
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM2):$(BPMCH1):, PORT=$(PORT),ADDR=22,TIMEOUT=1,NAME=$(BPM2):$(BPMCH1)")
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM2):$(BPMCH2):, PORT=$(PORT),ADDR=23,TIMEOUT=1,NAME=$(BPM2):$(BPMCH2)")
 #dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM2):$(BPMCH3):, PORT=$(PORT),ADDR=24,TIMEOUT=1,NAME=$(BPM2):$(BPMCH3)")

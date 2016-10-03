@@ -17,8 +17,39 @@
 #include <sis8300drv.h>
 #include <sis8300drvbpm.h>
 
-#define SisDummy1String               "SIS_DUMMY1"
-#define SisDummy2String               "SIS_DUMMY2"
+/* System wide parameters */
+#define BpmPulseDoneString                          "BPM_PULSE_DONE"
+#define BpmPulseCountString                         "BPM_PULSE_COUNT"
+#define BpmPulseMissedString                        "BPM_PULSE_MISSED"
+#define BpmNearIQMString                            "BPM_NEARIQ_M"
+#define BpmNearIQNString                            "BPM_NEARIQ_N"
+#define BpmNumSamplesString                         "BPM_NUM_SAMPLES"
+#define BpmNumIQSamplesString                       "BPM_NUM_IQ_SAMPLES"
+#define BpmMemMuxString                             "BPM_MEM_MUX"
+#define BpmMemMux10String                           "BPM_MEM_MUX10"
+#define BpmFilterControlString                      "BPM_FILTER_CONTROL"
+#define BpmFilterCoeff0String                       "BPM_FILTER_COEFF_0"
+#define BpmFilterCoeff1String                       "BPM_FILTER_COEFF_1"
+#define BpmFilterCoeff2String                       "BPM_FILTER_COEFF_2"
+#define BpmFilterCoeff3String                       "BPM_FILTER_COEFF_3"
+#define BpmFilterCoeff4String                       "BPM_FILTER_COEFF_4"
+#define BpmFilterCoeff5String                       "BPM_FILTER_COEFF_5"
+#define BpmFilterGainString                         "BPM_FILTER_GAIN"
+#define BpmFilterApplyString                        "BPM_FILTER_APPLY"
+#define BpmFirmwareVersionString                    "BPM_FW_VERSION"
+/* BPM instance wide parameters (BPM1 or BPM2)*/
+#define BpmIEnableString                            "BPMI_ENABLE"
+#define BpmIThrXPosLowString                        "BPMI_THR_XPOS_LOW"
+#define BpmIThrXPosHighString                       "BPMI_THR_XPOS_HIGH"
+#define BpmIThrYPosLowString                        "BPMI_THR_YPOS_LOW"
+#define BpmIThrYPosHighString                       "BPMI_THR_YPOS_HIGH"
+#define BpmIThrMagnitudeString                      "BPMI_THR_MAGNITUDE"
+#define BpmIThrSelectString                         "BPMI_THR_SELECT"
+#define BpmIIlkControlString                        "BPMI_ILK_CONTROL"
+#define BpmIIlkClearString                          "BPMI_ILK_CLEAR"
+#define BpmIIlkStatusString                         "BPMI_ILK_STATUS"
+/* BPM channel wide parameters */
+#define BpmNConvFactorString                        "BPMN_CONV_FACTOR"
 
 #define SIS8300BPM_IRQ_WAIT_TIME      0
 
@@ -37,8 +68,40 @@ public:
     virtual void report(FILE *fp, int details);
 
 protected:
-    int P_Dummy1;
-    #define FIRST_SIS8300BPM_PARAM P_Dummy1
+    /* System wide parameters */
+    int P_PulseDone;
+    #define FIRST_SIS8300BPM_PARAM P_PulseDone
+    int P_PulseCount;
+    int P_PulseMissed;
+    int P_NearIQM;
+    int P_NearIQN;
+    int P_NumSamples;
+    int P_NumIQSamples;
+    int P_MemMux;
+    int P_MemMux10;
+    int P_FilterControl;
+    int P_FilterCoeff0;
+    int P_FilterCoeff1;
+    int P_FilterCoeff2;
+    int P_FilterCoeff3;
+    int P_FilterCoeff4;
+    int P_FilterCoeff5;
+    int P_FilterGain;
+    int P_FilterApply;
+    int P_BPMFirmwareVersion;
+    /* BPM instance wide parameters (BPM1 or BPM2)*/
+    int P_IEnable;
+    int P_IThrXPosLow;
+    int P_IThrXPosHigh;
+    int P_IThrYPosLow;
+    int P_IThrYPosHigh;
+    int P_IThrMagnitude;
+    int P_IThrSelect;
+    int P_IIlkControl;
+    int P_IIlkClear;
+    int P_IIlkStatus;
+    /* BPM channel wide parameters */
+    int P_NConvFactor;
 
     int P_Dummy2;
     #define LAST_SIS8300BPM_PARAM P_Dummy2
