@@ -1,3 +1,4 @@
+#if 0
 #include <stdio.h>
 #include <stdint.h>
 
@@ -161,7 +162,6 @@ int sis8300llrfdrv_setup_adc_tap_delay(sis8300drv_usr *sisuser) {
     return status_success;
 }
 
-#if 0
 /**
  * @brief Setup memory map for custom logic
  *

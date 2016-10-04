@@ -111,9 +111,8 @@ int sis8300llrfdrv_set_sw_id(sis8300drv_usr *sisuser, unsigned sw_id);
 /* ==================================================== */
 /* ================ Initialization ==================== */
 /* ==================================================== */
-int sis8300llrfdrv_setup_dac(sis8300drv_usr *sisuser);
-int sis8300llrfdrv_setup_adc_tap_delay(sis8300drv_usr *sisuser);
-//int sis8300llrfdrv_mem_ctrl_set_custom_mem_map(sis8300drv_usr *sisuser, unsigned num_pulse_types);
+int sis8300drvbpm_setup_dac(sis8300drv_usr *sisuser);
+int sis8300drvbpm_setup_adc_tap_delay(sis8300drv_usr *sisuser);
 
 /* ==================================================== */
 /* ============ Triggers and Interlocks =============== */
