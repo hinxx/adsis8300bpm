@@ -132,3 +132,12 @@ set_requestfile_path("$(ADSIS8300BPM)/SIS8300bpmApp/Db")
 #asynSetTraceMask("$(PORT)",0,255)
 
 iocInit()
+
+
+# Set some defaults for BPM
+dbpf $(PREFIX)ClockSource 2
+dbpf $(PREFIX)ClockDiv 1
+dbpf $(PREFIX)TrigSource 2
+dbpf $(PREFIX)RTMType 2
+dbpf $(PREFIX)RTMTempGet 1
+dbpf $(PREFIX)Enable 1

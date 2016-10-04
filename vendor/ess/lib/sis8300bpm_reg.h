@@ -187,8 +187,9 @@ extern "C" {
 //#define SIS8300LLRF_GIP_PT_MASK                      0xffff0000
 //#define SIS8300LLRF_GIP_PT_SHIFT                     16
 //#define SIS8300LLRF_GIP_UPDATE_REASON_MASK               0x1e
-#define SIS8300LLRF_GIP_INIT_DONE_BIT                0x001
-#define SIS8300LLRF_GIP_UPDATE_REASON_MASK           0x002
+#define SIS8300LLRF_GIP_UPDATE_REASON_MASK           0x003
+//#define SIS8300LLRF_GIP_INIT_DONE_BIT                0x000
+//#define SIS8300LLRF_GIP_UPDATE_PARAMS_BIT            0x001
 #define SIS8300LLRF_GIP_SW_RESET_BIT                 0x040
 #define SIS8300LLRF_GIP_CLEAR_PULSE_DONE_BIT         0x080
 

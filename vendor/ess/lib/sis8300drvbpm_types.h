@@ -79,6 +79,8 @@ extern const sis8300llrfdrv_Qmn sis8300llrfdrv_Qmn_IQ_sample;
 //extern const sis8300llrfdrv_Qmn sis8300llrfdrv_Qmn_sp_mag;
 //extern const sis8300llrfdrv_Qmn sis8300llrfdrv_Qmn_ff_mag;
 extern const sis8300llrfdrv_Qmn sis8300llrfdrv_Qmn_angle;
+extern const sis8300llrfdrv_Qmn sis8300llrfdrv_Position_threshold;
+extern const sis8300llrfdrv_Qmn sis8300llrfdrv_Magnitude_threshold;
 
 /* uint limits */
 #define SIS8300LLRFDRV_CHECK_UINT_LIMITS(uint_val,int_bits)\

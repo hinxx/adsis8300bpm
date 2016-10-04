@@ -140,6 +140,41 @@ record(mbbi, "$(P)$(R)MemMux10_RBV") {
     field(THST, "ANGLES")
 }
 
+# board setup
+
+record(bo, "$(P)$(R)TrigSetup") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_TRIG_SETUP")
+    field(ZNAM, "MLVDS 1,2")
+    field(ONAM, "MLVDS 5,6")
+    field(VAL,  "0")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)TrigSetup_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_TRIG_SETUP")
+    field(ZNAM, "MLVDS 1,2")
+    field(ONAM, "MLVDS 5,6")
+    field(SCAN, "I/O Intr")
+}
+
+record(bi, "$(P)$(R)RegReadErr_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_REG_READ_ERR")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+}
+
+record(bi, "$(P)$(R)RegWriteErr_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_REG_WRITE_ERR")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+}
+
 # filters
 
 record(bo, "$(P)$(R)FilterControl") {

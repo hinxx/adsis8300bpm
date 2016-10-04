@@ -131,6 +131,8 @@ record(bi, "$(P)$(R)ThrSelect_RBV") {
     field(ONAM, "MAG Threshold")
 }
 
+# interlock
+
 record(bo, "$(P)$(R)IlkControl") {
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_CONTROL")
@@ -163,4 +165,40 @@ record(bi, "$(P)$(R)IlkStatus_RBV") {
     field(SCAN, "I/O Intr")
     field(ZNAM, "No interlock")
     field(ONAM, "Interlock")
+}
+
+record(bo, "$(P)$(R)IlkIRQ") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_IRQ")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)IlkIRQ_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_IRQ")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+}
+
+# board setup
+
+record(bi, "$(P)$(R)DivXPosErr_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_DIV_XPOS_ERR")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+}
+
+record(bi, "$(P)$(R)DivYPosErr_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_DIV_YPOS_ERR")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
 }

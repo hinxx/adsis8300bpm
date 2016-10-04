@@ -18,6 +18,7 @@
 #include <sis8300drvbpm.h>
 
 /* System wide parameters */
+#define BpmFirmwareVersionString                    "BPM_FW_VERSION"
 #define BpmPulseDoneString                          "BPM_PULSE_DONE"
 #define BpmPulseCountString                         "BPM_PULSE_COUNT"
 #define BpmPulseMissedString                        "BPM_PULSE_MISSED"
@@ -27,6 +28,9 @@
 #define BpmNumIQSamplesString                       "BPM_NUM_IQ_SAMPLES"
 #define BpmMemMuxString                             "BPM_MEM_MUX"
 #define BpmMemMux10String                           "BPM_MEM_MUX10"
+#define BpmTrigSetupString                          "BPM_TRIG_SETUP"
+#define BpmRegReadErrString                         "BPM_REG_READ_ERR"
+#define BpmRegWriteErrString                        "BPM_REG_WRITE_ERR"
 #define BpmFilterControlString                      "BPM_FILTER_CONTROL"
 #define BpmFilterCoeff0String                       "BPM_FILTER_COEFF_0"
 #define BpmFilterCoeff1String                       "BPM_FILTER_COEFF_1"
@@ -36,7 +40,6 @@
 #define BpmFilterCoeff5String                       "BPM_FILTER_COEFF_5"
 #define BpmFilterGainString                         "BPM_FILTER_GAIN"
 #define BpmFilterApplyString                        "BPM_FILTER_APPLY"
-#define BpmFirmwareVersionString                    "BPM_FW_VERSION"
 /* BPM instance wide parameters (BPM1 or BPM2)*/
 #define BpmIEnableString                            "BPMI_ENABLE"
 #define BpmIThrXPosLowString                        "BPMI_THR_XPOS_LOW"
@@ -48,6 +51,9 @@
 #define BpmIIlkControlString                        "BPMI_ILK_CONTROL"
 #define BpmIIlkClearString                          "BPMI_ILK_CLEAR"
 #define BpmIIlkStatusString                         "BPMI_ILK_STATUS"
+#define BpmIIlkIRQString                            "BPMI_ILK_IRQ"
+#define BpmIDivXPosErrString                        "BPMI_DIV_XPOS_ERR"
+#define BpmIDivYPosErrString                        "BPMI_DIV_YPOS_ERR"
 /* BPM channel wide parameters */
 #define BpmNConvFactorString                        "BPMN_CONV_FACTOR"
 
@@ -69,8 +75,9 @@ public:
 
 protected:
     /* System wide parameters */
+    int P_BPMFirmwareVersion;
+    #define FIRST_SIS8300BPM_PARAM P_BPMFirmwareVersion
     int P_PulseDone;
-    #define FIRST_SIS8300BPM_PARAM P_PulseDone
     int P_PulseCount;
     int P_PulseMissed;
     int P_NearIQM;
@@ -79,6 +86,9 @@ protected:
     int P_NumIQSamples;
     int P_MemMux;
     int P_MemMux10;
+    int P_TrigSetup;
+    int P_RegReadErr;
+    int P_RegWriteErr;
     int P_FilterControl;
     int P_FilterCoeff0;
     int P_FilterCoeff1;
@@ -88,7 +98,6 @@ protected:
     int P_FilterCoeff5;
     int P_FilterGain;
     int P_FilterApply;
-    int P_BPMFirmwareVersion;
     /* BPM instance wide parameters (BPM1 or BPM2)*/
     int P_IEnable;
     int P_IThrXPosLow;
@@ -100,6 +109,9 @@ protected:
     int P_IIlkControl;
     int P_IIlkClear;
     int P_IIlkStatus;
+    int P_IIlkIRQ;
+    int P_IDivXPosErr;
+    int P_IDivYPosErr;
     /* BPM channel wide parameters */
     int P_NConvFactor;
 
@@ -118,12 +130,24 @@ protected:
     virtual int disarmDevice();
     virtual int waitForDevice();
     virtual int deviceDone();
+    virtual int updateParameters();
+    int updateBoardSetup();
+    int updateNearIQ();
+    int updateFilter();
+    int updateThreshold(int addr);
 
 private:
 
     /* Our data */
     uint32_t mBPMChannelMask;
-    bool mDoRegisterUpdate;
+    bool mDoNearIQUpdate;
+    bool mDoBoardSetupUpdate;
+    bool mDoFilterControlUpdate;
+    bool mDoFilterCoeffUpdate;
+    bool mDoBpm1ThresholdUpdate;
+    bool mDoBpm2ThresholdUpdate;
+//    bool mDoBpm1InterlockUpdate;
+//    bool mDoBpm2InterlockUpdate;
 };
 
 

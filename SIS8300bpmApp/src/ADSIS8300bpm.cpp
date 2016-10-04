@@ -34,6 +34,8 @@
 #include <asynNDArrayDriver.h>
 #include <epicsExport.h>
 
+#include <sis8300bpm_reg.h>
+#include <sis8300drvbpm_types.h>
 #include <ADSIS8300.h>
 #include <ADSIS8300bpm.h>
 
@@ -53,13 +55,13 @@ static const char *driverName = "ADSIS8300bpm";
 	ret; \
 })
 
-/**
- * Exit handler, delete the ADSIS8300 BPM object.
+/* asyn addresses:
+ * 0 - 9         analog channels
+ * 10 - 21       BPM1 channels
+ * 22 - 33       BPM2 channels
  */
-//static void exitHandler(void *drvPvt) {
-//	ADSIS8300bpm *pPvt = (ADSIS8300bpm *) drvPvt;
-//	delete pPvt;
-//}
+#define SIS8300BPM_BPM1_ADDR		10
+#define SIS8300BPM_BPM2_ADDR		22
 
 /** Constructor for SIS8300bpm; most parameters are simply passed to ADSIS8300::ADSIS8300.
   * After calling the base class constructor this method creates a thread to compute the simulated detector data,
@@ -82,8 +84,8 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
 		int maxBuffers, size_t maxMemory, int priority, int stackSize)
 
     : ADSIS8300(portName, devicePath,
-    		SIS8300DRV_NUM_AI_CHANNELS+maxAddr,
-    		NUM_SIS8300BPM_PARAMS+numParams,
+    		maxAddr,
+    		NUM_SIS8300BPM_PARAMS/*+numParams*/,
 			numTimePoints,
 			dataType,
 			maxBuffers, maxMemory,
@@ -94,9 +96,10 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     int status = asynSuccess;
 
     printf("%s::%s: %d channels, %d parameters\n", driverName, __func__,
-    		SIS8300DRV_NUM_AI_CHANNELS+maxAddr,NUM_SIS8300BPM_PARAMS+numParams);
+    		maxAddr,NUM_SIS8300BPM_PARAMS+numParams);
 
     /* System wide parameters */
+    createParam(BpmFirmwareVersionString,         asynParamInt32, &P_BPMFirmwareVersion);
     createParam(BpmPulseDoneString,               asynParamInt32, &P_PulseDone);
     createParam(BpmPulseCountString,              asynParamInt32, &P_PulseCount);
     createParam(BpmPulseMissedString,             asynParamInt32, &P_PulseMissed);
@@ -106,6 +109,9 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     createParam(BpmNumIQSamplesString,            asynParamInt32, &P_NumIQSamples);
     createParam(BpmMemMuxString,                  asynParamInt32, &P_MemMux);
     createParam(BpmMemMux10String,                asynParamInt32, &P_MemMux10);
+    createParam(BpmRegReadErrString,              asynParamInt32, &P_RegReadErr);
+    createParam(BpmRegWriteErrString,             asynParamInt32, &P_RegWriteErr);
+    createParam(BpmTrigSetupString,               asynParamInt32, &P_TrigSetup);
     createParam(BpmFilterControlString,           asynParamInt32, &P_FilterControl);
     createParam(BpmFilterCoeff0String,          asynParamFloat64, &P_FilterCoeff0);
     createParam(BpmFilterCoeff1String,          asynParamFloat64, &P_FilterCoeff1);
@@ -115,7 +121,6 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     createParam(BpmFilterCoeff5String,          asynParamFloat64, &P_FilterCoeff5);
     createParam(BpmFilterGainString,            asynParamFloat64, &P_FilterGain);
     createParam(BpmFilterApplyString,             asynParamInt32, &P_FilterApply);
-    createParam(BpmFirmwareVersionString,         asynParamInt32, &P_BPMFirmwareVersion);
     /* BPM instance wide parameters (BPM1 or BPM2)*/
     createParam(BpmIEnableString,                 asynParamInt32, &P_IEnable);
     createParam(BpmIThrXPosLowString,           asynParamFloat64, &P_IThrXPosLow);
@@ -127,10 +132,15 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     createParam(BpmIIlkControlString,             asynParamInt32, &P_IIlkControl);
     createParam(BpmIIlkClearString,               asynParamInt32, &P_IIlkClear);
     createParam(BpmIIlkStatusString,              asynParamInt32, &P_IIlkStatus);
+    createParam(BpmIIlkIRQString,                 asynParamInt32, &P_IIlkIRQ);
+    createParam(BpmIDivXPosErrString,             asynParamInt32, &P_IDivXPosErr);
+    createParam(BpmIDivYPosErrString,             asynParamInt32, &P_IDivYPosErr);
     /* BPM channel wide parameters */
     createParam(BpmNConvFactorString,           asynParamFloat64, &P_NConvFactor);
 
-    mDoRegisterUpdate = false;
+    mDoBoardSetupUpdate = false;
+    mDoNearIQUpdate = false;
+    mDoFilterCoeffUpdate = false;
 
     if (status) {
         printf("%s::%s: unable to set parameters\n", driverName, __func__);
@@ -267,10 +277,6 @@ int ADSIS8300bpm::initDeviceDone()
 		return ret;
 	}
 
-	setIntegerParam(P_PulseDone, 0);
-	setIntegerParam(P_PulseMissed, 0);
-	callParamCallbacks(0);
-
 	return ret;
 }
 
@@ -291,6 +297,16 @@ int ADSIS8300bpm::armDevice()
 	}
 
 	ret = SIS8300DRV_CALL("sis8300llrfdrv_arm_device", sis8300llrfdrv_arm_device(mSisDevice));
+
+	setIntegerParam(P_PulseDone, 0);
+//	setIntegerParam(P_PulseMissed, 0);
+//	setIntegerParam(10, P_IDivXPosErr, 0);
+//	setIntegerParam(10, P_IDivYPosErr, 0);
+//	setIntegerParam(22, P_IDivXPosErr, 0);
+//	setIntegerParam(22, P_IDivYPosErr, 0);
+//	setIntegerParam(P_RegReadErr, 0);
+//	setIntegerParam(P_RegWriteErr, 0);
+//	callParamCallbacks(0);
 
 	return ret;
 }
@@ -329,31 +345,291 @@ int ADSIS8300bpm::deviceDone()
 	int ret;
 	int oldCount;
 	unsigned int pulseCount;
+	unsigned int sampleCount;
+	unsigned int gop;
 
 	printf("%s::%s: Enter\n", driverName, __func__);
 
+	pulseCount = 0;
 	ret = SIS8300DRV_CALL("sis8300llrfdrv_get_pulse_done_count", sis8300llrfdrv_get_pulse_done_count(mSisDevice, &pulseCount));
-	printf("%s::%s: Pulse count = %d\n", driverName, __func__, pulseCount);
-
-	if (ret) {
-		setIntegerParam(P_PulseMissed, 1);
+	if (pulseCount != 1) {
+		setIntegerParam(P_PulseMissed, pulseCount - 1);
 	} else {
+		setIntegerParam(P_PulseMissed, 0);
+	}
+	getIntegerParam(P_PulseCount, &oldCount);
+	oldCount += pulseCount;
+	setIntegerParam(P_PulseCount, oldCount);
+	setIntegerParam(P_PulseDone, 1);
 
-		ret = SIS8300DRV_CALL("sis8300llrfdrv_get_pulse_done_count", sis8300llrfdrv_get_pulse_done_count(mSisDevice, &pulseCount));
-		if (pulseCount != 1) {
-			setIntegerParam(P_PulseMissed, pulseCount - 1);
+	ret = SIS8300DRV_CALL("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300LLRF_SAMPLE_CNT_R_REG, &sampleCount));
+	setIntegerParam(P_NumSamples, sampleCount);
+	ret = SIS8300DRV_CALL("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300LLRF_IQ_SAMPLE_CNT_REG, &sampleCount));
+	setIntegerParam(P_NumIQSamples, sampleCount);
+
+	ret = SIS8300DRV_CALL("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300LLRF_GOP_REG, &gop));
+	if (gop & 0x400) {
+		setIntegerParam(10, P_IDivXPosErr, 1);
+	} else {
+		setIntegerParam(10, P_IDivXPosErr, 0);
+	}
+	if (gop & 0x200) {
+		setIntegerParam(10, P_IDivYPosErr, 1);
+	} else {
+		setIntegerParam(10, P_IDivYPosErr, 0);
+	}
+	if (gop & 0x100) {
+		setIntegerParam(22, P_IDivXPosErr, 1);
+	} else {
+		setIntegerParam(22, P_IDivXPosErr, 0);
+	}
+	if (gop & 0x80) {
+		setIntegerParam(22, P_IDivYPosErr, 1);
+	} else {
+		setIntegerParam(22, P_IDivYPosErr, 0);
+	}
+	if (gop & 0x40) {
+		setIntegerParam(P_RegReadErr, 1);
+	} else {
+		setIntegerParam(P_RegReadErr, 0);
+	}
+	if (gop & 0x20) {
+		setIntegerParam(P_RegWriteErr, 1);
+	} else {
+		setIntegerParam(P_RegWriteErr, 0);
+	}
+	if (gop & 0x10) {
+		setIntegerParam(10, P_IIlkStatus, 1);
+	}
+	if (gop & 0x8) {
+		setIntegerParam(22, P_IIlkStatus, 1);
+	}
+
+	return ret;
+}
+
+int ADSIS8300bpm::updateParameters()
+{
+	int ret = 0;
+    bool doShadowUpdate = false;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	if (mDoNearIQUpdate) {
+		ret = updateNearIQ();
+		doShadowUpdate = true;
+	}
+	if (mDoBoardSetupUpdate) {
+		ret = updateBoardSetup();
+	}
+	if (mDoFilterControlUpdate || mDoFilterCoeffUpdate) {
+		ret = updateFilter();
+	}
+	if (mDoBpm1ThresholdUpdate) {
+		ret = updateThreshold(10);
+		doShadowUpdate = true;
+	}
+	if (mDoBpm2ThresholdUpdate) {
+		ret = updateThreshold(22);
+		doShadowUpdate = true;
+	}
+	if (doShadowUpdate) {
+		ret = SIS8300DRV_CALL("sis8300llrfdrv_update", sis8300llrfdrv_update(mSisDevice, SIS8300LLRFDRV_UPDATE_REASON_NEW_PARAMS));
+	}
+
+	return ret;
+}
+
+
+int ADSIS8300bpm::updateBoardSetup()
+{
+	int ret;
+	int ilk1IRQ, ilk2IRQ;
+	int ilk1Ctrl, ilk2Ctrl;
+	int memMux, memMux10;
+	int trigSetup;
+	unsigned int boardSetup;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	getIntegerParam(P_MemMux, &memMux);
+	getIntegerParam(P_MemMux10, &memMux10);
+	getIntegerParam(P_TrigSetup, &trigSetup);
+	getIntegerParam(10, P_IIlkControl, &ilk1Ctrl);
+	getIntegerParam(22, P_IIlkControl, &ilk2Ctrl);
+	getIntegerParam(10, P_IIlkIRQ, &ilk1IRQ);
+	getIntegerParam(22, P_IIlkIRQ, &ilk2IRQ);
+
+	/* XXX: Handle the rest of the bits in board setup reg!
+	 *      Do not clobber the other bits in board setup reg! */
+	boardSetup = (ilk1IRQ & 0x1) << 21 | (ilk2IRQ & 0x1) << 20 |
+			(ilk1Ctrl & 0x1) << 19 | (ilk2Ctrl & 0x1) << 18 |
+			(memMux & 0x3) << 8 | (memMux10 & 0x3) << 6 |
+			(trigSetup & 0x3) << 0;
+	printf("%s::%s: New board setup 0x%08X\n", driverName, __func__, boardSetup);
+
+	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300LLRF_BOARD_SETUP_REG, boardSetup));
+	if (ret) {
+		return ret;
+	}
+
+	mDoBoardSetupUpdate = false;
+
+	return ret;
+}
+
+int ADSIS8300bpm::updateNearIQ()
+{
+	int ret;
+	int n, m;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	getIntegerParam(P_NearIQM, &m);
+	getIntegerParam(P_NearIQN, &n);
+
+	printf("%s::%s: New near IQ M = %d, N = %d\n", driverName, __func__, m, n);
+
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_set_near_iq", sis8300llrfdrv_set_near_iq(mSisDevice, m, n));
+	if (ret) {
+		return ret;
+	}
+
+	mDoNearIQUpdate = false;
+
+	return ret;
+}
+
+int ADSIS8300bpm::updateFilter()
+{
+	int ret;
+	epicsFloat64 coeff[6];
+	epicsFloat64 gain;
+	int filterControl;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	ret = 0;
+	if (mDoFilterCoeffUpdate) {
+		getDoubleParam(P_FilterCoeff0, &coeff[0]);
+		getDoubleParam(P_FilterCoeff1, &coeff[1]);
+		getDoubleParam(P_FilterCoeff2, &coeff[2]);
+		getDoubleParam(P_FilterCoeff3, &coeff[3]);
+		getDoubleParam(P_FilterCoeff4, &coeff[4]);
+		getDoubleParam(P_FilterCoeff5, &coeff[5]);
+		ret = SIS8300DRV_CALL("sis8300llrfdrv_set_bpm_filter_param", sis8300llrfdrv_set_bpm_filter_param(mSisDevice, coeff, 6));
+		if (ret) {
+			return ret;
 		}
-		getIntegerParam(P_PulseCount, &oldCount);
-		oldCount += pulseCount;
-		setIntegerParam(P_PulseCount, oldCount);
-		setIntegerParam(P_PulseDone, 1);
+
+		gain = 2 * coeff[0] + \
+				2 * coeff[2] + \
+				2 * coeff[3] + \
+				2 * coeff[4] + \
+				2 * coeff[5] + \
+				coeff[1];
+
+		setDoubleParam(P_FilterGain, gain);
+
+		mDoFilterCoeffUpdate = false;
 	}
 
-	if (mDoRegisterUpdate) {
-		ret = SIS8300DRV_CALL("sis8300llrfdrv_update", sis8300llrfdrv_update(mSisDevice, SIS8300LLRFDRV_UPDATE_REASON_INIT_DONE));
+	if (mDoFilterControlUpdate) {
+		getIntegerParam(P_FilterControl, &filterControl);
+
+		printf("%s::%s: New filter control %d\n", driverName, __func__, filterControl);
+
+		ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300LLRF_BPM_FILTER_CTRL_REG, filterControl));
+		if (ret) {
+			return ret;
+		}
+		mDoFilterControlUpdate = false;
 	}
 
-	callParamCallbacks(0);
+	return ret;
+}
+
+int ADSIS8300bpm::updateThreshold(int addr)
+{
+	int ret;
+	double xPosLow, xPosHigh;
+	double yPosLow, yPosHigh;
+	double magnitude;
+	int thrMagCtrlReg;
+	int thrXValReg;
+	int thrYValReg;
+	int thrControl;
+	int thrVal;
+	uint32_t conv;
+	double err;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+	if (addr == SIS8300BPM_BPM1_ADDR) {
+		thrMagCtrlReg = SIS8300LLRF_POS_MAG_CTRL1_REG;
+		thrXValReg = SIS8300LLRF_POS_PARAM_X1_REG;
+		thrYValReg = SIS8300LLRF_POS_PARAM_Y1_REG;
+	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+		thrMagCtrlReg = SIS8300LLRF_POS_MAG_CTRL2_REG;
+		thrXValReg = SIS8300LLRF_POS_PARAM_X2_REG;
+		thrYValReg = SIS8300LLRF_POS_PARAM_Y2_REG;
+	} else {
+		return -1;
+	}
+	getDoubleParam(addr, P_IThrXPosLow, &xPosLow);
+	getDoubleParam(addr, P_IThrXPosHigh, &xPosHigh);
+	getDoubleParam(addr, P_IThrYPosLow, &yPosLow);
+	getDoubleParam(addr, P_IThrYPosHigh, &yPosHigh);
+	getDoubleParam(addr, P_IThrMagnitude, &magnitude);
+	getIntegerParam(addr, P_IThrSelect, &thrControl);
+
+	/* X position threshold */
+	ret = sis8300llrfdrv_double_2_Qmn(xPosHigh, sis8300llrfdrv_Position_threshold, &conv, &err);
+	if (ret) {
+		return ret;
+	}
+	thrVal = (int)(conv & 0xFFFF) << 16;
+	ret = sis8300llrfdrv_double_2_Qmn(xPosLow, sis8300llrfdrv_Position_threshold, &conv, &err);
+	if (ret) {
+		return ret;
+	}
+	thrVal |= (int)(conv  & 0xFFFF);
+	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrXValReg, thrVal));
+	if (ret) {
+		return ret;
+	}
+	/* Y position threshold */
+	ret = sis8300llrfdrv_double_2_Qmn(yPosHigh, sis8300llrfdrv_Position_threshold, &conv, &err);
+	if (ret) {
+		return ret;
+	}
+	thrVal = (int)(conv & 0xFFFF) << 16;
+	ret = sis8300llrfdrv_double_2_Qmn(yPosLow, sis8300llrfdrv_Position_threshold, &conv, &err);
+	if (ret) {
+		return ret;
+	}
+	thrVal |= (int)(conv  & 0xFFFF);
+	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrYValReg, thrVal));
+	if (ret) {
+		return ret;
+	}
+	/* magnitude threshold and control */
+	thrVal = (int)(thrControl & 0x1) << 16;
+	ret = sis8300llrfdrv_double_2_Qmn(xPosLow, sis8300llrfdrv_Magnitude_threshold, &conv, &err);
+	if (ret) {
+		return ret;
+	}
+	thrVal |= (int)(conv  & 0xFFFF);
+	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrMagCtrlReg, thrVal));
+	if (ret) {
+		return ret;
+	}
+
+	if (addr == SIS8300BPM_BPM1_ADDR) {
+		mDoBpm1ThresholdUpdate = false;
+	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+		mDoBpm2ThresholdUpdate = false;
+	}
 
 	return ret;
 }
@@ -367,7 +643,6 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
 {
     int function = pasynUser->reason;
     int addr;
-//    int ret;
     asynStatus status = asynSuccess;
 
     getAddress(pasynUser, &addr);
@@ -378,9 +653,29 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     status = setIntegerParam(addr, function, value);
 
     if (function == P_NearIQM) {
-    	mDoRegisterUpdate = true;
+		mDoNearIQUpdate = true;
     } else if (function == P_NearIQN) {
-    	mDoRegisterUpdate = true;
+		mDoNearIQUpdate = true;
+    } else if (function == P_MemMux) {
+    	mDoBoardSetupUpdate = true;
+    } else if (function == P_MemMux10) {
+    	mDoBoardSetupUpdate = true;
+    } else if (function == P_FilterControl) {
+    	mDoFilterControlUpdate = true;
+    } else if (function == P_FilterApply) {
+    	mDoFilterCoeffUpdate = true;
+    } else if (function == P_IThrSelect) {
+    	if (addr == SIS8300BPM_BPM1_ADDR) {
+    		mDoBpm1ThresholdUpdate = true;
+    	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+    		mDoBpm2ThresholdUpdate = true;
+    	}
+    } else if (function == P_IIlkControl ||
+    		function == P_IIlkIRQ ||
+			function == P_TrigSetup) {
+    	mDoBoardSetupUpdate = true;
+    } else if (function == P_IIlkClear) {
+    	setIntegerParam(addr, P_IIlkStatus, 0);
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
@@ -411,7 +706,6 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 {
     int function = pasynUser->reason;
     int addr;
-//    int ret;
     asynStatus status = asynSuccess;
 
     getAddress(pasynUser, &addr);
@@ -421,10 +715,16 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
      * status at the end, but that's OK */
     status = setDoubleParam(addr, function, value);
 
-    if (function == P_FilterCoeff0) {
-    	mDoRegisterUpdate = true;
-    } else if (function == P_FilterCoeff1) {
-    	mDoRegisterUpdate = true;
+    if (function == P_IThrXPosLow  ||
+    	function == P_IThrXPosHigh ||
+		function == P_IThrYPosLow  ||
+		function == P_IThrYPosLow  ||
+		function == P_IThrMagnitude) {
+    	if (addr == SIS8300BPM_BPM1_ADDR) {
+    		mDoBpm1ThresholdUpdate = true;
+    	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+    		mDoBpm2ThresholdUpdate = true;
+    	}
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
@@ -454,7 +754,7 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
   */
 void ADSIS8300bpm::report(FILE *fp, int details)
 {
-    fprintf(fp, "Struck BPM       : %s\n", this->portName);
+    fprintf(fp, "Struck SIS8300 based BPM\n");
     if (details > 0) {
     }
 
@@ -504,20 +804,6 @@ int ADSIS8300bpm::destroyDevice()
 
 	return 0;
 }
-
-//int ADSIS8300bpm::enableChannel(unsigned int channel)
-//{
-//   	mBPMChannelMask |= (1 << channel);
-//    printf("%s::%s: channel mask %X\n", driverName, __func__, mBPMChannelMask);
-//	return 0;
-//}
-//
-//int ADSIS8300bpm::disableChannel(unsigned int channel)
-//{
-//   	mBPMChannelMask &= ~(1 << channel);
-//    printf("%s::%s: channel mask %X\n", driverName, __func__, mBPMChannelMask);
-//	return 0;
-//}
 
 /** Configuration command, called directly or from iocsh */
 extern "C" int SIS8300BpmConfig(const char *portName, const char *devicePath,

@@ -35,6 +35,10 @@ const sis8300llrfdrv_Qmn sis8300llrfdrv_Qmn_near_iq =
 //        { .int_bits_m = 1,  .frac_bits_n = 15, .is_signed = 1 };
 const sis8300llrfdrv_Qmn sis8300llrfdrv_Qmn_angle  =
         { .int_bits_m = 3,  .frac_bits_n = 13, .is_signed = 1 };
+const sis8300llrfdrv_Qmn sis8300llrfdrv_Position_threshold =
+        { .int_bits_m = 1,  .frac_bits_n = 15, .is_signed = 1 };
+const sis8300llrfdrv_Qmn sis8300llrfdrv_Magnitude_threshold =
+        { .int_bits_m = 1,  .frac_bits_n = 15, .is_signed = 0 };
 
 /**
  * @brief Convert double to signed or unsigned Qmn, where 
