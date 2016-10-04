@@ -21,6 +21,7 @@
  * @file sis8300llrfdrv.c
  * @brief Implementation of sis8300 digitizer LLRF FW upgraded userspace api.
  */
+#if 0
 #include <stdint.h>
 
 #include <sis8300drv.h>
@@ -234,7 +235,6 @@ int sis8300llrfdrv_get_general_status(sis8300drv_usr *sisuser,
     return status_success;
 }
 
-#if 0
 /**
  * @brief Get signal monitoring status
  *
@@ -286,7 +286,6 @@ int sis8300llrfdrv_get_sigmon_status(
 
     return status_success;
 }
-#endif
 
 /**
  * @brief Clear all latched statuses from GOP register
@@ -571,6 +570,6 @@ int sis8300llrfdrv_sw_reset(sis8300drv_usr *sisuser) {
 }
 
 
-
+#endif
 
 
