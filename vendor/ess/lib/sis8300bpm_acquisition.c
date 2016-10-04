@@ -1,3 +1,4 @@
+#if 0
 #include <stdint.h>
 
 #include <sis8300drv.h>
@@ -205,7 +206,7 @@ int sis8300llrfdrv_get_trigger_setup(
 
     return status_success;
 }
-#if 0
+
 /**
  * @brief get number of acquired samples during the passed pulse
  *

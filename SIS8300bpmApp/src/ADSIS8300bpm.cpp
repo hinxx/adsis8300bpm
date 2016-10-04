@@ -35,7 +35,6 @@
 #include <epicsExport.h>
 
 #include <sis8300bpm_reg.h>
-#include <sis8300drvbpm_types.h>
 #include <ADSIS8300.h>
 #include <ADSIS8300bpm.h>
 
@@ -286,7 +285,7 @@ int ADSIS8300bpm::armDevice()
 
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-	ret = SIS8300DRV_CALL("sis8300llrfdrv_clear_latched_statuses", sis8300llrfdrv_clear_gop(mSisDevice));
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_clear_latched_statuses", sis8300drvbpm_clear_gop(mSisDevice));
 	if (ret) {
 		return ret;
 	}
@@ -296,7 +295,7 @@ int ADSIS8300bpm::armDevice()
 		return ret;
 	}
 
-	ret = SIS8300DRV_CALL("sis8300llrfdrv_arm_device", sis8300llrfdrv_arm_device(mSisDevice));
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_arm_device", sis8300drvbpm_arm_device(mSisDevice));
 
 	setIntegerParam(P_PulseDone, 0);
 //	setIntegerParam(P_PulseMissed, 0);
@@ -335,7 +334,7 @@ int ADSIS8300bpm::waitForDevice()
 
 //	ret = SIS8300DRV_CALL("sis8300llrfdrv_wait_pulse_done_pms", sis8300llrfdrv_wait_pulse_done_pms(mSisDevice, SIS8300BPM_IRQ_WAIT_TIME));
 // XXX: Debug!
-	ret = SIS8300DRV_CALL("sis8300llrfdrv_wait_pulse_done_pms", sis8300llrfdrv_wait_pulse_done_pms(mSisDevice, 1000));
+	ret = SIS8300DRV_CALL("sis8300llrfdrv_wait_pulse_done_pms", sis8300drvbpm_wait_pulse_done_pposition(mSisDevice, 1000));
 
 	return ret;
 }
@@ -516,7 +515,7 @@ int ADSIS8300bpm::updateFilter()
 		getDoubleParam(P_FilterCoeff3, &coeff[3]);
 		getDoubleParam(P_FilterCoeff4, &coeff[4]);
 		getDoubleParam(P_FilterCoeff5, &coeff[5]);
-		ret = SIS8300DRV_CALL("sis8300llrfdrv_set_bpm_filter_param", sis8300drvbpm_set_bpm_filter_param(mSisDevice, coeff, SIS8300DRVBPM_FIR_FILTER_PARAM_NUM));
+		ret = SIS8300DRV_CALL("sis8300llrfdrv_set_bpm_filter_param", sis8300drvbpm_set_fir_filter_param(mSisDevice, coeff, SIS8300DRVBPM_FIR_FILTER_PARAM_NUM));
 		if (ret) {
 			return ret;
 		}

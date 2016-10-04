@@ -6,14 +6,14 @@ include $(TOP)/configure/CONFIG
 
 USR_INCLUDES += $(ADSIS8300)/include
 
-INC += sis8300drvbpm.h  sis8300drvbpm_types.h  sis8300bpm_reg.h
+INC += sis8300drvbpm.h sis8300bpm_reg.h
 
 LIBRARY_IOC = sis8300drvbpm
 
 LIB_SYS_LIBS += 
 LIB_LIBS += sis8300drv
 
-sis8300drvbpm_SRCS += sis8300bpm_acquisition.c sis8300drvbpm.c
+sis8300drvbpm_SRCS += sis8300drvbpm.c
         
 include $(TOP)/configure/RULES
 #----------------------------------------

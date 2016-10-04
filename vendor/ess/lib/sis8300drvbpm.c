@@ -366,7 +366,7 @@ int sis8300drvbpm_get_gop(sis8300drv_usr *sisuser, unsigned gop_bit,
  * that alter the functionality of the device. This means that this
  * function may block.
  */
-int sis8300llrfdrv_clear_gop(sis8300drv_usr *sisuser) {
+int sis8300drvbpm_clear_gop(sis8300drv_usr *sisuser) {
 
     int status;
     sis8300drv_dev *sisdevice;
@@ -479,7 +479,6 @@ int sis8300drvbpm_clear_pulse_done_count(sis8300drv_usr *sisuser) {
  * @return status_success             Set successfull
  * @return status_device_access     Can't access device registers
  * @return status_no_device         Device not opened
- * @return status_argument_invalid    Invalid choice for update_reason
  *
  * All calls to this function will result in some kind of update of
  * controller operational parameters.
@@ -493,8 +492,7 @@ int sis8300drvbpm_clear_pulse_done_count(sis8300drv_usr *sisuser) {
  */
 int sis8300drvbpm_update_parameters(sis8300drv_usr *sisuser) {
 
-    uint32_t ui32_reg_val;
-    int status;
+	int status;
     sis8300drv_dev *sisdevice;
 
     sisdevice = sisuser->device;
@@ -510,7 +508,7 @@ int sis8300drvbpm_update_parameters(sis8300drv_usr *sisuser) {
 
     status = sis8300_reg_write(sisdevice->handle,
     			SIS8300LLRF_GIP_REG,
-				SIS8300LLRFDRV_UPDATE_REASON_NEW_PARAMS);
+				SIS8300LLRF_GIP_NEW_PARAMS_BIT);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -556,7 +554,7 @@ int sis8300drvbpm_init_done(sis8300drv_usr *sisuser) {
 
     status = sis8300_reg_write(sisdevice->handle,
                 SIS8300LLRF_GIP_REG,
-                SIS8300LLRFDRV_UPDATE_REASON_INIT_DONE);
+				SIS8300LLRF_GIP_INIT_DONE_BIT);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -602,6 +600,204 @@ int sis8300drvbpm_sw_reset(sis8300drv_usr *sisuser) {
     return status_success;
 }
 
+/* ==================================================== */
+/* ================== Acquisition ===================== */
+/* ==================================================== */
+/**
+ * @brief Arm the device
+ *
+ * @param [in]  sisuser     User context struct
+ *
+ * @return status_success       Arm successful
+ * @return status_no_device     Device not opened
+ * @return status_device_access Cannot access device registers
+ *
+ * Overrides generic sis8300drv_arm_device function, to make sure that
+ * trigger type ARM is always used. The BPM controller ignores the
+ * SIS8300_SAMPLE_CONTROL_REG completely.
+ */
+int sis8300drvbpm_arm_device(sis8300drv_usr *sisuser) {
+    int status;
+    uint32_t ui32_reg_val;
+    sis8300drv_dev *sisdevice;
+
+    sisdevice = sisuser->device;
+    if (!sisdevice) {
+        return status_no_device;
+    }
+
+    /* Should not arm if there are pending operations on device. */
+    pthread_mutex_lock(&sisdevice->lock);
+
+    if (!__sync_lock_test_and_set(&sisdevice->armed, 1)) {
+        /* Reset sampling logic. */
+        status = sis8300_reg_write(sisdevice->handle,
+                    SIS8300_ACQUISITION_CONTROL_STATUS_REG,
+                    SIS8300DRV_RESET_ACQ);
+        if (status) {
+            __sync_lock_release(&sisdevice->armed);
+            pthread_mutex_unlock(&sisdevice->lock);
+            return status_device_access;
+        }
+
+        /* Wait until internal sampling logic is not busy anymore. */
+        do {
+            status = sis8300_reg_read(sisdevice->handle,
+                        SIS8300_ACQUISITION_CONTROL_STATUS_REG,
+                        &ui32_reg_val);
+            if (status) {
+                    __sync_lock_release(&sisdevice->armed);
+                pthread_mutex_unlock(&sisdevice->lock);
+                return status_device_access;
+            }
+        } while (ui32_reg_val & 0x30);
+
+        status = sis8300_reg_write(sisdevice->handle,
+                    SIS8300_ACQUISITION_CONTROL_STATUS_REG,
+                    SIS8300DRV_TRG_ARM);
+        if (status) {
+            __sync_lock_release(&sisdevice->armed);
+            pthread_mutex_unlock(&sisdevice->lock);
+            return status_device_access;
+        }
+    }
+
+    pthread_mutex_unlock(&sisdevice->lock);
+    return status_success;
+}
+
+/**
+ * @brief wait for pulse done or position software interrupt
+ *
+ * @param [in]  sisuser     User context struct
+ * @param [in]  timeout     Wait irq timeout
+ *
+ * @return status_no_device     Device not opened
+ * @return @see #sis8300drv_wait_irq
+ *
+ * The function will wait for the board to fire a user interrupt,
+ * indicating pulse done or position out of bounds. This interrupt
+ * replaces DAQ done interrupt on the generic version - it should
+ * not be counted on for BPM controller.
+ */
+int sis8300drvbpm_wait_pulse_done_pposition(sis8300drv_usr *sisuser,
+		unsigned timeout) {
+
+    int status;
+    sis8300drv_dev  *sisdevice;
+
+    sisdevice = sisuser->device;
+    if (!sisdevice) {
+        return status_no_device;
+    }
+
+    status = sis8300drv_wait_irq(sisuser, irq_type_usr, timeout);
+
+    __sync_lock_release(&sisdevice->armed);
+
+    return status;
+}
+
+/**
+ * @brief Set trigger setup for the controller
+ *
+ * @param [in]  sisuser     User context struct
+ * @param [in]  trg_setup   @see #sis8300llrfdrv_trg_setup
+ *
+ * @return status_success          Information retrieved successfully
+ * @return status_device_access    Can't access device registers
+ * @return status_no_device        Device not opened
+ *
+ * Selects the trigger setup that should be used for this instance of
+ * the LLRF controller. The LLRF specific implementation ignores generic
+ * sis8300 trigger settings. This is the function that replaces them.
+ *
+ * Calls to this function are serialized with respect to other calls
+ * that alter the functionality of the device. This means that this
+ * function may block.
+ */
+int sis8300drvbpm_set_trigger_setup(
+        sis8300drv_usr *sisuser, sis8300drvbpm_trg_setup trg_setup) {
+
+    int status;
+    sis8300drv_dev *sisdevice;
+    uint32_t ui32_reg_val;
+
+    sisdevice = sisuser->device;
+    if (!sisdevice) {
+        return status_no_device;
+    }
+    pthread_mutex_lock(&sisdevice->lock);
+
+    if (sisdevice->armed) {
+        pthread_mutex_unlock(&sisdevice->lock);
+        return status_device_armed;
+    }
+
+    status = sis8300_reg_read(sisdevice->handle,
+                SIS8300LLRF_BOARD_SETUP_REG, &ui32_reg_val);
+    if (status) {
+        pthread_mutex_unlock(&sisdevice->lock);
+        return status_device_access;
+    }
+
+    /* clear bits 0 and 1 */
+    ui32_reg_val &= ~0x3;
+    /* set the new value */
+    ui32_reg_val |= (uint32_t) trg_setup & 0x3;
+
+    status = sis8300_reg_write(sisdevice->handle,
+                SIS8300LLRF_BOARD_SETUP_REG, ui32_reg_val);
+    if (status) {
+        pthread_mutex_unlock(&sisdevice->lock);
+        return status_device_access;
+    }
+
+    pthread_mutex_unlock(&sisdevice->lock);
+    return status_success;
+}
+
+/* ==================================================== */
+/* ===================== Triggers ===================== */
+/* ==================================================== */
+/**
+ * @brief Get trigger setup for the BPM controller
+ *
+ * @param [in]  sisuser     User context struct
+ * @param [out] trg_setup   @see #sis8300drvbpm_trg_setup
+ *
+ * @return status_success          Information retrieved successfully
+ * @return status_device_access    Can't access device registers
+ * @return status_no_device        Device not opened
+ *
+ * Returns the trigger setup that is currently used by the device.
+ *
+ */
+int sis8300drvbpm_get_trigger_setup(sis8300drv_usr *sisuser,
+		sis8300drvbpm_trg_setup *trg_setup) {
+
+    int status;
+    unsigned u_reg_val;
+
+    status = sis8300drv_reg_read(sisuser,
+                SIS8300LLRF_BOARD_SETUP_REG, &u_reg_val);
+    if (status) {
+        return status_device_access;
+    }
+
+    u_reg_val &= 0x3;
+
+    if (u_reg_val != (unsigned) mlvds_456) {
+        /* values 0, 2 and 3 are mlvds_012 */
+        *trg_setup = mlvds_012;
+    }
+    else {
+        *trg_setup = mlvds_456;
+    }
+
+    return status_success;
+}
+
 /* ===================================================== */
 /* ================= Near IQ control =================== */
 /* ===================================================== */
@@ -622,8 +818,7 @@ int sis8300drvbpm_sw_reset(sis8300drv_usr *sisuser) {
  * that alter the functionality of the device. This means that this
  * function may block.
  */
-int sis8300drvbpm_set_near_iq(
-        sis8300drv_usr *sisuser, unsigned M, unsigned N) {
+int sis8300drvbpm_set_near_iq(sis8300drv_usr *sisuser, unsigned M, unsigned N) {
 
     uint32_t u32_reg_val = 0;
     int32_t i32_reg_val = 0;
@@ -719,9 +914,7 @@ int sis8300drvbpm_set_near_iq(
  * @return status_device_access Error while accessing device registers
  *
  */
-int sis8300drvbpm_get_near_iq(
-        sis8300drv_usr *sisuser,
-        unsigned *M, unsigned *N) {
+int sis8300drvbpm_get_near_iq(sis8300drv_usr *sisuser, unsigned *M, unsigned *N) {
 
     uint32_t u32_reg_val;
     int status;
@@ -773,8 +966,7 @@ static const uint32_t bpm_filter_param_map[] = {
  * alter the functionality of the device. This means that this function
  * may block.
  */
-int sis8300drvbpm_set_bpm_filter_param(
-        sis8300drv_usr *sisuser,
+int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
         double *param_vals, int param_count) {
 
 	int i;
@@ -843,8 +1035,7 @@ int sis8300drvbpm_set_bpm_filter_param(
  * alter the functionality of the device. This means that this function
  * may block.
  */
-int sis8300drvbpm_set_fir_filter_enable(
-        sis8300drv_usr *sisuser, int param_val) {
+int sis8300drvbpm_set_fir_filter_enable(sis8300drv_usr *sisuser, int param_val) {
 
     sis8300drv_dev *sisdevice;
     int status;
