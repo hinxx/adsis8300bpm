@@ -123,20 +123,18 @@ protected:
     virtual int acquireArrays();
     virtual int initDevice();
     virtual int destroyDevice();
-//    virtual int enableChannel(unsigned int channel);
-//    virtual int disableChannel(unsigned int channel);
     virtual int initDeviceDone();
     virtual int armDevice();
     virtual int disarmDevice();
     virtual int waitForDevice();
     virtual int deviceDone();
     virtual int updateParameters();
+
+private:
     int updateBoardSetup();
     int updateNearIQ();
     int updateFilter();
     int updateThreshold(int addr);
-
-private:
 
     /* Our data */
     uint32_t mBPMChannelMask;
@@ -146,8 +144,6 @@ private:
     bool mDoFilterCoeffUpdate;
     bool mDoBpm1ThresholdUpdate;
     bool mDoBpm2ThresholdUpdate;
-//    bool mDoBpm1InterlockUpdate;
-//    bool mDoBpm2InterlockUpdate;
 };
 
 

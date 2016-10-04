@@ -369,24 +369,24 @@ int ADSIS8300bpm::deviceDone()
 
 	ret = SIS8300DRV_CALL("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300LLRF_GOP_REG, &gop));
 	if (gop & 0x400) {
-		setIntegerParam(10, P_IDivXPosErr, 1);
+		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivXPosErr, 1);
 	} else {
-		setIntegerParam(10, P_IDivXPosErr, 0);
+		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivXPosErr, 0);
 	}
 	if (gop & 0x200) {
-		setIntegerParam(10, P_IDivYPosErr, 1);
+		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivYPosErr, 1);
 	} else {
-		setIntegerParam(10, P_IDivYPosErr, 0);
+		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivYPosErr, 0);
 	}
 	if (gop & 0x100) {
-		setIntegerParam(22, P_IDivXPosErr, 1);
+		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivXPosErr, 1);
 	} else {
-		setIntegerParam(22, P_IDivXPosErr, 0);
+		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivXPosErr, 0);
 	}
 	if (gop & 0x80) {
-		setIntegerParam(22, P_IDivYPosErr, 1);
+		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivYPosErr, 1);
 	} else {
-		setIntegerParam(22, P_IDivYPosErr, 0);
+		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivYPosErr, 0);
 	}
 	if (gop & 0x40) {
 		setIntegerParam(P_RegReadErr, 1);
@@ -399,10 +399,10 @@ int ADSIS8300bpm::deviceDone()
 		setIntegerParam(P_RegWriteErr, 0);
 	}
 	if (gop & 0x10) {
-		setIntegerParam(10, P_IIlkStatus, 1);
+		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IIlkStatus, 1);
 	}
 	if (gop & 0x8) {
-		setIntegerParam(22, P_IIlkStatus, 1);
+		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkStatus, 1);
 	}
 
 	return ret;
@@ -426,11 +426,11 @@ int ADSIS8300bpm::updateParameters()
 		ret = updateFilter();
 	}
 	if (mDoBpm1ThresholdUpdate) {
-		ret = updateThreshold(10);
+		ret = updateThreshold(SIS8300BPM_BPM1_ADDR);
 		doShadowUpdate = true;
 	}
 	if (mDoBpm2ThresholdUpdate) {
-		ret = updateThreshold(22);
+		ret = updateThreshold(SIS8300BPM_BPM2_ADDR);
 		doShadowUpdate = true;
 	}
 	if (doShadowUpdate) {
@@ -455,10 +455,10 @@ int ADSIS8300bpm::updateBoardSetup()
 	getIntegerParam(P_MemMux, &memMux);
 	getIntegerParam(P_MemMux10, &memMux10);
 	getIntegerParam(P_TrigSetup, &trigSetup);
-	getIntegerParam(10, P_IIlkControl, &ilk1Ctrl);
-	getIntegerParam(22, P_IIlkControl, &ilk2Ctrl);
-	getIntegerParam(10, P_IIlkIRQ, &ilk1IRQ);
-	getIntegerParam(22, P_IIlkIRQ, &ilk2IRQ);
+	getIntegerParam(SIS8300BPM_BPM1_ADDR, P_IIlkControl, &ilk1Ctrl);
+	getIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkControl, &ilk2Ctrl);
+	getIntegerParam(SIS8300BPM_BPM1_ADDR, P_IIlkIRQ, &ilk1IRQ);
+	getIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkIRQ, &ilk2IRQ);
 
 	/* XXX: Handle the rest of the bits in board setup reg!
 	 *      Do not clobber the other bits in board setup reg! */
@@ -782,12 +782,12 @@ int ADSIS8300bpm::initDevice()
 		return ret;
 	}
 
-	ret = SIS8300DRV_CALL("sis8300llrfdrv_setup_dac", sis8300llrfdrv_setup_dac(mSisDevice));
+	ret = SIS8300DRV_CALL("sis8300drvbpm_setup_dac", sis8300drvbpm_setup_dac(mSisDevice));
 	if (ret) {
 		return ret;
 	}
 
-	ret = SIS8300DRV_CALL("sis8300llrfdrv_setup_adc_tap_delay", sis8300llrfdrv_setup_adc_tap_delay(mSisDevice));
+	ret = SIS8300DRV_CALL("sis8300drvbpm_setup_adc_tap_delay", sis8300drvbpm_setup_adc_tap_delay(mSisDevice));
 	if (ret) {
 		return ret;
 	}
