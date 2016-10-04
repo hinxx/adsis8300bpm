@@ -156,7 +156,7 @@ int sis8300drvbpm_setup_adc_tap_delay(sis8300drv_usr *sisuser) {
         return status_device_armed;
     }
 
-    /* XXX: This LLRF specific!!!! */
+    /* XXX: This is probably not correct!! */
     ui32_reg_val = 0x103;
 
     status = sis8300_reg_write(sisdevice->handle,
@@ -204,7 +204,7 @@ int sis8300drvbpm_get_fw_version(
     }
 
     status = sis8300_reg_read(sisdevice->handle,
-                SIS8300LLRF_ID_R_REG, &ui32_reg_val);
+                SIS8300BPM_ID_R_REG, &ui32_reg_val);
     if (status) {
         return status_device_access;
     }
@@ -239,7 +239,7 @@ int sis8300drvbpm_get_sw_id(sis8300drv_usr *sisuser, unsigned *sw_id) {
     }
 
     status = sis8300_reg_read(sisdevice->handle,
-                SIS8300LLRF_INST_ID_REG, &ui32_reg_val);
+                SIS8300BPM_INST_ID_REG, &ui32_reg_val);
     if (status) {
         return status_device_access;
     }
@@ -276,7 +276,7 @@ int sis8300drvbpm_set_sw_id(sis8300drv_usr *sisuser, unsigned sw_id) {
     pthread_mutex_lock(&sisdevice->lock);
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_INST_ID_REG, (uint32_t) sw_id);
+                SIS8300BPM_INST_ID_REG, (uint32_t) sw_id);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -319,12 +319,12 @@ int sis8300drvbpm_get_gop(sis8300drv_usr *sisuser, unsigned gop_bit,
     }
 
     status = sis8300_reg_read(sisdevice->handle,
-                SIS8300LLRF_GEN_STATUS_REG, &ui32_reg_val);
+    		SIS8300BPM_GOP_REG, &ui32_reg_val);
     if (status) {
         return status_device_access;
     }
 
-    ui32_reg_val &= SIS8300LLRF_GEN_STATUS_MASK;
+    ui32_reg_val &= SIS8300BPM_GOP_MASK;
 
     switch (gop_bit) {
         case gop_all:
@@ -383,7 +383,7 @@ int sis8300drvbpm_clear_gop(sis8300drv_usr *sisuser) {
     }
 
 	status = sis8300_reg_write(sisdevice->handle,
-				SIS8300LLRF_GOP_REG, 0x1);
+				SIS8300BPM_GOP_REG, 0x1);
 	if (status) {
 		pthread_mutex_lock(&sisdevice->lock);
 		return status_device_access;
@@ -417,14 +417,14 @@ int sis8300drvbpm_get_pulse_done_count(
     }
 
     status = sis8300_reg_read(sisdevice->handle,
-                SIS8300LLRF_GOP_REG, &ui32_reg_val);
+                SIS8300BPM_GOP_REG, &ui32_reg_val);
     if (status) {
         return status_device_access;
     }
 
     *pulse_count = (unsigned) (
-        (ui32_reg_val & SIS8300LLRF_GOP_PULSE_DONE_CNT_MASK) >>
-                SIS8300LLRF_GOP_PULSE_DONE_CNT_SHIFT);
+        (ui32_reg_val & SIS8300BPM_GOP_PULSE_DONE_CNT_MASK) >>
+                SIS8300BPM_GOP_PULSE_DONE_CNT_SHIFT);
 
     return status_success;
 }
@@ -461,7 +461,7 @@ int sis8300drvbpm_clear_pulse_done_count(sis8300drv_usr *sisuser) {
     }
 
     status = sis8300_reg_write(sisdevice->handle,
-    			SIS8300LLRF_GIP_REG, SIS8300LLRF_GIP_CLEAR_PULSE_DONE_BIT);
+    			SIS8300BPM_GIP_REG, SIS8300BPM_GIP_CLEAR_PULSE_DONE_BIT);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -507,8 +507,8 @@ int sis8300drvbpm_update_parameters(sis8300drv_usr *sisuser) {
     }
 
     status = sis8300_reg_write(sisdevice->handle,
-    			SIS8300LLRF_GIP_REG,
-				SIS8300LLRF_GIP_NEW_PARAMS_BIT);
+    			SIS8300BPM_GIP_REG,
+				SIS8300BPM_GIP_NEW_PARAMS_BIT);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -553,8 +553,8 @@ int sis8300drvbpm_init_done(sis8300drv_usr *sisuser) {
     }
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_GIP_REG,
-				SIS8300LLRF_GIP_INIT_DONE_BIT);
+                SIS8300BPM_GIP_REG,
+				SIS8300BPM_GIP_INIT_DONE_BIT);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -589,8 +589,8 @@ int sis8300drvbpm_sw_reset(sis8300drv_usr *sisuser) {
     pthread_mutex_lock(&sisdevice->lock);;
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_GIP_REG,
-				SIS8300LLRF_GIP_SW_RESET_BIT);
+                SIS8300BPM_GIP_REG,
+				SIS8300BPM_GIP_SW_RESET_BIT);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -702,14 +702,14 @@ int sis8300drvbpm_wait_pulse_done_pposition(sis8300drv_usr *sisuser,
  * @brief Set trigger setup for the controller
  *
  * @param [in]  sisuser     User context struct
- * @param [in]  trg_setup   @see #sis8300llrfdrv_trg_setup
+ * @param [in]  trg_setup   @see #sis8300drvbpm_trg_setup
  *
  * @return status_success          Information retrieved successfully
  * @return status_device_access    Can't access device registers
  * @return status_no_device        Device not opened
  *
  * Selects the trigger setup that should be used for this instance of
- * the LLRF controller. The LLRF specific implementation ignores generic
+ * the BPM controller. The BPM specific implementation ignores generic
  * sis8300 trigger settings. This is the function that replaces them.
  *
  * Calls to this function are serialized with respect to other calls
@@ -735,7 +735,7 @@ int sis8300drvbpm_set_trigger_setup(
     }
 
     status = sis8300_reg_read(sisdevice->handle,
-                SIS8300LLRF_BOARD_SETUP_REG, &ui32_reg_val);
+                SIS8300BPM_BOARD_SETUP_REG, &ui32_reg_val);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -747,7 +747,7 @@ int sis8300drvbpm_set_trigger_setup(
     ui32_reg_val |= (uint32_t) trg_setup & 0x3;
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_BOARD_SETUP_REG, ui32_reg_val);
+                SIS8300BPM_BOARD_SETUP_REG, ui32_reg_val);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -780,7 +780,7 @@ int sis8300drvbpm_get_trigger_setup(sis8300drv_usr *sisuser,
     unsigned u_reg_val;
 
     status = sis8300drv_reg_read(sisuser,
-                SIS8300LLRF_BOARD_SETUP_REG, &u_reg_val);
+                SIS8300BPM_BOARD_SETUP_REG, &u_reg_val);
     if (status) {
         return status_device_access;
     }
@@ -853,7 +853,7 @@ int sis8300drvbpm_set_near_iq(sis8300drv_usr *sisuser, unsigned M, unsigned N) {
     u32_reg_val |= M;
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_NEAR_IQ_1_PARAM_REG, u32_reg_val);
+                SIS8300BPM_NEAR_IQ_1_PARAM_REG, u32_reg_val);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -863,7 +863,7 @@ int sis8300drvbpm_set_near_iq(sis8300drv_usr *sisuser, unsigned M, unsigned N) {
 
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_NEAR_IQ_2_PARAM_REG, i32_reg_val);
+                SIS8300BPM_NEAR_IQ_2_PARAM_REG, i32_reg_val);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -871,7 +871,7 @@ int sis8300drvbpm_set_near_iq(sis8300drv_usr *sisuser, unsigned M, unsigned N) {
 
     /* Calc Sin/cos values and write them */
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_NEAR_IQ_ADDR_REG, 0);
+                SIS8300BPM_NEAR_IQ_ADDR_REG, 0);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -883,7 +883,7 @@ int sis8300drvbpm_set_near_iq(sis8300drv_usr *sisuser, unsigned M, unsigned N) {
 
         i32_reg_val = (int32_t) ( sin(double_val * i) * conv_fact );
         status = sis8300_reg_write(sisdevice->handle,
-                    SIS8300LLRF_NEAR_IQ_DATA_REG, i32_reg_val);
+                    SIS8300BPM_NEAR_IQ_DATA_REG, i32_reg_val);
         if (status) {
             pthread_mutex_unlock(&sisdevice->lock);
             return status_device_access;
@@ -891,7 +891,7 @@ int sis8300drvbpm_set_near_iq(sis8300drv_usr *sisuser, unsigned M, unsigned N) {
 
         i32_reg_val = (int32_t) ( cos(double_val * i) * conv_fact );
         status = sis8300_reg_write(sisdevice->handle,
-                    SIS8300LLRF_NEAR_IQ_DATA_REG, i32_reg_val);
+                    SIS8300BPM_NEAR_IQ_DATA_REG, i32_reg_val);
         if (status) {
             pthread_mutex_unlock(&sisdevice->lock);
             return status_device_access;
@@ -926,7 +926,7 @@ int sis8300drvbpm_get_near_iq(sis8300drv_usr *sisuser, unsigned *M, unsigned *N)
     }
 
     status = sis8300_reg_read(sisdevice->handle,
-                SIS8300LLRF_NEAR_IQ_1_PARAM_REG, &u32_reg_val);
+                SIS8300BPM_NEAR_IQ_1_PARAM_REG, &u32_reg_val);
     if (status) {
         return status_device_access;
     }
@@ -992,7 +992,7 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
 
     /* Enable loading FIR coefficients into firmware */
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_BPM_FILTER_CTRL_REG, 0x2);
+                SIS8300BPM_FILTER_CTRL_REG, 0x2);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -1009,7 +1009,7 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
 				i, bpm_filter_param_map[i], param_vals[i], val);
 		/* address will internally auto increment */
 	    status = sis8300_reg_write(sisdevice->handle,
-	                SIS8300LLRF_BPM_FILTER_DATA_REG, val);
+	                SIS8300BPM_FILTER_DATA_REG, val);
 	    if (status) {
 	        pthread_mutex_unlock(&sisdevice->lock);
 	        return status_device_access;
@@ -1052,7 +1052,7 @@ int sis8300drvbpm_set_fir_filter_enable(sis8300drv_usr *sisuser, int param_val) 
     }
 
     status = sis8300_reg_write(sisdevice->handle,
-                SIS8300LLRF_BPM_FILTER_CTRL_REG, param_val & 0x1);
+                SIS8300BPM_FILTER_CTRL_REG, param_val & 0x1);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status_device_access;
@@ -1087,7 +1087,7 @@ int sis8300drvbpm_get_fir_filter_enable(
 
     /* get the value */
     status = sis8300_reg_read(sisdevice->handle,
-    		SIS8300LLRF_BPM_FILTER_CTRL_REG, &ui32_reg_val);
+    		SIS8300BPM_FILTER_CTRL_REG, &ui32_reg_val);
     if (status) {
         return status_device_access;
     }
@@ -1189,7 +1189,7 @@ int sis8300drvbpm_double_2_Qmn(
  * @return status_success            Conversion successfull
  * @return argument_invalid         int_bits + frac bits > 32
  *
- * this is the inverse function of @see sis8300llrfdrv_double_2_Qmn
+ * This is the inverse function of @see sis8300drvbpm_double_2_Qmn
  */
 void sis8300drvbpm_Qmn_2_double(
         uint32_t val, sis8300drvbpm_Qmn Qmn, double *converted) {
