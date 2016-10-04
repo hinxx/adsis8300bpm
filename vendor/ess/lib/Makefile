@@ -14,8 +14,7 @@ LIB_SYS_LIBS +=
 LIB_LIBS += sis8300drv
 
 sis8300drvbpm_SRCS += sis8300bpm_acquisition.c  sis8300bpm_general.c \
-sis8300drvbpm.c   sis8300bpm_parameter_setup.c \
-sis8300drvbpm_types.c
+sis8300drvbpm.c
         
 include $(TOP)/configure/RULES
 #----------------------------------------

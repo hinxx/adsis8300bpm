@@ -138,7 +138,6 @@ int sis8300llrfdrv_set_sw_id(sis8300drv_usr *sisuser, unsigned sw_id) {
     }
     pthread_mutex_lock(&sisdevice->lock);
 
-    status = SIS8300LLRFDRV_CHECK_UINT_LIMITS((uint64_t ) sw_id, 32);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
         return status;

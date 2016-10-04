@@ -349,7 +349,6 @@ int sis8300llrfdrv_read_pi_error_raw(
     pthread_mutex_unlock(&sisdevice->lock);
     return status;
 }
-#endif
 
 /**
  * @brief get current signal angle and magnitude.
@@ -411,7 +410,6 @@ int sis8300llrfdrv_get_signal_ma(
     return status_success;
 }
 
-#if 0
 /**
  * @brief Get the current magnitude for a specific signal monitor capable 
  *        AI channel (channels AI2 - AI9)

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#if 0
 /**
  * @file sis8300llrfdrv_utils.h
  * @brief Header file for the sis8300 LLRF type conversion functions
@@ -101,3 +101,4 @@ int sis8300llrfdrv_IQ_2_raw_sample(double I, double Q, unsigned *raw_sample, dou
 #endif
 
 #endif /* SIS8300LLRFDRV_TYPES_H_ */
+#endif

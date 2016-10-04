@@ -31,6 +31,8 @@ extern "C" {
 #endif
 
 #include <limits.h>
+#include <stdint.h>
+#include <math.h>
 
 #if UINT_MAX == 0xffffffff
 #else
@@ -49,8 +51,8 @@ extern "C" {
 #define SIS8300LLRF_INFO(fmt, args...) printf("sis8300llrfdrv INFO:" fmt, ## args)
 
 /* Block bytes check for write ram */
-#define SIS8300LLRF_IQ_SAMPLE_BYTES      4
-#define SIS8300LLRF_MEM_CTRL_BLOCK_BYTES 32
+//#define SIS8300LLRF_IQ_SAMPLE_BYTES      4
+//#define SIS8300LLRF_MEM_CTRL_BLOCK_BYTES 32
 
 /*
 #if SIS8300LLRF_MEM_CTRL_BLOCK_BYTES == SIS8300DRV_BLOCK_BYTES
@@ -70,14 +72,14 @@ extern "C" {
 #define SIS8300LLRFDRV_VERSION_MINOR_FIRST      0x06    /** < Minor revision - first minor revision in the supported range */
 #define SIS8300LLRFDRV_VERSION_MINOR_LAST       0x06    /** < Minor revision - last minor revison in the supported range */
 
-#define SIS8300LLRFDRV_FW_VERSION_MAJOR_MA      0x01    /** < Magnitude Angle based fw version of the controller, fw major revision */
+//#define SIS8300LLRFDRV_FW_VERSION_MAJOR_MA      0x01    /** < Magnitude Angle based fw version of the controller, fw major revision */
 //#define SIS8300LLRFDRV_FW_VERSION_MAJOR_IQ      0x02    /** < IQ based fw version of the controller, fw major revision */
 //HK for BPM
-#define SIS8300LLRFDRV_FW_VERSION_MAJOR_IQ      0x00    /** < The only BPM fw version of the controller, fw major revision */
+//#define SIS8300LLRFDRV_FW_VERSION_MAJOR_IQ      0x00    /** < The only BPM fw version of the controller, fw major revision */
 
 /* meaning of analogue input channels */
 //#define SIS8300LLRFDRV_AI_CHAN_CAV              0   /** < AI channel 0 always corresponds to cavity probe input */
-#define SIS8300LLRFDRV_AI_CHAN_REF              1   /** < AI channel 1 always corresponds to reference input */
+//#define SIS8300LLRFDRV_AI_CHAN_REF              1   /** < AI channel 1 always corresponds to reference input */
 //#define SIS8300LLRFDRV_SIGMON_CHAN_FIRST        2   /** < first channel that has signal monitoring available - AI2 */
 
 /* GOP = General Output register status bits */
@@ -101,10 +103,46 @@ extern "C" {
 //#define SIS8300LLRFDRV_STATUS_CLR_SIGMON                2       /** < Set this to clear signal monitor latched statuses, when calling #sis8300llrfdrv_clear_latched_statuses */
 
 /* ==================================================== */
+/* ====== Type Conversion and limit checks ============ */
+/* ==================================================== */
+/* Controller uses fixed point representation of fractional numbers.
+ * They can be either Signed(m,n) or Unsigned(m,n), where m = nr. of bits
+ * to represent the integer and n = nr. of bits to represent the fraction.
+ * The types are marked as Qmn in function, with sign bit inclusive.
+ *
+ * None of the types defined in BPM custom logic have more than 32 bits.
+ *
+ * All the values that are read/written to/from register are in uint32_t
+ * format, since this is the format used for register r/w in API.
+ * The conversion functions provided here thus convert between double and Qmn.
+ *
+ * None of these functions require the device context to work.
+ */
+
+/**
+ * @brief Structure for Qmn type
+ *
+ * This structure represents the fixed point format
+ * radix that the device uses
+ */
+typedef struct t_sis8300drvbpm_Qmn {
+    unsigned int_bits_m;    /** < Number of integer bits (sign bit inclusive) */
+    unsigned frac_bits_n;   /** < Number of fraction bits */
+    unsigned is_signed;     /** < Number is signed or unsigned */
+} sis8300drvbpm_Qmn;
+
+/* Type definitions */
+extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_near_iq;
+extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_pos_threshold;
+extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_mag_threshold;
+
+int sis8300drvbpm_double_2_Qmn(double val, sis8300drvbpm_Qmn Qmn, uint32_t *converted, double *err);
+void sis8300drvbpm_Qmn_2_double(uint32_t val, sis8300drvbpm_Qmn Qmn, double *converted);
+
+/* ==================================================== */
 /* ================ Basic information ================= */
 /* ==================================================== */
 int sis8300llrfdrv_get_fw_version(sis8300drv_usr *sisuser, unsigned *ver_device, unsigned *ver_major, unsigned *ver_minor);
-
 int sis8300llrfdrv_get_sw_id(sis8300drv_usr *sisuser, unsigned *sw_id);
 int sis8300llrfdrv_set_sw_id(sis8300drv_usr *sisuser, unsigned sw_id);
 

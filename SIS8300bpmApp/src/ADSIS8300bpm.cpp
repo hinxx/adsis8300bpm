@@ -584,12 +584,12 @@ int ADSIS8300bpm::updateThreshold(int addr)
 	getIntegerParam(addr, P_IThrSelect, &thrControl);
 
 	/* X position threshold */
-	ret = sis8300llrfdrv_double_2_Qmn(xPosHigh, sis8300llrfdrv_Position_threshold, &conv, &err);
+	ret = sis8300drvbpm_double_2_Qmn(xPosHigh, sis8300drvbpm_Qmn_pos_threshold, &conv, &err);
 	if (ret) {
 		return ret;
 	}
 	thrVal = (int)(conv & 0xFFFF) << 16;
-	ret = sis8300llrfdrv_double_2_Qmn(xPosLow, sis8300llrfdrv_Position_threshold, &conv, &err);
+	ret = sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_pos_threshold, &conv, &err);
 	if (ret) {
 		return ret;
 	}
@@ -599,12 +599,12 @@ int ADSIS8300bpm::updateThreshold(int addr)
 		return ret;
 	}
 	/* Y position threshold */
-	ret = sis8300llrfdrv_double_2_Qmn(yPosHigh, sis8300llrfdrv_Position_threshold, &conv, &err);
+	ret = sis8300drvbpm_double_2_Qmn(yPosHigh, sis8300drvbpm_Qmn_pos_threshold, &conv, &err);
 	if (ret) {
 		return ret;
 	}
 	thrVal = (int)(conv & 0xFFFF) << 16;
-	ret = sis8300llrfdrv_double_2_Qmn(yPosLow, sis8300llrfdrv_Position_threshold, &conv, &err);
+	ret = sis8300drvbpm_double_2_Qmn(yPosLow, sis8300drvbpm_Qmn_pos_threshold, &conv, &err);
 	if (ret) {
 		return ret;
 	}
@@ -615,7 +615,7 @@ int ADSIS8300bpm::updateThreshold(int addr)
 	}
 	/* magnitude threshold and control */
 	thrVal = (int)(thrControl & 0x1) << 16;
-	ret = sis8300llrfdrv_double_2_Qmn(xPosLow, sis8300llrfdrv_Magnitude_threshold, &conv, &err);
+	ret = sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_mag_threshold, &conv, &err);
 	if (ret) {
 		return ret;
 	}

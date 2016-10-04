@@ -1,3 +1,4 @@
+#if 0
 #include <stdio.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,7 +11,6 @@
 #include "sis8300bpm_reg.h"
 #include "sis8300drvbpm_types.h"
 
-#if 0
 static inline int _sis8300llrfdrv_set_param(
                     sis8300drv_usr *sisuser, 
                     int is_int_param, 
@@ -756,7 +756,6 @@ int sis8300llrfdrv_get_iq_param(
             iq_param_Qmn[param],
             param_val);
 }
-#endif
 
 /** @brief Setup near IQ parameters and tables, where:
  *         table[n] = sin(2 PI M / N) and cos(2 PI M / N)
@@ -1037,7 +1036,6 @@ int sis8300llrfdrv_get_bpm_filter_enable(
     return status_success;
 }
 
-#if 0
 /* ==================================================== */
 /* =================== Signal Monitoring ============== */
 /* ==================================================== */
