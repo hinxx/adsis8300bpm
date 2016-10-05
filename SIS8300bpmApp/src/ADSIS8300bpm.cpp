@@ -785,11 +785,6 @@ int ADSIS8300bpm::initDevice()
 		return ret;
 	}
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_setup_adc_tap_delay", sis8300drvbpm_setup_adc_tap_delay(mSisDevice));
-	if (ret) {
-		return ret;
-	}
-
 	return ret;
 }
 
