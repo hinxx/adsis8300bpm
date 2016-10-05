@@ -1,6 +1,7 @@
 /**
  * Struck 8300 BPM Linux userspace library.
  * Copyright (C) 2016 ESS ERIC
+ * Copyright (C) 2014-2015  Cosylab
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
