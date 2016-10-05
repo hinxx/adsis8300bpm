@@ -37,10 +37,10 @@ extern "C" {
 #error UNSIGNED DATA TYPE IS NOT 4 BYTES UINT_MAX
 #endif
 
-#define SIS8300DRVBPM_HW_ID                    0xCA5E  /** < Unique BPM controller ID */
-#define SIS8300DRVBPM_VERSION_MAJOR            0x00    /** < Library supports this Major FW revision */
-#define SIS8300DRVBPM_VERSION_MINOR_FIRST      0x06    /** < Minor revision - first minor revision in the supported range */
-#define SIS8300DRVBPM_VERSION_MINOR_LAST       0x06    /** < Minor revision - last minor revison in the supported range */
+#define SIS8300BPM_HW_ID                    0xCA5E  /** < Unique BPM controller ID */
+#define SIS8300BPM_VERSION_MAJOR            0x00    /** < Library supports this Major FW revision */
+#define SIS8300BPM_VERSION_MINOR_FIRST      0x06    /** < Minor revision - first minor revision in the supported range */
+#define SIS8300BPM_VERSION_MINOR_LAST       0x06    /** < Minor revision - last minor revison in the supported range */
 
 /* ==================================================== */
 /* ================ Basic information ================= */
@@ -108,7 +108,7 @@ int sis8300drvbpm_get_near_iq(sis8300drv_usr *sisuser, unsigned *M, unsigned *N)
 /* ==================================================== */
 /* ================ FIR filter setup ================== */
 /* ==================================================== */
-#define SIS8300DRVBPM_FIR_FILTER_PARAM_NUM         6
+#define SIS8300BPM_FIR_FILTER_PARAM_NUM         6
 int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser, double *param_vals, int param_count);
 int sis8300drvbpm_set_fir_filter_enable(sis8300drv_usr *sisuser, int param_val);
 int sis8300drvbpm_get_fir_filter_enable(sis8300drv_usr *sisuser, int *param_val);

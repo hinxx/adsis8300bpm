@@ -182,7 +182,7 @@ int sis8300drvbpm_setup_adc_tap_delay(sis8300drv_usr *sisuser) {
  *
  * @param [in]  sisuser      User context struct
  * @param [out] ver_device   Will hold device id on success, should be
- *                           #SIS8300DRVBPM_HW_ID for a BPM controller
+ *                           #SIS8300BPM_HW_ID for a BPM controller
  * @param [out] ver_major    Will hold major fw version on success
  * @param [out] ver_minor    Will hold minor fw version on success
  *
@@ -976,7 +976,7 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
     sis8300drv_dev *sisdevice;
     int status = status_success;
 
-    if (param_count != SIS8300DRVBPM_FIR_FILTER_PARAM_NUM) {
+    if (param_count != SIS8300BPM_FIR_FILTER_PARAM_NUM) {
         return status_argument_range;
     }
 

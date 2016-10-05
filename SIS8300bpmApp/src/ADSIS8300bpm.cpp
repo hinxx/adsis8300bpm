@@ -41,19 +41,6 @@
 
 static const char *driverName = "ADSIS8300bpm";
 
-#define SIS8300DRV_CALL(s, x) ({\
-	char message[256]; \
-	int ret = x; \
-	if (ret) {\
-        sprintf(message, "%s::%s: %s() error: %s (%d)", \
-        		driverName,__func__, s, sis8300drv_strerror(ret), ret); \
-        asynPrint(pasynUserSelf, ASYN_TRACE_ERROR, \
-      	    	  "%s:%s: %s\n", driverName, __func__, message); \
-      	setStringParam(P_Message, message); \
-	} \
-	ret; \
-})
-
 /* asyn addresses:
  * 0 - 9         analog channels
  * 10 - 21       BPM1 channels
@@ -501,7 +488,7 @@ int ADSIS8300bpm::updateNearIQ()
 int ADSIS8300bpm::updateFilter()
 {
 	int ret;
-	epicsFloat64 coeff[SIS8300DRVBPM_FIR_FILTER_PARAM_NUM];
+	epicsFloat64 coeff[SIS8300BPM_FIR_FILTER_PARAM_NUM];
 	epicsFloat64 gain;
 	int filterControl;
 
@@ -515,7 +502,7 @@ int ADSIS8300bpm::updateFilter()
 		getDoubleParam(P_FilterCoeff3, &coeff[3]);
 		getDoubleParam(P_FilterCoeff4, &coeff[4]);
 		getDoubleParam(P_FilterCoeff5, &coeff[5]);
-		ret = SIS8300DRV_CALL("sis8300drvbpm_set_fir_filter_param", sis8300drvbpm_set_fir_filter_param(mSisDevice, coeff, SIS8300DRVBPM_FIR_FILTER_PARAM_NUM));
+		ret = SIS8300DRV_CALL("sis8300drvbpm_set_fir_filter_param", sis8300drvbpm_set_fir_filter_param(mSisDevice, coeff, SIS8300BPM_FIR_FILTER_PARAM_NUM));
 		if (ret) {
 			return ret;
 		}
@@ -766,6 +753,7 @@ int ADSIS8300bpm::initDevice()
 	unsigned int ver_device;
 	unsigned int ver_major;
 	unsigned int ver_minor;
+	char message[128];
 
 	printf("%s::%s: Enter\n", driverName, __func__);
 
@@ -774,6 +762,17 @@ int ADSIS8300bpm::initDevice()
 		return ret;
 	}
 	setIntegerParam(P_BPMFirmwareVersion, ver_major << 8 | ver_minor);
+
+    if (ver_major != SIS8300BPM_VERSION_MAJOR ||
+        ver_minor < SIS8300BPM_VERSION_MINOR_FIRST ||
+        ver_minor > SIS8300BPM_VERSION_MINOR_LAST) {
+        snprintf(message, 128, "ERR: firmware %dv%02d incompatible with software %dv%02d - %dv%02d",
+        		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
+				SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
+    	ADSIS8300_LOG(message);
+         destroyDevice();
+        return -1;
+    }
 
 	ret = SIS8300DRV_CALL("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 	if (ret) {
@@ -784,6 +783,11 @@ int ADSIS8300bpm::initDevice()
 	if (ret) {
 		return ret;
 	}
+
+    snprintf(message, 128, "Firmware %dv%02d compatible with software %dv%02d - %dv%02d",
+    		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
+			SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
+	ADSIS8300_LOG(message);
 
 	return ret;
 }
