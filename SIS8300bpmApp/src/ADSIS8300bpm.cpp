@@ -127,6 +127,9 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     mDoBoardSetupUpdate = false;
     mDoNearIQUpdate = false;
     mDoFilterCoeffUpdate = false;
+    mDoFilterControlUpdate = false;
+    mDoBpm1ThresholdUpdate = false;
+    mDoBpm2ThresholdUpdate = false;
 
     if (status) {
         printf("%s::%s: unable to set parameters\n", driverName, __func__);
@@ -285,14 +288,6 @@ int ADSIS8300bpm::armDevice()
 	ret = SIS8300DRV_CALL("sis8300drvbpm_arm_device", sis8300drvbpm_arm_device(mSisDevice));
 
 	setIntegerParam(P_PulseDone, 0);
-//	setIntegerParam(P_PulseMissed, 0);
-//	setIntegerParam(10, P_IDivXPosErr, 0);
-//	setIntegerParam(10, P_IDivYPosErr, 0);
-//	setIntegerParam(22, P_IDivXPosErr, 0);
-//	setIntegerParam(22, P_IDivYPosErr, 0);
-//	setIntegerParam(P_RegReadErr, 0);
-//	setIntegerParam(P_RegWriteErr, 0);
-//	callParamCallbacks(0);
 
 	return ret;
 }
