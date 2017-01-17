@@ -128,9 +128,31 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS:8:, PORT=
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS:9:, PORT=TS1,ADDR=8,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AI9)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS:10:,PORT=TS1,ADDR=9,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AI10)")
 
-dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpm.template",  "P=$(PREFIX),R=,                   PORT=$(PORT),ADDR=0,TIMEOUT=1")
+# Timing MTCA EVR 300
+# As per EVR MTCA 300 engineering manual ch 5.3.5
+epicsEnvSet("SYS"               "EVR")
+epicsEnvSet("DEVICE"            "MTCA")
+epicsEnvSet("EVR_PCIDOMAIN"     "0x0")
+epicsEnvSet("EVR_PCIBUS"        "0x6")
+epicsEnvSet("EVR_PCIDEVICE"     "0x0")
+epicsEnvSet("EVR_PCIFUNCTION"   "0x0")
 
+#require mrfioc2,2.7.13
+mrmEvrSetupPCI($(DEVICE), $(EVR_PCIDOMAIN), $(EVR_PCIBUS), $(EVR_PCIDEVICE), $(EVR_PCIFUNCTION))
+dbLoadRecords("$(MRFIOC2)/db/evr-mtca-300.db", "DEVICE=$(DEVICE), SYS=$(SYS), Link-Clk-SP=88.0525")
+# PULSE_START_EVENT = 2
+dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=2, CODE=14")
+# MLVDS 1 (RearUniv33)
+dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=1, F=Trig, ID=0, EVT=2")
+# MLVDS 5 (RearUniv37)
+#dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=5, F=Trig, ID=1, EVT=2")
 
+# PULSE_STOP_EVENT = 3
+dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=3, CODE=14")
+# MLVDS 2 (RearUniv34)
+dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=2, F=Trig, ID=0, EVT=3")
+# MLVDS 6 (RearUniv38)
+#dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=6, F=Trig, ID=1, EVT=3")
 
 set_requestfile_path("$(ADSIS8300)/SIS8300App/Db")
 set_requestfile_path("$(ADSIS8300BPM)/SIS8300bpmApp/Db")
@@ -148,3 +170,29 @@ dbpf $(PREFIX)TrigSource 2
 dbpf $(PREFIX)RTMType 2
 dbpf $(PREFIX)RTMTempGet 1
 dbpf $(PREFIX)Enable 1
+
+# Disable Rear Universal Output 33
+dbpf $(SYS)-$(DEVICE):RearUniv33-Ena-SP "Disabled"
+# Map Rear Universal Output 33 to pulser 1
+dbpf $(SYS)-$(DEVICE):RearUniv33-Src-SP 1
+# Map pulser 1 to event 14
+dbpf $(SYS)-$(DEVICE):Pul1-Evt-Trig0-SP 14
+# Set pulser 1 width to 1 us
+dbpf $(SYS)-$(DEVICE):Pul1-Width-SP 100
+# event 2 received the SIS8300 will start the data acquisition
+dbpf $(SYS)-$(DEVICE):RearUniv33-Ena-SP "Enabled"
+
+
+# Disable Rear Universal Output 34
+dbpf $(SYS)-$(DEVICE):RearUniv34-Ena-SP "Disabled"
+# Map Rear Universal Output 34 to pulser 2
+dbpf $(SYS)-$(DEVICE):RearUniv34-Src-SP 2
+# Map pulser 2 to event 14
+dbpf $(SYS)-$(DEVICE):Pul2-Evt-Trig0-SP 14
+# Set pulser 2 width to 1 us
+dbpf $(SYS)-$(DEVICE):Pul2-Width-SP 100
+# Set the delay time of the pulser 2 to 2.86 ms
+dbpf $(SYS)-$(DEVICE):Pul2-Delay-SP 2860
+# event 3 received the SIS8300 will stop the data acquisition
+dbpf $(SYS)-$(DEVICE):RearUniv34-Ena-SP "Enabled"
+
