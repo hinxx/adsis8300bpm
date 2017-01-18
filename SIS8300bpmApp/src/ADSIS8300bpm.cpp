@@ -167,7 +167,6 @@ template <typename epicsType> int ADSIS8300bpm::acquireArraysT()
     int ch;
     int i;
     double convFactor, convOffset;
-    int ret;
     
     getIntegerParam(NDDataType, (int *)&dataType);
     getIntegerParam(P_NumTimePoints, &numTimePoints);
@@ -198,17 +197,15 @@ template <typename epicsType> int ADSIS8300bpm::acquireArraysT()
             continue;
         }
 
-		ret = SIS8300DRV_CALL("sis8300drv_read_ai", sis8300drv_read_ai(mSisDevice, ch, pRawData));
-		if (ret) {
-			return ret;
-		}
+		SIS8300DRV_CALL_RET("sis8300drv_read_ai", sis8300drv_read_ai(mSisDevice, ch, pRawData));
+
 		getDoubleParam(ch, P_ConvFactor, &convFactor);
 		getDoubleParam(ch, P_ConvOffset, &convOffset);
 		this->unlock();
 		printf("%s::%s: CH %d [%d] CF %f, CO %f:\n", driverName, __func__,
 				ch, numTimePoints, convFactor, convOffset);
 		for (i = 0; i < numTimePoints; i++) {
-//			printf("%d ", *(pRawData + i));
+			printf("%d ", *(pRawData + i));
 			pData[SIS8300DRV_NUM_AI_CHANNELS*i + ch] = (epicsType)((double)*(pRawData + i) * convFactor + convOffset);
 		}
 		printf("\n");
@@ -257,73 +254,48 @@ int ADSIS8300bpm::acquireArrays()
 
 int ADSIS8300bpm::initDeviceDone()
 {
-	int ret;
-
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_init_done", sis8300drvbpm_init_done(mSisDevice));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_init_done", sis8300drvbpm_init_done(mSisDevice));
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::armDevice()
 {
-	int ret;
-
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_clear_gop", sis8300drvbpm_clear_gop(mSisDevice));
-	if (ret) {
-		return ret;
-	}
-
-	ret = SIS8300DRV_CALL("sis8300drvbpm_clear_pulse_done_count", sis8300drvbpm_clear_pulse_done_count(mSisDevice));
-	if (ret) {
-		return ret;
-	}
-
-	ret = SIS8300DRV_CALL("sis8300drvbpm_arm_device", sis8300drvbpm_arm_device(mSisDevice));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_gop", sis8300drvbpm_clear_gop(mSisDevice));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_pulse_done_count", sis8300drvbpm_clear_pulse_done_count(mSisDevice));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_arm_device", sis8300drvbpm_arm_device(mSisDevice));
 
 	setIntegerParam(P_PulseDone, 0);
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::disarmDevice()
 {
-	int ret;
-
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_VOID("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 
-	ret = ADSIS8300::disarmDevice();
-
-	return ret;
+	return ADSIS8300::disarmDevice();
 }
 
 int ADSIS8300bpm::waitForDevice()
 {
-	int ret;
-
 	printf("%s::%s: Enter\n", driverName, __func__);
 
 //	ret = SIS8300DRV_CALL("sis8300drvbpm_wait_pulse_done_pposition", sis8300drvbpm_wait_pulse_done_pposition(mSisDevice, SIS8300BPM_IRQ_WAIT_TIME));
 // XXX: Debug!
-	ret = SIS8300DRV_CALL("sis8300drvbpm_wait_pulse_done_pposition", sis8300drvbpm_wait_pulse_done_pposition(mSisDevice, 1000));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_position(mSisDevice, 1000));
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::deviceDone()
 {
-	int ret;
 	int oldCount;
 	unsigned int pulseCount;
 	unsigned int sampleCount;
@@ -332,7 +304,7 @@ int ADSIS8300bpm::deviceDone()
 	printf("%s::%s: Enter\n", driverName, __func__);
 
 	pulseCount = 0;
-	ret = SIS8300DRV_CALL("sis8300drvbpm_get_pulse_done_count", sis8300drvbpm_get_pulse_done_count(mSisDevice, &pulseCount));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_get_pulse_done_count", sis8300drvbpm_get_pulse_done_count(mSisDevice, &pulseCount));
 	if (pulseCount != 1) {
 		setIntegerParam(P_PulseMissed, pulseCount - 1);
 	} else {
@@ -343,12 +315,12 @@ int ADSIS8300bpm::deviceDone()
 	setIntegerParam(P_PulseCount, oldCount);
 	setIntegerParam(P_PulseDone, 1);
 
-	ret = SIS8300DRV_CALL("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
+	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
 	setIntegerParam(P_NumSamples, sampleCount);
-	ret = SIS8300DRV_CALL("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
+	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
 	setIntegerParam(P_NumIQSamples, sampleCount);
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_get_gop", sis8300drvbpm_get_gop(mSisDevice, gop_all, &gop));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_get_gop", sis8300drvbpm_get_gop(mSisDevice, gop_all, &gop));
 	if (gop & (1 << gop_X1_pos_div_error)) {
 		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivXPosErr, 1);
 	} else {
@@ -386,7 +358,7 @@ int ADSIS8300bpm::deviceDone()
 		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkStatus, 1);
 	}
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::updateParameters()
@@ -415,7 +387,7 @@ int ADSIS8300bpm::updateParameters()
 		doShadowUpdate = true;
 	}
 	if (doShadowUpdate) {
-		ret = SIS8300DRV_CALL("sis8300drvbpm_update_parameters", sis8300drvbpm_update_parameters(mSisDevice));
+		SIS8300DRV_CALL_RET("sis8300drvbpm_update_parameters", sis8300drvbpm_update_parameters(mSisDevice));
 	}
 
 	return ret;
@@ -423,7 +395,6 @@ int ADSIS8300bpm::updateParameters()
 
 int ADSIS8300bpm::updateBoardSetup()
 {
-	int ret;
 	int ilk1IRQ, ilk2IRQ;
 	int ilk1Ctrl, ilk2Ctrl;
 	int memMux, memMux10;
@@ -448,19 +419,14 @@ int ADSIS8300bpm::updateBoardSetup()
 			(trigSetup & 0x3) << 0;
 	printf("%s::%s: New board setup 0x%08X\n", driverName, __func__, boardSetup);
 
-	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300BPM_BOARD_SETUP_REG, boardSetup));
-	if (ret) {
-		return ret;
-	}
-
+	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300BPM_BOARD_SETUP_REG, boardSetup));
 	mDoBoardSetupUpdate = false;
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::updateNearIQ()
 {
-	int ret;
 	int n, m;
 
 	printf("%s::%s: Enter\n", driverName, __func__);
@@ -470,26 +436,21 @@ int ADSIS8300bpm::updateNearIQ()
 
 	printf("%s::%s: New near IQ M = %d, N = %d\n", driverName, __func__, m, n);
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_set_near_iq", sis8300drvbpm_set_near_iq(mSisDevice, m, n));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_set_near_iq", sis8300drvbpm_set_near_iq(mSisDevice, m, n));
 
 	mDoNearIQUpdate = false;
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::updateFilter()
 {
-	int ret;
 	epicsFloat64 coeff[SIS8300BPM_FIR_FILTER_PARAM_NUM];
 	epicsFloat64 gain;
 	int filterControl;
 
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-	ret = 0;
 	if (mDoFilterCoeffUpdate) {
 		getDoubleParam(P_FilterCoeff0, &coeff[0]);
 		getDoubleParam(P_FilterCoeff1, &coeff[1]);
@@ -497,10 +458,7 @@ int ADSIS8300bpm::updateFilter()
 		getDoubleParam(P_FilterCoeff3, &coeff[3]);
 		getDoubleParam(P_FilterCoeff4, &coeff[4]);
 		getDoubleParam(P_FilterCoeff5, &coeff[5]);
-		ret = SIS8300DRV_CALL("sis8300drvbpm_set_fir_filter_param", sis8300drvbpm_set_fir_filter_param(mSisDevice, coeff, SIS8300BPM_FIR_FILTER_PARAM_NUM));
-		if (ret) {
-			return ret;
-		}
+		SIS8300DRV_CALL_RET("sis8300drvbpm_set_fir_filter_param", sis8300drvbpm_set_fir_filter_param(mSisDevice, coeff, SIS8300BPM_FIR_FILTER_PARAM_NUM));
 
 		gain = 2 * coeff[0] + \
 				2 * coeff[2] + \
@@ -508,9 +466,7 @@ int ADSIS8300bpm::updateFilter()
 				2 * coeff[4] + \
 				2 * coeff[5] + \
 				coeff[1];
-
 		setDoubleParam(P_FilterGain, gain);
-
 		mDoFilterCoeffUpdate = false;
 	}
 
@@ -519,19 +475,15 @@ int ADSIS8300bpm::updateFilter()
 
 		printf("%s::%s: New filter control %d\n", driverName, __func__, filterControl);
 
-		ret = SIS8300DRV_CALL("sis8300drvbpm_set_fir_filter_enable", sis8300drvbpm_set_fir_filter_enable(mSisDevice, filterControl));
-		if (ret) {
-			return ret;
-		}
+		SIS8300DRV_CALL_RET("sis8300drvbpm_set_fir_filter_enable", sis8300drvbpm_set_fir_filter_enable(mSisDevice, filterControl));
 		mDoFilterControlUpdate = false;
 	}
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::updateThreshold(int addr)
 {
-	int ret;
 	double xPosLow, xPosHigh;
 	double yPosLow, yPosHigh;
 	double magnitude;
@@ -564,46 +516,22 @@ int ADSIS8300bpm::updateThreshold(int addr)
 	getIntegerParam(addr, P_IThrSelect, &thrControl);
 
 	/* X position threshold */
-	ret = sis8300drvbpm_double_2_Qmn(xPosHigh, sis8300drvbpm_Qmn_pos_thr, &conv, &err);
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosHigh, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
 	thrVal = (int)(conv & 0xFFFF) << 16;
-	ret = sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_pos_thr, &conv, &err);
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
-	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrXValReg, thrVal));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrXValReg, thrVal));
 	/* Y position threshold */
-	ret = sis8300drvbpm_double_2_Qmn(yPosHigh, sis8300drvbpm_Qmn_pos_thr, &conv, &err);
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(yPosHigh, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
 	thrVal = (int)(conv & 0xFFFF) << 16;
-	ret = sis8300drvbpm_double_2_Qmn(yPosLow, sis8300drvbpm_Qmn_pos_thr, &conv, &err);
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn",sis8300drvbpm_double_2_Qmn(yPosLow, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
-	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrYValReg, thrVal));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrYValReg, thrVal));
 	/* magnitude threshold and control */
 	thrVal = (int)(thrControl & 0x1) << 16;
-	ret = sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_mag_thr, &conv, &err);
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_mag_thr, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
-	ret = SIS8300DRV_CALL("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrMagCtrlReg, thrVal));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrMagCtrlReg, thrVal));
 
 	if (addr == SIS8300BPM_BPM1_ADDR) {
 		mDoBpm1ThresholdUpdate = false;
@@ -611,7 +539,7 @@ int ADSIS8300bpm::updateThreshold(int addr)
 		mDoBpm2ThresholdUpdate = false;
 	}
 
-	return ret;
+	return 0;
 }
 
 /** Called when asyn clients call pasynInt32->write().
@@ -744,7 +672,6 @@ void ADSIS8300bpm::report(FILE *fp, int details)
 
 int ADSIS8300bpm::initDevice()
 {
-	int ret;
 	unsigned int ver_device;
 	unsigned int ver_major;
 	unsigned int ver_minor;
@@ -752,10 +679,7 @@ int ADSIS8300bpm::initDevice()
 
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_get_fw_version", sis8300drvbpm_get_fw_version(mSisDevice, &ver_device, &ver_major, &ver_minor));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_get_fw_version", sis8300drvbpm_get_fw_version(mSisDevice, &ver_device, &ver_major, &ver_minor));
 	setIntegerParam(P_BPMFirmwareVersion, ver_major << 8 | ver_minor);
 
     if (ver_major != SIS8300BPM_VERSION_MAJOR ||
@@ -769,22 +693,15 @@ int ADSIS8300bpm::initDevice()
         return -1;
     }
 
-	ret = SIS8300DRV_CALL("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
-	if (ret) {
-		return ret;
-	}
-
-	ret = SIS8300DRV_CALL("sis8300drvbpm_setup_dac", sis8300drvbpm_setup_dac(mSisDevice));
-	if (ret) {
-		return ret;
-	}
+	SIS8300DRV_CALL_RET("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_setup_dac", sis8300drvbpm_setup_dac(mSisDevice));
 
     snprintf(message, 128, "Firmware %dv%02d compatible with software %dv%02d - %dv%02d",
     		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
 			SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
 	ADSIS8300_LOG(message);
 
-	return ret;
+	return 0;
 }
 
 int ADSIS8300bpm::destroyDevice()
