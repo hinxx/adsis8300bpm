@@ -681,7 +681,7 @@ int sis8300drvbpm_arm_device(sis8300drv_usr *sisuser) {
  * replaces DAQ done interrupt on the generic version - it should
  * not be counted on for BPM controller.
  */
-int sis8300drvbpm_wait_pulse_done_pposition(sis8300drv_usr *sisuser,
+int sis8300drvbpm_wait_pulse_done_position(sis8300drv_usr *sisuser,
 		unsigned timeout) {
 
     int status;

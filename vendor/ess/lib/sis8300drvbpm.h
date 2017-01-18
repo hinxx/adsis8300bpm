@@ -97,7 +97,7 @@ int sis8300drvbpm_sw_reset(sis8300drv_usr *sisuser);
 /* ================== Acquisition ===================== */
 /* ==================================================== */
 int sis8300drvbpm_arm_device(sis8300drv_usr *sisuser);
-int sis8300drvbpm_wait_pulse_done_pposition(sis8300drv_usr *sisuser, unsigned timeout);
+int sis8300drvbpm_wait_pulse_done_position(sis8300drv_usr *sisuser, unsigned timeout);
 
 /* ===================================================== */
 /* ================= Near IQ control =================== */
