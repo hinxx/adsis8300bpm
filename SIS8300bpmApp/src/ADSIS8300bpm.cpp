@@ -685,21 +685,21 @@ int ADSIS8300bpm::initDevice()
     if (ver_major != SIS8300BPM_VERSION_MAJOR ||
         ver_minor < SIS8300BPM_VERSION_MINOR_FIRST ||
         ver_minor > SIS8300BPM_VERSION_MINOR_LAST) {
-        snprintf(message, 128, "ERR: firmware %dv%02d incompatible with software %dv%02d - %dv%02d",
+        snprintf(message, 128, "firmware %dv%02d incompatible with software %dv%02d - %dv%02d",
         		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
 				SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
-    	ADSIS8300_LOG(message);
-         destroyDevice();
+    	ADSIS8300_ERR(message);
+        destroyDevice();
         return -1;
     }
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 	SIS8300DRV_CALL_RET("sis8300drvbpm_setup_dac", sis8300drvbpm_setup_dac(mSisDevice));
 
-    snprintf(message, 128, "Firmware %dv%02d compatible with software %dv%02d - %dv%02d",
+    snprintf(message, 128, "firmware %dv%02d compatible with software %dv%02d - %dv%02d",
     		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
 			SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
-	ADSIS8300_LOG(message);
+	ADSIS8300_INF(message);
 
 	return 0;
 }
