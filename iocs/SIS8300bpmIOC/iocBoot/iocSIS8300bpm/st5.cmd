@@ -13,7 +13,7 @@ epicsEnvSet("QSIZE",  "20")
 # The maximim image width; used for row profiles in the NDPluginStats plugin
 epicsEnvSet("XSIZE",  "24")
 # The maximim image height; used for column profiles in the NDPluginStats plugin
-epicsEnvSet("YSIZE",  "260000")
+epicsEnvSet("YSIZE",  "64")
 # The maximum number of time series points in the NDPluginStats plugin
 epicsEnvSet("NCHANS", "64")
 # The maximum number of time series points in the NDPluginTimeSeries plugin
