@@ -40,12 +40,14 @@
 /* extern */
 const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_near_iq =
         { .int_bits_m = 2,  .frac_bits_n = 30, .is_signed = 1 };
-const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_pos_thr =
+const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_position =
         { .int_bits_m = 1,  .frac_bits_n = 15, .is_signed = 1 };
-const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_mag_thr =
+const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_magnitude =
         { .int_bits_m = 1,  .frac_bits_n = 15, .is_signed = 0 };
 const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_filter_coeff =
         { .int_bits_m = 16, .frac_bits_n = 0,  .is_signed = 1 };
+const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_phase  =
+        { .int_bits_m = 3,  .frac_bits_n = 13, .is_signed = 1 };
 
 /* ==================================================== */
 /* ================ Initialization ==================== */
@@ -1174,7 +1176,7 @@ int sis8300drvbpm_double_2_Qmn(
     /* Write the converted value */
     *converted = (uint32_t) val_int64;
 
-    return 0;
+    return status_success;
 }
 
 /**
@@ -1192,7 +1194,7 @@ int sis8300drvbpm_double_2_Qmn(
  *
  * This is the inverse function of @see sis8300drvbpm_double_2_Qmn
  */
-void sis8300drvbpm_Qmn_2_double(
+int sis8300drvbpm_Qmn_2_double(
         uint32_t val, sis8300drvbpm_Qmn Qmn, double *converted) {
 
     double pow_2_frac_bits =
@@ -1212,5 +1214,5 @@ void sis8300drvbpm_Qmn_2_double(
     /* convert to double */
     *converted /= pow_2_frac_bits;
 
-    return;
+    return status_success;
 }

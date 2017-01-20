@@ -144,12 +144,13 @@ typedef struct t_sis8300drvbpm_Qmn {
 
 /* Type definitions */
 extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_near_iq;
-extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_pos_thr;
-extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_mag_thr;
+extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_position;
+extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_magnitude;
+extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_phase;
 extern const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_filter_coeff;
 
 int sis8300drvbpm_double_2_Qmn(double val, sis8300drvbpm_Qmn Qmn, uint32_t *converted, double *err);
-void sis8300drvbpm_Qmn_2_double(uint32_t val, sis8300drvbpm_Qmn Qmn, double *converted);
+int sis8300drvbpm_Qmn_2_double(uint32_t val, sis8300drvbpm_Qmn Qmn, double *converted);
 
 #ifdef __cplusplus
 }
