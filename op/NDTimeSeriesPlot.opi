@@ -6,11 +6,11 @@
   <show_grid>false</show_grid>
   <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
   <scripts />
-  <height>415</height>
+  <height>600</height>
   <macros>
     <include_parent_macros>true</include_parent_macros>
   </macros>
-  <boy_version>4.0.103.201506301920</boy_version>
+  <boy_version>4.0.103.201506251634</boy_version>
   <show_edit_range>true</show_edit_range>
   <widget_type>Display</widget_type>
   <auto_scale_widgets>
@@ -21,7 +21,7 @@
   <background_color>
     <color red="187" green="187" blue="187" />
   </background_color>
-  <width>500</width>
+  <width>800</width>
   <x>370</x>
   <name>NDTimeSeriesPlot</name>
   <grid_space>5</grid_space>
@@ -60,9 +60,9 @@
       <color red="187" green="187" blue="187" />
     </background_color>
     <width>485</width>
-    <x>10</x>
+    <x>307</x>
     <name>Grouping Container</name>
-    <y>315</y>
+    <y>501</y>
     <foreground_color>
       <color red="0" green="0" blue="0" />
     </foreground_color>
@@ -70,7 +70,7 @@
     <fc>false</fc>
     <show_scrollbar>false</show_scrollbar>
     <font>
-      <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
     </font>
     <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
       <border_style>0</border_style>
@@ -358,7 +358,7 @@ $(pv_value)</tooltip>
         <color red="0" green="0" blue="0" />
       </foreground_color>
       <font>
-        <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+        <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
       </font>
     </widget>
     <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -452,7 +452,7 @@ $(pv_value)</tooltip>
         </action>
       </actions>
       <font>
-        <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+        <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
       </font>
     </widget>
     <widget typeId="org.csstudio.opibuilder.widgets.MenuButton" version="1.0.0">
@@ -495,7 +495,7 @@ $(pv_value)</tooltip>
         <color red="0" green="0" blue="0" />
       </foreground_color>
       <font>
-        <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+        <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
       </font>
     </widget>
     <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -768,7 +768,7 @@ $(pv_value)</tooltip>
     <background_color>
       <color red="187" green="187" blue="187" />
     </background_color>
-    <width>500</width>
+    <width>192</width>
     <x>0</x>
     <name>Text Update</name>
     <y>5</y>
@@ -797,20 +797,20 @@ $(trace_0_y_pv_value)</tooltip>
     <wuid>21e74fc9:1546cf85e77:-75c1</wuid>
     <transparent>false</transparent>
     <axis_0_title_font>
-      <opifont.name fontName="Droid Sans" height="10" style="1">Default Bold</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="1">Default Bold</opifont.name>
     </axis_0_title_font>
     <background_color>
       <color red="240" green="240" blue="240" />
     </background_color>
     <x>5</x>
-    <y>80</y>
+    <y>34</y>
     <trace_0_x_axis_index>0</trace_0_x_axis_index>
     <axis_count>2</axis_count>
     <pv_value />
-    <trace_0_buffer_size>1000</trace_0_buffer_size>
+    <trace_0_buffer_size>20000</trace_0_buffer_size>
     <axis_1_maximum>100.0</axis_1_maximum>
     <axis_0_scale_font>
-      <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
     </axis_0_scale_font>
     <trigger_pv></trigger_pv>
     <widget_type>XY Graph</widget_type>
@@ -844,7 +844,7 @@ $(trace_0_y_pv_value)</tooltip>
     </scale_options>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <axis_0_maximum>100.0</axis_0_maximum>
-    <height>230</height>
+    <height>464</height>
     <trigger_pv_value />
     <axis_1_grid_color>
       <color red="200" green="200" blue="200" />
@@ -870,22 +870,22 @@ $(trace_0_y_pv_value)</tooltip>
     <enabled>true</enabled>
     <trace_0_x_pv></trace_0_x_pv>
     <axis_1_scale_font>
-      <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
     </axis_1_scale_font>
     <axis_1_time_format>0</axis_1_time_format>
     <border_alarm_sensitive>true</border_alarm_sensitive>
     <show_plot_area_border>false</show_plot_area_border>
-    <width>490</width>
+    <width>789</width>
     <axis_1_minimum>0.0</axis_1_minimum>
     <title_font>
-      <opifont.name fontName="Droid Sans" height="10" style="1">Default Bold</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="1">Default Bold</opifont.name>
     </title_font>
     <trace_0_y_pv_value />
     <plot_area_background_color>
       <color red="255" green="255" blue="255" />
     </plot_area_background_color>
     <axis_1_title_font>
-      <opifont.name fontName="Droid Sans" height="10" style="1">Default Bold</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="1">Default Bold</opifont.name>
     </axis_1_title_font>
     <visible>true</visible>
     <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
@@ -929,9 +929,9 @@ $(trace_0_y_pv_value)</tooltip>
       <color red="255" green="255" blue="255" />
     </background_color>
     <width>70</width>
-    <x>26</x>
+    <x>8</x>
     <name>Label</name>
-    <y>55</y>
+    <y>506</y>
     <foreground_color>
       <color red="0" green="0" blue="0" />
     </foreground_color>
@@ -974,9 +974,9 @@ $(pv_value)</tooltip>
       <color red="115" green="223" blue="255" />
     </background_color>
     <width>85</width>
-    <x>101</x>
+    <x>83</x>
     <name>Action Button</name>
-    <y>55</y>
+    <y>506</y>
     <style>0</style>
     <foreground_color>
       <color red="0" green="0" blue="0" />
@@ -991,7 +991,7 @@ $(pv_value)</tooltip>
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1028,9 +1028,9 @@ $(pv_value)</tooltip>
       <color red="115" green="223" blue="255" />
     </background_color>
     <width>85</width>
-    <x>191</x>
+    <x>173</x>
     <name>Action Button</name>
-    <y>55</y>
+    <y>506</y>
     <style>0</style>
     <foreground_color>
       <color red="0" green="0" blue="0" />
@@ -1045,7 +1045,7 @@ $(pv_value)</tooltip>
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
@@ -1089,9 +1089,9 @@ $(pv_value)</tooltip>
       <color red="70" green="70" blue="70" />
     </background_color>
     <width>100</width>
-    <x>282</x>
+    <x>7</x>
     <name>Text Update</name>
-    <y>56</y>
+    <y>530</y>
     <foreground_color>
       <color red="10" green="0" blue="184" />
     </foreground_color>
@@ -1129,9 +1129,9 @@ $(pv_value)</tooltip>
       <color red="255" green="255" blue="255" />
     </background_color>
     <width>500</width>
-    <x>0</x>
+    <x>294</x>
     <name>Label</name>
-    <y>30</y>
+    <y>5</y>
     <foreground_color>
       <color red="10" green="0" blue="184" />
     </foreground_color>
@@ -1173,9 +1173,9 @@ $(pv_value)</tooltip>
       <color red="115" green="223" blue="255" />
     </background_color>
     <width>100</width>
-    <x>10</x>
+    <x>307</x>
     <name>Menu Button</name>
-    <y>390</y>
+    <y>576</y>
     <foreground_color>
       <color red="0" green="0" blue="0" />
     </foreground_color>
@@ -1190,7 +1190,7 @@ $(pv_value)</tooltip>
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Droid Sans" height="10" style="0">Default</opifont.name>
+      <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
     </font>
   </widget>
 </display>
