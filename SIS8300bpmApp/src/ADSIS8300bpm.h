@@ -55,6 +55,7 @@ typedef enum _BpmChannelIndex {
 #define BpmNearIQNString                            "BPM_NEARIQ_N"
 #define BpmNumSamplesString                         "BPM_NUM_SAMPLES"
 #define BpmNumIQSamplesString                       "BPM_NUM_IQ_SAMPLES"
+#define BpmNumBPMSamplesString                      "BPM_NUM_BPM_SAMPLES"
 #define BpmMemMuxString                             "BPM_MEM_MUX"
 #define BpmMemMux10String                           "BPM_MEM_MUX10"
 #define BpmTrigSetupString                          "BPM_TRIG_SETUP"
@@ -113,6 +114,7 @@ protected:
     int P_NearIQN;
     int P_NumSamples;
     int P_NumIQSamples;
+    int P_NumBPMSamples;
     int P_MemMux;
     int P_MemMux10;
     int P_TrigSetup;
