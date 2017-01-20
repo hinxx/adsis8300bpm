@@ -17,6 +17,35 @@
 #include <sis8300drv.h>
 #include <sis8300drvbpm.h>
 
+typedef enum _BpmChannelIndex {
+	BPMChannelXPos1 = 0,
+	BPMChannelYPos1,
+	BPMChannelMSum1,
+	BPMChannelPSum1,
+	BPMChannelAMag1,
+	BPMChannelBMag1,
+	BPMChannelCMag1,
+	BPMChannelDMag1,
+	BPMChannelAPha1,
+	BPMChannelBPha1,
+	BPMChannelCPha1,
+	BPMChannelDPha1,
+
+	BPMChannelXPos2,
+	BPMChannelYPos2,
+	BPMChannelMSum2,
+	BPMChannelPSum2,
+	BPMChannelAMag2,
+	BPMChannelBMag2,
+	BPMChannelCMag2,
+	BPMChannelDMag2,
+	BPMChannelAPha2,
+	BPMChannelBPha2,
+	BPMChannelCPha2,
+	BPMChannelDPha2,
+} BPMChannelIndex;
+#define SIS8300DRV_NUM_BPM_CHANNELS   12          /**< Number of BPM channels on one instance. */
+
 /* System wide parameters */
 #define BpmFirmwareVersionString                    "BPM_FW_VERSION"
 #define BpmPulseDoneString                          "BPM_PULSE_DONE"
@@ -119,7 +148,9 @@ protected:
     #define LAST_SIS8300BPM_PARAM P_Dummy2
 
     /* These are the methods that are new to this class */
-    template <typename epicsType> int acquireArraysT();
+    template <typename epicsType> int convertArraysT();
+    template <typename epicsType> int convertAIArraysT(int aich);
+    template <typename epicsType> int convertBPMArraysT(int aich);
     virtual int acquireArrays();
     virtual int initDevice();
     virtual int destroyDevice();

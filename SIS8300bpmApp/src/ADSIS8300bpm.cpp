@@ -153,63 +153,347 @@ ADSIS8300bpm::~ADSIS8300bpm() {
 	this->unlock();
 	printf("%s::%s: Shutdown complete!\n", driverName, __func__);
 }
+/*
+inline double ADSIS8300bpm::convertSample(int val, double convFactor, double convOffset) {
+	printf("%s::%s: Enter\n", driverName, __func__);
+	bool negative = (val & (1 << 15)) != 0;
+	if (negative) {
+		return ((double)(val | ~((1 << 16) - 1)) * convFactor + convOffset);
+	} else {
+		return ((double)(val) * convFactor + convOffset);
+	}
+}
+*/
+/** Template function to compute the simulated detector data for any data type */
+template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
+{
+//    size_t dims[2];
+    int numTimePoints;
+//    NDDataType_t dataType;
+    epicsType *pData, *pVal;
+    epicsUInt16 *pRaw, *pChRaw;
+    int i;
+//    double convFactor, convOffset;
+    bool negative;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+//    getIntegerParam(NDDataType, (int *)&dataType);
+    getIntegerParam(P_NumTimePoints, &numTimePoints);
+
+    /* 0th NDArray is for raw AI data samples */
+    pRaw = (epicsUInt16 *)this->pArrays[0]->pData;
+    if (! pRaw) {
+    	return -1;
+    }
+
+//    /* converted AI data samples of all channel are interleaved */
+//    dims[0] = SIS8300DRV_NUM_AI_CHANNELS;
+//    dims[1] = numTimePoints;
+
+//    /* 1th NDArray is for converted AI data samples */
+//    if (this->pArrays[1]) {
+//    	this->pArrays[1]->release();
+//    }
+//    this->pArrays[1] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[1]->pData;
+//    memset(pData, 0, SIS8300DRV_NUM_AI_CHANNELS * numTimePoints * sizeof(epicsType));
+
+//    for (aich = 0; aich < SIS8300DRV_NUM_AI_CHANNELS; aich++) {
+//    	if (!(mChannelMask & (1 << aich))) {
+//            continue;
+//        }
+    	pChRaw = pRaw + (aich * numTimePoints);
+    	pVal = pData + aich;
+
+//    	if (aich < 5) {
+//    		getDoubleParam(aich, P_ConvFactor, &convFactor);
+//    		getDoubleParam(aich, P_ConvOffset, &convOffset);
+//    	} else {
+//    		//getDoubleParam(aich, P_NConvFactor, &convFactor);
+//    		convFactor = 1;
+//    		convOffset = 0;
+//    	}
+
+		char fname[32];
+		sprintf(fname, "/tmp/%d.txt", aich);
+		FILE *fp = fopen(fname, "w");
+//		printf("%s::%s: CH %d [%d] CF %f, CO %f: ", driverName, __func__, aich, numTimePoints, convFactor, convOffset);
+		printf("%s::%s: CH %d [%d] ", driverName, __func__, aich, numTimePoints);
+		for (i = 0; i < numTimePoints; i++) {
+//			*pVal = (epicsType)((double)*(pChRaw + i) * convFactor + convOffset);
+			negative = (*(pChRaw + i) & (1 << 15)) != 0;
+			if (negative) {
+				*pVal = (epicsType)((double)(*(pChRaw + i) | ~((1 << 16) - 1))/* * convFactor + convOffset*/);
+			} else {
+				*pVal = (epicsType)((double)(*(pChRaw + i))/* * convFactor + convOffset*/);
+			}
+
+//			printf("%f ", (double)*pVal);
+			fprintf(fp, "%f\n", (double)*pVal);
+			pVal += SIS8300DRV_NUM_AI_CHANNELS;
+		}
+		printf("\n");
+		fclose(fp);
+//    }
+
+    return 0;
+}
 
 /** Template function to compute the simulated detector data for any data type */
-template <typename epicsType> int ADSIS8300bpm::acquireArraysT()
+template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 {
-    size_t dims[2], rawDims[1];
+//    size_t dims[2];
     int numTimePoints;
+    int numBPMSamples;
+//    NDDataType_t dataType;
+    epicsType *pData, *pVal;
+    epicsUInt16 *pRaw, *pChRaw;
+    int i, j;
+//    double convFactor, convOffset;
+    double convFactor, converted;
+    int nearIQN, memMux, memMux10;
+    
+	printf("%s::%s: Enter\n", driverName, __func__);
+
+//    getIntegerParam(NDDataType, (int *)&dataType);
+    getIntegerParam(P_NumTimePoints, &numTimePoints);
+    getIntegerParam(P_NearIQN, &nearIQN);
+    getIntegerParam(P_MemMux, &memMux);
+    getIntegerParam(P_MemMux10, &memMux10);
+
+    /* 0th NDArray is for raw AI data samples */
+    pRaw = (epicsUInt16 *)this->pArrays[0]->pData;
+    if (! pRaw) {
+    	return -1;
+    }
+
+    numBPMSamples = (int)(numTimePoints / nearIQN);
+//	printf("%s::%s: nearIQ N %d, num samples %d, num BPM samples %d\n", driverName, __func__,
+//			nearIQN, numTimePoints, numBPMSamples);
+
+    /* converted BPM data samples of all channel are interleaved */
+//    dims[0] = 2 * SIS8300DRV_NUM_BPM_CHANNELS;
+//    dims[1] = numBPMSamples;
+
+//    /* 1st NDArray is for converted AI data samples */
+//    /* 2nd NDArray is for converted BPM data samples */
+//    if (this->pArrays[2]) {
+//    	this->pArrays[2]->release();
+//    }
+//    this->pArrays[2] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[2]->pData;
+//    memset(pData, 0, 2 * SIS8300DRV_NUM_BPM_CHANNELS * numBPMSamples * sizeof(epicsType));
+
+//    for (aich = 0; aich < SIS8300DRV_NUM_AI_CHANNELS; aich++) {
+//        if (!(mChannelMask & (1 << aich))) {
+//            continue;
+//        }
+//
+//		if (aich < 5) {
+//			/* AI data is here */
+//			continue;
+//		}
+//		if ((aich < 9) && (memMux == 2)) {
+//			/* AI data is here */
+//			continue;
+//		}
+
+    	i = 0;
+		j = 0;
+    	pChRaw = pRaw + (aich * numTimePoints);
+    	pVal = pData;
+	    /* find the first non 0xDEAD sample in this channel */
+		while (i < numTimePoints) {
+			if (*pChRaw != 0xDEAD) {
+				printf("%s::%s: First non 0xDEAD sample index %d\n", driverName, __func__, i);
+				break;
+			}
+			i++;
+			pChRaw++;
+		}
+
+		getDoubleParam(aich, P_NConvFactor, &convFactor);
+		//getDoubleParam(aich, P_ConvOffset, &convOffset);
+		printf("%s::%s: CH %d [%d] CF %f\n", driverName, __func__,
+				aich, numTimePoints, convFactor);
+
+		while (i < numTimePoints) {
+
+			assert(i < numTimePoints);
+			assert(j < numBPMSamples);
+
+			if ((aich == 5) || ((aich == 9) && (memMux == 2) && (memMux10 == 1))) {
+				/* BPM magnitude and phase sum data is here */
+				/* magnitude sum BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelMSum1) = converted;
+				/* phase sum BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 1), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelPSum1) = converted * 180.0 / M_PI;
+				/* magnitude sum BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 2), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelMSum2) = converted;
+				/* phase sum BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 3), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelPSum2) = converted * 180.0 / M_PI;
+			} else if ((aich == 6) || ((aich == 9) && (memMux == 2) && (memMux10 == 2))) {
+				/* BPM antenna magnitude data is here */
+				/* antenna magnitude A BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelAMag1) = converted;
+				/* antenna magnitude A BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 1), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelAMag2) = converted;
+				/* antenna magnitude B BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 2), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelBMag1) = converted;
+				/* antenna magnitude B BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 3), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelBMag2) = converted;
+				/* antenna magnitude C BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 4), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelCMag1) = converted;
+				/* antenna magnitude C BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 5), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelCMag2) = converted;
+				/* antenna magnitude D BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 6), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelDMag1) = converted;
+				/* antenna magnitude D BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 7), sis8300drvbpm_Qmn_magnitude, &converted));
+				*(pVal + BPMChannelDMag2) = converted;
+			} else if ((aich == 7) || ((aich == 9) && (memMux == 2) && (memMux10 == 3))) {
+				/* BPM antenna phase data is here */
+				/* antenna phase A BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelAPha1) = converted;
+				/* antenna phase A BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 1), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelAPha2) = converted;
+				/* antenna phase B BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 2), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelBPha1) = converted;
+				/* antenna phase B BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 3), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelBPha2) = converted;
+				/* antenna phase C BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 4), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelCPha1) = converted;
+				/* antenna phase C BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 5), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelCPha2) = converted;
+				/* antenna phase D BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 6), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelDPha1) = converted;
+				/* antenna phase D BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 7), sis8300drvbpm_Qmn_phase, &converted));
+				*(pVal + BPMChannelDPha2) = converted;
+			} else if ((aich == 8) || ((aich == 9) && (memMux == 2) && (memMux10 == 0))) {
+				/* BPM X & Y position data is here */
+				/* X position BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i), sis8300drvbpm_Qmn_position, &converted));
+				*(pVal + BPMChannelXPos1) = converted;
+				/* Y position BPM 1 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 1), sis8300drvbpm_Qmn_position, &converted));
+				*(pVal + BPMChannelYPos1) = converted;
+				/* X position BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 2), sis8300drvbpm_Qmn_position, &converted));
+				*(pVal + BPMChannelXPos2) = converted;
+				/* Y position BPM 2 */
+				SIS8300DRV_CALL_VOID("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + i + 3), sis8300drvbpm_Qmn_position, &converted));
+				*(pVal + BPMChannelYPos2) = converted;
+			} else {
+				printf("%s::%s: Should not be here!!!\n", driverName, __func__);
+				assert(1 == 0);
+			}
+
+			/* adjust raw AI offset for current channel */
+			i += nearIQN;
+			/* adjust BPM offset for all channels */
+			j++;
+			/* adjust BPM data pointer */
+			pVal += 2 * SIS8300DRV_NUM_BPM_CHANNELS;
+//			printf("%s::%s: i %d, j %d\n", driverName, __func__, i, j);
+		}
+//    }
+
+    return 0;
+}
+
+/** Template function to compute the simulated detector data for any data type */
+template <typename epicsType> int ADSIS8300bpm::convertArraysT()
+{
+    size_t dims[2];
+    int numTimePoints;
+    int numBPMSamples;
     NDDataType_t dataType;
     epicsType *pData;
-    epicsUInt16 *pRawData;
-    double acquireTime;
-    double timeStep;
-    int ch;
-    int i;
-    double convFactor, convOffset;
-    
+//    epicsUInt16 *pRaw, *pChRaw;
+    int aich;
+//    double convFactor, convOffset;
+//    double convFactor, converted;
+    int nearIQN, memMux, memMux10;
+    int ret;
+
+	printf("%s::%s: Enter\n", driverName, __func__);
+
     getIntegerParam(NDDataType, (int *)&dataType);
     getIntegerParam(P_NumTimePoints, &numTimePoints);
-    getDoubleParam(P_AcquireTime, &acquireTime);
-    getDoubleParam(P_TimeStep, &timeStep);
+    getIntegerParam(P_NearIQN, &nearIQN);
+    getIntegerParam(P_MemMux, &memMux);
+    getIntegerParam(P_MemMux10, &memMux10);
 
+    /* 0th NDArray is for raw AI data samples */
+    if (! (epicsUInt16 *)this->pArrays[0]->pData) {
+    	return -1;
+    }
+
+    /* converted AI data samples of all channel are interleaved */
     dims[0] = SIS8300DRV_NUM_AI_CHANNELS;
     dims[1] = numTimePoints;
 
-    if (this->pArrays[0]) this->pArrays[0]->release();
-    this->pArrays[0] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
-    pData = (epicsType *)this->pArrays[0]->pData;
+    /* 1th NDArray is for converted AI data samples */
+    if (this->pArrays[1]) {
+    	this->pArrays[1]->release();
+    }
+    this->pArrays[1] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[1]->pData;
     memset(pData, 0, SIS8300DRV_NUM_AI_CHANNELS * numTimePoints * sizeof(epicsType));
 
-    /* raw data is always 16-bit, allocate for one channel */
-    if (mRawDataArray && (mRawDataArray->dims[0].size != (size_t)numTimePoints)) {
-    	mRawDataArray->release();
-    	mRawDataArray = NULL;
-    }
-    if (! mRawDataArray) {
-    	rawDims[0] = numTimePoints;
-        mRawDataArray = pNDArrayPool->alloc(1, rawDims, NDUInt16, 0, 0);
-    }
-	pRawData = (epicsUInt16 *)mRawDataArray->pData;
+    numBPMSamples = (int)(numTimePoints / nearIQN);
+	printf("%s::%s: nearIQ N %d, num samples %d, num BPM samples %d, memMux %d, memMux10 %d\n", driverName, __func__,
+			nearIQN, numTimePoints, numBPMSamples, memMux, memMux10);
 
-    for (ch = 0; ch < SIS8300DRV_NUM_AI_CHANNELS; ch++) {
-        if (!(mChannelMask & (1 << ch))) {
+    /* converted BPM data samples of all channel are interleaved */
+    dims[0] = 2 * SIS8300DRV_NUM_BPM_CHANNELS;
+    dims[1] = numBPMSamples;
+
+    /* 2nd NDArray is for converted BPM data samples */
+    if (this->pArrays[2]) {
+    	this->pArrays[2]->release();
+    }
+    this->pArrays[2] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[2]->pData;
+    memset(pData, 0, 2 * SIS8300DRV_NUM_BPM_CHANNELS * numBPMSamples * sizeof(epicsType));
+
+    for (aich = 0; aich < SIS8300DRV_NUM_AI_CHANNELS; aich++) {
+        if (!(mChannelMask & (1 << aich))) {
             continue;
         }
 
-		SIS8300DRV_CALL_RET("sis8300drv_read_ai", sis8300drv_read_ai(mSisDevice, ch, pRawData));
-
-		getDoubleParam(ch, P_ConvFactor, &convFactor);
-		getDoubleParam(ch, P_ConvOffset, &convOffset);
-		this->unlock();
-		printf("%s::%s: CH %d [%d] CF %f, CO %f:\n", driverName, __func__,
-				ch, numTimePoints, convFactor, convOffset);
-		for (i = 0; i < numTimePoints; i++) {
-			printf("%d ", *(pRawData + i));
-			pData[SIS8300DRV_NUM_AI_CHANNELS*i + ch] = (epicsType)((double)*(pRawData + i) * convFactor + convOffset);
+		if ((aich < 5) || ((aich < 9) && (memMux == 2))) {
+			/* AI data is here */
+			ret = convertAIArraysT<epicsType>(aich);
+		} else if ((aich == 9) && (memMux != 2)) {
+			printf("%s::%s: Not interested in aich 9 data (memMux != 2)..\n", driverName, __func__);
+		} else {
+			/* BPM data is here */
+			ret = convertBPMArraysT<epicsType>(aich);
 		}
-		printf("\n");
-		this->lock();
+		if (ret) {
+			return ret;
+		}
     }
 
     return 0;
@@ -219,32 +503,43 @@ template <typename epicsType> int ADSIS8300bpm::acquireArraysT()
 int ADSIS8300bpm::acquireArrays()
 {
     int dataType;
-    getIntegerParam(NDDataType, &dataType); 
+    int ret;
 
+//    ret = ADSIS8300::acquireArrays();
+//    if (ret) {
+//    	return ret;
+//    }
+
+    ret = acquireRawArrays();
+    if (ret) {
+    	return ret;
+    }
+
+    getIntegerParam(NDDataType, &dataType);
     switch (dataType) {
         case NDInt8:
-            return acquireArraysT<epicsInt8>();
+            return convertArraysT<epicsInt8>();
             break;
         case NDUInt8:
-        	return acquireArraysT<epicsUInt8>();
+        	return convertArraysT<epicsUInt8>();
             break;
         case NDInt16:
-        	return acquireArraysT<epicsInt16>();
+        	return convertArraysT<epicsInt16>();
             break;
         case NDUInt16:
-        	return acquireArraysT<epicsUInt16>();
+        	return convertArraysT<epicsUInt16>();
             break;
         case NDInt32:
-        	return acquireArraysT<epicsInt32>();
+        	return convertArraysT<epicsInt32>();
             break;
         case NDUInt32:
-        	return acquireArraysT<epicsUInt32>();
+        	return convertArraysT<epicsUInt32>();
             break;
         case NDFloat32:
-        	return acquireArraysT<epicsFloat32>();
+        	return convertArraysT<epicsFloat32>();
             break;
         case NDFloat64:
-        	return acquireArraysT<epicsFloat64>();
+        	return convertArraysT<epicsFloat64>();
             break;
         default:
         	return -1;
@@ -516,20 +811,20 @@ int ADSIS8300bpm::updateThreshold(int addr)
 	getIntegerParam(addr, P_IThrSelect, &thrControl);
 
 	/* X position threshold */
-	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosHigh, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosHigh, sis8300drvbpm_Qmn_position, &conv, &err));
 	thrVal = (int)(conv & 0xFFFF) << 16;
-	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_position, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrXValReg, thrVal));
 	/* Y position threshold */
-	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(yPosHigh, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(yPosHigh, sis8300drvbpm_Qmn_position, &conv, &err));
 	thrVal = (int)(conv & 0xFFFF) << 16;
-	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn",sis8300drvbpm_double_2_Qmn(yPosLow, sis8300drvbpm_Qmn_pos_thr, &conv, &err));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn",sis8300drvbpm_double_2_Qmn(yPosLow, sis8300drvbpm_Qmn_position, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrYValReg, thrVal));
 	/* magnitude threshold and control */
 	thrVal = (int)(thrControl & 0x1) << 16;
-	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_mag_thr, &conv, &err));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_magnitude, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrMagCtrlReg, thrVal));
 
