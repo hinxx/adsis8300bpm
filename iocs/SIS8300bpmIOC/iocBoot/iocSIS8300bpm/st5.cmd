@@ -241,7 +241,7 @@ dbpf $(SYS)-$(DEVICE):Pul1-Evt-Trig0-SP 14
 # Set pulser 1 width to 1 us
 dbpf $(SYS)-$(DEVICE):Pul1-Width-SP 100
 # Set the delay time of the pulser 1 to 0.3 ms
-dbpf $(SYS)-$(DEVICE):Pul1-Delay-SP 300
+#dbpf $(SYS)-$(DEVICE):Pul1-Delay-SP 300
 # event 2 received the SIS8300 will start the data acquisition
 dbpf $(SYS)-$(DEVICE):RearUniv33-Ena-SP "Enabled"
 
@@ -254,7 +254,7 @@ dbpf $(SYS)-$(DEVICE):Pul2-Evt-Trig0-SP 14
 # Set pulser 2 width to 1 us
 dbpf $(SYS)-$(DEVICE):Pul2-Width-SP 100
 # Set the delay time of the pulser 2 to 3.16 ms (pulse width of 2.86 ms)
-dbpf $(SYS)-$(DEVICE):Pul2-Delay-SP 3160
+dbpf $(SYS)-$(DEVICE):Pul2-Delay-SP 2860
 # event 3 received the SIS8300 will stop the data acquisition
 dbpf $(SYS)-$(DEVICE):RearUniv34-Ena-SP "Enabled"
 
