@@ -78,6 +78,12 @@ record(longin, "$(P)$(R)NumIQSamples_RBV") {
     field(SCAN, "I/O Intr")
 }
 
+record(longin, "$(P)$(R)NumBPMSamples_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_NUM_BPM_SAMPLES")
+    field(SCAN, "I/O Intr")
+}
+
 # channel data mux
 
 record(mbbo, "$(P)$(R)MemMux") {
