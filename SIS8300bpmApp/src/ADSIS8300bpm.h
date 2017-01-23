@@ -17,6 +17,7 @@
 #include <sis8300drv.h>
 #include <sis8300drvbpm.h>
 
+/*
 typedef enum _BpmChannelIndex {
 	BPMChannelXPos1 = 0,
 	BPMChannelYPos1,
@@ -44,7 +45,23 @@ typedef enum _BpmChannelIndex {
 	BPMChannelCPha2,
 	BPMChannelDPha2,
 } BPMChannelIndex;
-#define SIS8300DRV_NUM_BPM_CHANNELS   12          /**< Number of BPM channels on one instance. */
+*/
+
+typedef enum _BpmChannelIndex {
+	BPMChannelXPos = 0,
+	BPMChannelYPos,
+	BPMChannelMSum,
+	BPMChannelPSum,
+	BPMChannelAMag,
+	BPMChannelBMag,
+	BPMChannelCMag,
+	BPMChannelDMag,
+	BPMChannelAPha,
+	BPMChannelBPha,
+	BPMChannelCPha,
+	BPMChannelDPha,
+} BPMChannelIndex;
+#define ADSIS8300DRV_NUM_BPM_CHANNELS   12          /**< Number of BPM channels on one instance. */
 
 /* System wide parameters */
 #define BpmFirmwareVersionString                    "BPM_FW_VERSION"
@@ -85,16 +102,19 @@ typedef enum _BpmChannelIndex {
 #define BpmIDivXPosErrString                        "BPMI_DIV_XPOS_ERR"
 #define BpmIDivYPosErrString                        "BPMI_DIV_YPOS_ERR"
 /* BPM channel wide parameters */
-#define BpmNConvFactorString                        "BPMN_CONV_FACTOR"
+//#define BpmNConvFactorString                        "BPMN_CONV_FACTOR"
 
-#define SIS8300BPM_IRQ_WAIT_TIME      0
+#define ADSIS8300BPM_IRQ_WAIT_TIME      0
+
+#define ADSIS8300BPM_BPM1_NDARRAY           2
+#define ADSIS8300BPM_BPM2_NDARRAY           3
 
 /** Struck SIS8300 BPM driver; does 1-D waveforms on 12 channels.
   * Inherits from ADSIS8300 */
 class epicsShareClass ADSIS8300bpm : public ADSIS8300 {
 public:
 	ADSIS8300bpm(const char *portName, const char *devicePath,
-			int maxAddr, int numParams, int numTimePoints, NDDataType_t dataType,
+			int maxAddr, int numTimePoints, NDDataType_t dataType,
 			int maxBuffers, size_t maxMemory, int priority, int stackSize);
 	~ADSIS8300bpm();
 
@@ -144,7 +164,7 @@ protected:
     int P_IDivXPosErr;
     int P_IDivYPosErr;
     /* BPM channel wide parameters */
-    int P_NConvFactor;
+//    int P_NConvFactor;
 
     int P_Dummy2;
     #define LAST_SIS8300BPM_PARAM P_Dummy2

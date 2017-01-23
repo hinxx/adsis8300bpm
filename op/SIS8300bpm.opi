@@ -914,17 +914,18 @@ $(pv_value)</tooltip>
         <path>NDPluginTimeSeries.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <R>TS1:</R>
-          <R1>TS1:1:</R1>
-          <R2>TS1:2:</R2>
-          <R3>TS1:3:</R3>
-          <R4>TS1:4:</R4>
-          <R5>TS1:5:</R5>
-          <R6>TS1:6:</R6>
-          <R7>TS1:7:</R7>
-          <R8>TS1:8:</R8>
-          <R9>TS1:9:</R9>
-          <R10>TS1:10:</R10>
+          <R>TS0:</R>
+          <R0>TS0:0:</R0>
+          <R1>TS0:1:</R1>
+          <R2>TS0:2:</R2>
+          <R3>TS0:3:</R3>
+          <R4>TS0:4:</R4>
+          <R5>TS0:5:</R5>
+          <R6>TS0:6:</R6>
+          <R7>TS0:7:</R7>
+          <R8>TS0:8:</R8>
+          <R9>TS0:9:</R9>
+          <T0>Ch0</T0>
           <T1>Ch1</T1>
           <T2>Ch2</T2>
           <T3>Ch3</T3>
@@ -934,16 +935,45 @@ $(pv_value)</tooltip>
           <T7>Ch7</T7>
           <T8>Ch8</T8>
           <T9>Ch9</T9>
-          <T10>Ch10</T10>
         </macros>
         <replace>0</replace>
-        <description>Time series AI</description>
+        <description>Time series raw AI</description>
+      </action>
+      <action type="OPEN_DISPLAY">
+        <path>NDPluginTimeSeries.opi</path>
+        <macros>
+          <include_parent_macros>true</include_parent_macros>
+          <R>TS1:</R>
+          <R0>TS1:0:</R0>
+          <R1>TS1:1:</R1>
+          <R2>TS1:2:</R2>
+          <R3>TS1:3:</R3>
+          <R4>TS1:4:</R4>
+          <R5>TS1:5:</R5>
+          <R6>TS1:6:</R6>
+          <R7>TS1:7:</R7>
+          <R8>TS1:8:</R8>
+          <R9>TS1:9:</R9>
+          <T0>Ch0</T0>
+          <T1>Ch1</T1>
+          <T2>Ch2</T2>
+          <T3>Ch3</T3>
+          <T4>Ch4</T4>
+          <T5>Ch5</T5>
+          <T6>Ch6</T6>
+          <T7>Ch7</T7>
+          <T8>Ch8</T8>
+          <T9>Ch9</T9>
+        </macros>
+        <replace>0</replace>
+        <description>Time series converted AI</description>
       </action>
       <action type="OPEN_DISPLAY">
         <path>NDPluginTimeSeries.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <R>TS2:</R>
+          <R0>TS2:0:</R0>
           <R1>TS2:1:</R1>
           <R2>TS2:2:</R2>
           <R3>TS2:3:</R3>
@@ -955,19 +985,18 @@ $(pv_value)</tooltip>
           <R9>TS2:9:</R9>
           <R10>TS2:10:</R10>
           <R11>TS2:11:</R11>
-          <R12>TS2:12:</R12>
-          <T1>X pos</T1>
-          <T2>Y pos</T2>
-          <T3>Magnitude sum</T3>
-          <T4>Phase sum</T4>
-          <T5>A magnitude</T5>
-          <T6>B magnitude</T6>
-          <T7>C magnitude</T7>
-          <T8>D magnitude</T8>
-          <T9>A phase</T9>
-          <T10>B phase</T10>
-          <T11>C phase</T11>
-          <T12>D phase</T12>
+          <T0>X pos</T0>
+          <T1>Y pos</T1>
+          <T2>Magnitude sum</T2>
+          <T3>Phase sum</T3>
+          <T4>A magnitude</T4>
+          <T5>B magnitude</T5>
+          <T6>C magnitude</T6>
+          <T7>D magnitude</T7>
+          <T8>A phase</T8>
+          <T9>B phase</T9>
+          <T10>C phase</T10>
+          <T11>D phase</T11>
         </macros>
         <replace>0</replace>
         <description>Time series BPM1</description>
@@ -977,6 +1006,7 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <R>TS3:</R>
+          <R0>TS3:0:</R0>
           <R1>TS3:1:</R1>
           <R2>TS3:2:</R2>
           <R3>TS3:3:</R3>
@@ -988,19 +1018,18 @@ $(pv_value)</tooltip>
           <R9>TS3:9:</R9>
           <R10>TS3:10:</R10>
           <R11>TS3:11:</R11>
-          <R12>TS3:12:</R12>
-          <T1>X pos</T1>
-          <T2>Y pos</T2>
-          <T3>Magnitude sum</T3>
-          <T4>Phase sum</T4>
-          <T5>A magnitude</T5>
-          <T6>B magnitude</T6>
-          <T7>C magnitude</T7>
-          <T8>D magnitude</T8>
-          <T9>A phase</T9>
-          <T10>B phase</T10>
-          <T11>C phase</T11>
-          <T12>D phase</T12>
+          <T0>X pos</T0>
+          <T1>Y pos</T1>
+          <T2>Magnitude sum</T2>
+          <T3>Phase sum</T3>
+          <T4>A magnitude</T4>
+          <T5>B magnitude</T5>
+          <T6>C magnitude</T6>
+          <T7>D magnitude</T7>
+          <T8>A phase</T8>
+          <T9>B phase</T9>
+          <T10>C phase</T10>
+          <T11>D phase</T11>
         </macros>
         <replace>0</replace>
         <description>Time series BPM2</description>
@@ -1094,7 +1123,8 @@ $(pv_value)</tooltip>
         <path>NDFFT16.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <RTS>TS1:</RTS>
+          <RTS>TS:</RTS>
+          <R0>FFT0:</R0>
           <R1>FFT1:</R1>
           <R2>FFT2:</R2>
           <R3>FFT3:</R3>
@@ -1103,14 +1133,17 @@ $(pv_value)</tooltip>
           <R6>FFT6:</R6>
           <R7>FFT7:</R7>
           <R8>FFT8:</R8>
-          <T1>Sin(x)</T1>
-          <T2>Cos(x)</T2>
-          <T3>SquareWave(x)</T3>
-          <T4>Sawtooth(x)</T4>
-          <T5>Noise</T5>
-          <T6>Sin(x)+Cos(x)</T6>
-          <T7>Sin(x)*Cos(x)</T7>
-          <T8>SinSums</T8>
+          <R9>FFT9:</R9>
+          <T0>Ch0</T0>
+          <T1>Ch1</T1>
+          <T2>Ch2</T2>
+          <T3>Ch3</T3>
+          <T4>Ch4</T4>
+          <T5>Ch5</T5>
+          <T6>Ch6</T6>
+          <T7>Ch7</T7>
+          <T8>Ch8</T8>
+          <T9>Ch9</T9>
         </macros>
         <replace>0</replace>
         <description>FFT 16</description>
