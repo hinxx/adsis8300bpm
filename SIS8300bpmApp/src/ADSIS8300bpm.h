@@ -17,36 +17,6 @@
 #include <sis8300drv.h>
 #include <sis8300drvbpm.h>
 
-/*
-typedef enum _BpmChannelIndex {
-	BPMChannelXPos1 = 0,
-	BPMChannelYPos1,
-	BPMChannelMSum1,
-	BPMChannelPSum1,
-	BPMChannelAMag1,
-	BPMChannelBMag1,
-	BPMChannelCMag1,
-	BPMChannelDMag1,
-	BPMChannelAPha1,
-	BPMChannelBPha1,
-	BPMChannelCPha1,
-	BPMChannelDPha1,
-
-	BPMChannelXPos2,
-	BPMChannelYPos2,
-	BPMChannelMSum2,
-	BPMChannelPSum2,
-	BPMChannelAMag2,
-	BPMChannelBMag2,
-	BPMChannelCMag2,
-	BPMChannelDMag2,
-	BPMChannelAPha2,
-	BPMChannelBPha2,
-	BPMChannelCPha2,
-	BPMChannelDPha2,
-} BPMChannelIndex;
-*/
-
 typedef enum _BpmChannelIndex {
 	BPMChannelXPos = 0,
 	BPMChannelYPos,
@@ -61,7 +31,7 @@ typedef enum _BpmChannelIndex {
 	BPMChannelCPha,
 	BPMChannelDPha,
 } BPMChannelIndex;
-#define ADSIS8300DRV_NUM_BPM_CHANNELS   12          /**< Number of BPM channels on one instance. */
+#define ADSIS8300BPM_NUM_CHANNELS      12
 
 /* System wide parameters */
 #define BpmFirmwareVersionString                    "BPM_FW_VERSION"
@@ -101,13 +71,8 @@ typedef enum _BpmChannelIndex {
 #define BpmIIlkIRQString                            "BPMI_ILK_IRQ"
 #define BpmIDivXPosErrString                        "BPMI_DIV_XPOS_ERR"
 #define BpmIDivYPosErrString                        "BPMI_DIV_YPOS_ERR"
-/* BPM channel wide parameters */
-//#define BpmNConvFactorString                        "BPMN_CONV_FACTOR"
 
 #define ADSIS8300BPM_IRQ_WAIT_TIME      0
-
-#define ADSIS8300BPM_BPM1_NDARRAY           2
-#define ADSIS8300BPM_BPM2_NDARRAY           3
 
 /** Struck SIS8300 BPM driver; does 1-D waveforms on 12 channels.
   * Inherits from ADSIS8300 */
@@ -163,8 +128,6 @@ protected:
     int P_IIlkIRQ;
     int P_IDivXPosErr;
     int P_IDivYPosErr;
-    /* BPM channel wide parameters */
-//    int P_NConvFactor;
 
     int P_Dummy2;
     #define LAST_SIS8300BPM_PARAM P_Dummy2

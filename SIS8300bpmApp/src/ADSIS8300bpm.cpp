@@ -42,12 +42,12 @@
 static const char *driverName = "ADSIS8300bpm";
 
 /* asyn addresses:
- * 0         AI channels
- * 1         BPM1 channels
- * 2         BPM2 channels
+ * 0 .. 9    AI channels
+ * 10        BPM1 channels
+ * 11        BPM2 channels
  */
-#define SIS8300BPM_BPM1_ADDR		1
-#define SIS8300BPM_BPM2_ADDR		2
+#define SIS8300BPM_BPM1_ADDR		10
+#define SIS8300BPM_BPM2_ADDR		11
 
 /** Constructor for SIS8300bpm; most parameters are simply passed to ADSIS8300::ADSIS8300.
   * After calling the base class constructor this method creates a thread to compute the simulated detector data,
@@ -85,6 +85,9 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     printf("%s::%s: %d addresses, %d parameters\n", driverName, __func__,
     		maxAddr, NUM_SIS8300BPM_PARAMS);
 
+    /* adjust number of NDArrays we need to handle, 0 - AI, 1 - BPM1 and 2 - BPM2 */
+    mNumArrays = 3;
+
     /* System wide parameters */
     createParam(BpmFirmwareVersionString,         asynParamInt32, &P_BPMFirmwareVersion);
     createParam(BpmPulseDoneString,               asynParamInt32, &P_PulseDone);
@@ -110,7 +113,7 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     createParam(BpmFilterGainString,            asynParamFloat64, &P_FilterGain);
     createParam(BpmFilterApplyString,             asynParamInt32, &P_FilterApply);
     /* BPM instance wide parameters (BPM1 or BPM2)*/
-    for (i = 1; i < 3; i++) {
+    for (i = SIS8300BPM_BPM1_ADDR; i <= SIS8300BPM_BPM2_ADDR; i++) {
 		createParam(i, BpmIEnableString,                 asynParamInt32, &P_IEnable);
 		createParam(i, BpmIThrXPosLowString,           asynParamFloat64, &P_IThrXPosLow);
 		createParam(i, BpmIThrXPosHighString,          asynParamFloat64, &P_IThrXPosHigh);
@@ -125,8 +128,6 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
 		createParam(i, BpmIDivXPosErrString,             asynParamInt32, &P_IDivXPosErr);
 		createParam(i, BpmIDivYPosErrString,             asynParamInt32, &P_IDivYPosErr);
     }
-    /* BPM channel wide parameters */
-//    createParam(BpmNConvFactorString,           asynParamFloat64, &P_NConvFactor);
 
     mDoBoardSetupUpdate = false;
     mDoNearIQUpdate = false;
@@ -171,17 +172,17 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 
     getIntegerParam(P_NumTimePoints, &numTimePoints);
 
-    /* 0th NDArray is for raw AI data samples */
-    if (! this->pArrays[ADSIS8300_RAW_NDARRAY]) {
+    /* local NDArray is for raw AI data samples */
+    if (! mRawDataArray) {
     	return -1;
     }
-    pRaw = (epicsUInt16 *)this->pArrays[ADSIS8300_RAW_NDARRAY]->pData;
+    pRaw = (epicsUInt16 *)mRawDataArray->pData;
 
-    /* 1st NDArray is for converted AI data samples */
-    if (! this->pArrays[ADSIS8300_AI_NDARRAY]) {
+    /* 0th NDArray is for converted AI data samples */
+    if (! this->pArrays[0]) {
     	return -1;
     }
-    pData = (epicsType *)this->pArrays[ADSIS8300_AI_NDARRAY]->pData;
+    pData = (epicsType *)this->pArrays[0]->pData;
 	pChRaw = pRaw + (aich * numTimePoints);
 	pVal = pData + aich;
 
@@ -227,18 +228,21 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
     getIntegerParam(P_MemMux, &memMux);
     getIntegerParam(P_MemMux10, &memMux10);
 
-    /* 0th NDArray is for raw AI data samples */
-    if (! this->pArrays[ADSIS8300_RAW_NDARRAY]) {
+    /* local NDArray is for raw AI data samples */
+    if (! mRawDataArray) {
     	return -1;
     }
-    pRaw = (epicsUInt16 *)this->pArrays[ADSIS8300_RAW_NDARRAY]->pData;
-
-//    /* 1st NDArray is for raw AI data samples */
-//    if (! this->pArrays[ADSIS8300_AI_NDARRAY]) {
-//    	return -1;
-//    }
-    pData1 = (epicsType *)this->pArrays[ADSIS8300BPM_BPM1_NDARRAY]->pData;
-    pData2 = (epicsType *)this->pArrays[ADSIS8300BPM_BPM2_NDARRAY]->pData;
+    pRaw = (epicsUInt16 *)mRawDataArray->pData;
+    /* 1st NDArray is for BPM 1 data samples */
+    if (! this->pArrays[1]) {
+    	return -1;
+    }
+    pData1 = (epicsType *)this->pArrays[1]->pData;
+    /* 2nd NDArray is for BPM 2 data samples */
+    if (! this->pArrays[2]) {
+    	return -1;
+    }
+    pData2 = (epicsType *)this->pArrays[2]->pData;
 
 	i = 0;
 	j = 0;
@@ -364,8 +368,8 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 		/* adjust BPM offset for all channels */
 		j++;
 		/* adjust BPM data pointer */
-		pVal1 += ADSIS8300DRV_NUM_BPM_CHANNELS;
-		pVal2 += ADSIS8300DRV_NUM_BPM_CHANNELS;
+		pVal1 += ADSIS8300BPM_NUM_CHANNELS;
+		pVal2 += ADSIS8300BPM_NUM_CHANNELS;
 		}
 //		fclose(fp);
 
@@ -412,8 +416,8 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 	printf("%s::%s: nearIQ N %d, num samples %d, num BPM samples %d, memMux %d, memMux10 %d\n", driverName, __func__,
 			nearIQN, numTimePoints, numBPMSamples, memMux, memMux10);
 
-    /* 0th NDArray is for raw AI data samples */
-    if (! this->pArrays[ADSIS8300_RAW_NDARRAY]) {
+    /* local NDArray is for raw AI data samples */
+    if (! mRawDataArray) {
     	return -1;
     }
 
@@ -421,33 +425,33 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     dims[0] = SIS8300DRV_NUM_AI_CHANNELS;
     dims[1] = numTimePoints;
 
-    /* 1st NDArray is for converted AI data samples */
-    if (this->pArrays[ADSIS8300_AI_NDARRAY]) {
-    	this->pArrays[ADSIS8300_AI_NDARRAY]->release();
+    /* 0th NDArray is for converted AI data samples */
+    if (this->pArrays[0]) {
+    	this->pArrays[0]->release();
     }
-    this->pArrays[ADSIS8300_AI_NDARRAY] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
-    pData = (epicsType *)this->pArrays[ADSIS8300_AI_NDARRAY]->pData;
+    this->pArrays[0] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[0]->pData;
     memset(pData, 0, SIS8300DRV_NUM_AI_CHANNELS * numTimePoints * sizeof(epicsType));
 
     /* converted BPM data samples of all channels are interleaved */
-    dims[0] = ADSIS8300DRV_NUM_BPM_CHANNELS;
+    dims[0] = ADSIS8300BPM_NUM_CHANNELS;
     dims[1] = numBPMSamples;
 
-    /* 2nd NDArray is for converted BPM1 data samples */
-    if (this->pArrays[ADSIS8300BPM_BPM1_NDARRAY]) {
-    	this->pArrays[ADSIS8300BPM_BPM1_NDARRAY]->release();
+    /* 1st NDArray is for converted BPM1 data samples */
+    if (this->pArrays[1]) {
+    	this->pArrays[1]->release();
     }
-    this->pArrays[ADSIS8300BPM_BPM1_NDARRAY] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
-    pData = (epicsType *)this->pArrays[ADSIS8300BPM_BPM1_NDARRAY]->pData;
-    memset(pData, 0, 2 * ADSIS8300DRV_NUM_BPM_CHANNELS * numBPMSamples * sizeof(epicsType));
+    this->pArrays[1] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[1]->pData;
+    memset(pData, 0, ADSIS8300BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
 
-    /* 3rd NDArray is for converted BPM2 data samples */
-    if (this->pArrays[ADSIS8300BPM_BPM2_NDARRAY]) {
-    	this->pArrays[ADSIS8300BPM_BPM2_NDARRAY]->release();
+    /* 2nd NDArray is for converted BPM2 data samples */
+    if (this->pArrays[2]) {
+    	this->pArrays[2]->release();
     }
-    this->pArrays[ADSIS8300BPM_BPM2_NDARRAY] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
-    pData = (epicsType *)this->pArrays[ADSIS8300BPM_BPM2_NDARRAY]->pData;
-    memset(pData, 0, 2 * ADSIS8300DRV_NUM_BPM_CHANNELS * numBPMSamples * sizeof(epicsType));
+    this->pArrays[2] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
+    pData = (epicsType *)this->pArrays[2]->pData;
+    memset(pData, 0, ADSIS8300BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
 
     for (aich = 0; aich < SIS8300DRV_NUM_AI_CHANNELS; aich++) {
         if (!(mChannelMask & (1 << aich))) {

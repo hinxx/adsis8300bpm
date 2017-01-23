@@ -12,8 +12,7 @@ include $(TOP)/configure/CONFIG
 # databases, templates, substitutions like this
 
 DB += SIS8300bpm.template
-#DB += SIS8300bpmN.template
-DB += SIS8300bpmI.template
+DB += SIS8300bpmN.template
 
 #----------------------------------------------------
 # If <anyname>.db template is not named <anyname>*.template add

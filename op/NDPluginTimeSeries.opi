@@ -720,6 +720,24 @@ $(pv_value)</tooltip>
           <replace>0</replace>
           <description>$(T9)</description>
         </action>
+        <action type="OPEN_DISPLAY">
+          <path>NDTimeSeriesPlot.opi</path>
+          <macros>
+            <include_parent_macros>true</include_parent_macros>
+            <RN>$(R10)</RN>
+          </macros>
+          <replace>0</replace>
+          <description>$(T10)</description>
+        </action>
+        <action type="OPEN_DISPLAY">
+          <path>NDTimeSeriesPlot.opi</path>
+          <macros>
+            <include_parent_macros>true</include_parent_macros>
+            <RN>$(R11)</RN>
+          </macros>
+          <replace>0</replace>
+          <description>$(T11)</description>
+        </action>
       </actions>
       <font>
         <opifont.name fontName="Noto Sans" height="9" style="0">Default</opifont.name>
