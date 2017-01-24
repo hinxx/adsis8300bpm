@@ -56,7 +56,7 @@ static const char *driverName = "ADSIS8300bpm";
   * \param[in] devicePath The path to the /dev entry.
   * \param[in] maxAddr The maximum  number of asyn addr addresses this driver supports. 1 is minimum.
   * \param[in] numParams The number of parameters in the derived class.
-  * \param[in] numTimePoints The initial number of time points.
+  * \param[in] numSamples The initial number of samples.
   * \param[in] dataType The initial data type (NDDataType_t) of the arrays that this driver will create.
   * \param[in] maxBuffers The maximum number of NDArray buffers that the NDArrayPool for this driver is
   *            allowed to allocate. Set this to -1 to allow an unlimited number of buffers.
@@ -66,13 +66,13 @@ static const char *driverName = "ADSIS8300bpm";
   * \param[in] stackSize The stack size for the asyn port driver thread if ASYN_CANBLOCK is set in asynFlags.
   */
 ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
-		int maxAddr, int numTimePoints, NDDataType_t dataType,
+		int maxAddr, int numSamples, NDDataType_t dataType,
 		int maxBuffers, size_t maxMemory, int priority, int stackSize)
 
     : ADSIS8300(portName, devicePath,
     		maxAddr,
     		NUM_SIS8300BPM_PARAMS,
-			numTimePoints,
+			numSamples,
 			dataType,
 			maxBuffers, maxMemory,
 			priority,
@@ -82,8 +82,8 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
 	int i;
     int status = asynSuccess;
 
-    printf("%s::%s: %d addresses, %d parameters\n", driverName, __func__,
-    		maxAddr, NUM_SIS8300BPM_PARAMS);
+    D(printf("%d addresses, %d parameters\n",
+    		maxAddr, NUM_SIS8300BPM_PARAMS));
 
     /* adjust number of NDArrays we need to handle, 0 - AI, 1 - BPM1 and 2 - BPM2 */
     mNumArrays = 3;
@@ -137,7 +137,7 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     mDoBpm2ThresholdUpdate = false;
 
     if (status) {
-        printf("%s::%s: unable to set parameters\n", driverName, __func__);
+        E(printf("unable to set parameters\n"));
         return;
     }
 
@@ -145,32 +145,32 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     initDevice();
     this->unlock();
 
-	printf("%s::%s: Init done...\n", driverName, __func__);
+	I(printf("Init done...\n"));
 }
 
 ADSIS8300bpm::~ADSIS8300bpm() {
-	printf("%s::%s: Shutdown and freeing up memory...\n", driverName, __func__);
+	D(printf("Shutdown and freeing up memory...\n"));
 
 	this->lock();
-	printf("%s::%s: Data thread is already down!\n", driverName, __func__);
+	D(printf("Data thread is already down!\n"));
 	destroyDevice();
 
 	this->unlock();
-	printf("%s::%s: Shutdown complete!\n", driverName, __func__);
+	I(printf("Shutdown complete!\n"));
 }
 
 /** Template function to compute the simulated detector data for any data type */
 template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 {
-    int numTimePoints;
+    int numAiSamples;
     epicsType *pData, *pVal;
     epicsUInt16 *pRaw, *pChRaw;
     int i;
     bool negative;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
-    getIntegerParam(P_NumAiSamples, &numTimePoints);
+    getIntegerParam(P_NumAiSamples, &numAiSamples);
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -183,14 +183,14 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
     	return -1;
     }
     pData = (epicsType *)this->pArrays[0]->pData;
-	pChRaw = pRaw + (aich * numTimePoints);
+	pChRaw = pRaw + (aich * numAiSamples);
 	pVal = pData + aich;
 
 //	char fname[32];
 //	sprintf(fname, "/tmp/%d.txt", aich);
 //	FILE *fp = fopen(fname, "w");
-	printf("%s::%s: CH %d [%d] ", driverName, __func__, aich, numTimePoints);
-	for (i = 0; i < numTimePoints; i++) {
+	D(printf("CH %d [%d] ", aich, numAiSamples));
+	for (i = 0; i < numAiSamples; i++) {
 		negative = (*(pChRaw + i) & (1 << 15)) != 0;
 		if (negative) {
 			*pVal = (epicsType)((double)(*(pChRaw + i) | ~((1 << 16) - 1))/* * convFactor + convOffset*/);
@@ -202,7 +202,7 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 //		fprintf(fp, "%f\n", (double)*pVal);
 		pVal += SIS8300DRV_NUM_AI_CHANNELS;
 	}
-	printf("\n");
+	D0(printf("\n"));
 //	fclose(fp);
 
     return 0;
@@ -211,7 +211,7 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 /** Template function to compute the simulated detector data for any data type */
 template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 {
-    int numTimePoints;
+    int numAiSamples;
     int numBPMSamples;
     epicsType *pData1, *pVal1;
     epicsType *pData2, *pVal2;
@@ -220,9 +220,9 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
     double converted;
     int nearIQN, memMux, memMux10;
     
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
-    getIntegerParam(P_NumAiSamples, &numTimePoints);
+    getIntegerParam(P_NumAiSamples, &numAiSamples);
     getIntegerParam(P_NumBPMSamples, &numBPMSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
@@ -246,34 +246,33 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 
 	i = 0;
 	j = 0;
-	pChRaw = pRaw + (aich * numTimePoints);
+	pChRaw = pRaw + (aich * numAiSamples);
 	pVal1 = pData1;
 	pVal2 = pData2;
 
 	/* find the first non 0xDEAD sample in this channel */
-	while (i < numTimePoints) {
+	while (i < numAiSamples) {
 		if (*pChRaw != 0xDEAD) {
-			printf("%s::%s: First non 0xDEAD sample index %d\n", driverName, __func__, i);
+			D(printf("First non 0xDEAD sample index %d\n", i));
 			break;
 		}
 		i++;
 		pChRaw++;
 	}
 
-	printf("%s::%s: CH %d [%d] BPM samples %d\n", driverName, __func__,
-			aich, numTimePoints, numBPMSamples);
+	D(printf("CH %d [%d] BPM samples %d\n", aich, numAiSamples, numBPMSamples));
 
 //	char fname[32];
 //	sprintf(fname, "/tmp/bpm_X1_%d.txt", aich);
 //	FILE *fp = fopen(fname, "w");
-	while (i < numTimePoints) {
+	while (i < numAiSamples) {
 		/* since will always take less IQ samples from raw data than available
 		 * we need to bail out when desired amount was collected */
 		if (j == numBPMSamples) {
 			break;
 		}
 
-		assert(i < numTimePoints);
+		assert(i < numAiSamples);
 
 		if ((aich == 5) || ((aich == 9) && (memMux == 2) && (memMux10 == 1))) {
 			/* BPM magnitude and phase sum data is here */
@@ -357,7 +356,7 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 3), sis8300drvbpm_Qmn_position, &converted));
 			*(pVal2 + BPMChannelYPos) = converted;
 		} else {
-			printf("%s::%s: Should not be here!!!\n", driverName, __func__);
+			E(printf("Should not be here!!!\n"));
 			assert(1 == 0);
 		}
 
@@ -380,7 +379,7 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 {
     size_t dims[2];
-    int numTimePoints;
+    int numAiSamples;
     int numBPMSamples;
     int numIQSamples;
     NDDataType_t dataType;
@@ -389,17 +388,17 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     int nearIQN, memMux, memMux10;
     int ret;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
     getIntegerParam(NDDataType, (int *)&dataType);
-    getIntegerParam(P_NumAiSamples, &numTimePoints);
+    getIntegerParam(P_NumAiSamples, &numAiSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
     getIntegerParam(P_MemMux10, &memMux10);
     setIntegerParam(P_NumBPMSamples, 0);
     getIntegerParam(P_NumIQSamples, &numIQSamples);
 
-    numBPMSamples = (int)(numTimePoints / nearIQN);
+    numBPMSamples = (int)(numAiSamples / nearIQN);
     /* number of available IQ samples might be less than we expect from above
      * calculation which is based on requested number of raw samples */
     if (numBPMSamples > numIQSamples) {
@@ -408,13 +407,13 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     /* we want to ignore the first couple of samples, arbitrarily value is chosen */
     numBPMSamples -= 10;
     if (numBPMSamples < 1) {
-    	printf("%s::%s: not enough raw samples requested %d for used near IQ N %d!! Need at least %d raw samples\n", driverName, __func__,
-    			numTimePoints, nearIQN, 11 * nearIQN);
+    	E(printf("not enough raw samples requested %d for used near IQ N %d!! Need at least %d raw samples\n",
+    			numAiSamples, nearIQN, 11 * nearIQN));
     	return -1;
     }
     setIntegerParam(P_NumBPMSamples, numBPMSamples);
-	printf("%s::%s: nearIQ N %d, num samples %d, num BPM samples %d, memMux %d, memMux10 %d\n", driverName, __func__,
-			nearIQN, numTimePoints, numBPMSamples, memMux, memMux10);
+	E(printf("nearIQ N %d, num samples %d, num BPM samples %d, memMux %d, memMux10 %d\n",
+			nearIQN, numAiSamples, numBPMSamples, memMux, memMux10));
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -423,7 +422,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 
     /* converted AI data samples of all channel are interleaved */
     dims[0] = SIS8300DRV_NUM_AI_CHANNELS;
-    dims[1] = numTimePoints;
+    dims[1] = numAiSamples;
 
     /* 0th NDArray is for converted AI data samples */
     if (this->pArrays[0]) {
@@ -431,7 +430,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     }
     this->pArrays[0] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
     pData = (epicsType *)this->pArrays[0]->pData;
-    memset(pData, 0, SIS8300DRV_NUM_AI_CHANNELS * numTimePoints * sizeof(epicsType));
+    memset(pData, 0, SIS8300DRV_NUM_AI_CHANNELS * numAiSamples * sizeof(epicsType));
 
     /* converted BPM data samples of all channels are interleaved */
     dims[0] = ADSIS8300BPM_NUM_CHANNELS;
@@ -462,7 +461,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 			/* AI data is here */
 			ret = convertAIArraysT<epicsType>(aich);
 		} else if ((aich == 9) && (memMux != 2)) {
-			printf("%s::%s: Not interested in aich 9 data (memMux != 2)..\n", driverName, __func__);
+			D(printf("Not interested in aich 9 data (memMux != 2)..\n"));
 		} else {
 			/* BPM data is here */
 			ret = convertBPMArraysT<epicsType>(aich);
@@ -520,7 +519,7 @@ int ADSIS8300bpm::acquireArrays()
 
 int ADSIS8300bpm::initDeviceDone()
 {
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_init_done", sis8300drvbpm_init_done(mSisDevice));
 
@@ -529,7 +528,7 @@ int ADSIS8300bpm::initDeviceDone()
 
 int ADSIS8300bpm::armDevice()
 {
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_gop", sis8300drvbpm_clear_gop(mSisDevice));
 	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_pulse_done_count", sis8300drvbpm_clear_pulse_done_count(mSisDevice));
@@ -542,7 +541,7 @@ int ADSIS8300bpm::armDevice()
 
 int ADSIS8300bpm::disarmDevice()
 {
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	SIS8300DRV_CALL_VOID("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 
@@ -551,7 +550,7 @@ int ADSIS8300bpm::disarmDevice()
 
 int ADSIS8300bpm::waitForDevice()
 {
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 //	ret = SIS8300DRV_CALL("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_pposition(mSisDevice, SIS8300BPM_IRQ_WAIT_TIME));
 // XXX: Debug!
@@ -567,7 +566,7 @@ int ADSIS8300bpm::deviceDone()
 	unsigned int sampleCount;
 	unsigned int gop;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	pulseCount = 0;
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_pulse_done_count", sis8300drvbpm_get_pulse_done_count(mSisDevice, &pulseCount));
@@ -632,7 +631,7 @@ int ADSIS8300bpm::updateParameters()
 	int ret = 0;
     bool doShadowUpdate = false;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	if (mDoNearIQUpdate) {
 		ret = updateNearIQ();
@@ -667,7 +666,7 @@ int ADSIS8300bpm::updateBoardSetup()
 	int trigSetup;
 	unsigned int boardSetup;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	getIntegerParam(P_MemMux, &memMux);
 	getIntegerParam(P_MemMux10, &memMux10);
@@ -683,7 +682,7 @@ int ADSIS8300bpm::updateBoardSetup()
 			(ilk1Ctrl & 0x1) << 19 | (ilk2Ctrl & 0x1) << 18 |
 			(memMux & 0x3) << 8 | (memMux10 & 0x3) << 6 |
 			(trigSetup & 0x3) << 0;
-	printf("%s::%s: New board setup 0x%08X\n", driverName, __func__, boardSetup);
+	D(printf("New board setup 0x%08X\n", boardSetup));
 
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300BPM_BOARD_SETUP_REG, boardSetup));
 	mDoBoardSetupUpdate = false;
@@ -695,12 +694,12 @@ int ADSIS8300bpm::updateNearIQ()
 {
 	int n, m;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	getIntegerParam(P_NearIQM, &m);
 	getIntegerParam(P_NearIQN, &n);
 
-	printf("%s::%s: New near IQ M = %d, N = %d\n", driverName, __func__, m, n);
+	D(printf("New near IQ M = %d, N = %d\n", m, n));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_set_near_iq", sis8300drvbpm_set_near_iq(mSisDevice, m, n));
 
@@ -715,7 +714,7 @@ int ADSIS8300bpm::updateFilter()
 	epicsFloat64 gain;
 	int filterControl;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	if (mDoFilterCoeffUpdate) {
 		getDoubleParam(P_FilterCoeff0, &coeff[0]);
@@ -739,7 +738,7 @@ int ADSIS8300bpm::updateFilter()
 	if (mDoFilterControlUpdate) {
 		getIntegerParam(P_FilterControl, &filterControl);
 
-		printf("%s::%s: New filter control %d\n", driverName, __func__, filterControl);
+		D(printf("New filter control %d\n", filterControl));
 
 		SIS8300DRV_CALL_RET("sis8300drvbpm_set_fir_filter_enable", sis8300drvbpm_set_fir_filter_enable(mSisDevice, filterControl));
 		mDoFilterControlUpdate = false;
@@ -761,7 +760,7 @@ int ADSIS8300bpm::updateThreshold(int addr)
 	uint32_t conv;
 	double err;
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	if (addr == SIS8300BPM_BPM1_ADDR) {
 		thrMagCtrlReg = SIS8300BPM_POS_MAG_CTRL1_REG;
@@ -820,7 +819,7 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     asynStatus status = asynSuccess;
 
     getAddress(pasynUser, &addr);
-    printf("%s::%s: ENTER %d (%d) = %d\n", driverName, __func__, function, addr, value);
+    D(printf("Enter %d (%d) = %d\n", function, addr, value));
  
     /* Set the parameter and readback in the parameter library.  This may be overwritten when we read back the
      * status at the end, but that's OK */
@@ -883,7 +882,7 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
     asynStatus status = asynSuccess;
 
     getAddress(pasynUser, &addr);
-    printf("%s::%s: ENTER %d (%d) = %f\n", driverName, __func__, function, addr, value);
+    D(printf("Enter %d (%d) = %f\n", function, addr, value));
 
     /* Set the parameter and readback in the parameter library.  This may be overwritten when we read back the
      * status at the end, but that's OK */
@@ -943,7 +942,7 @@ int ADSIS8300bpm::initDevice()
 	unsigned int ver_minor;
 	char message[128];
 
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_fw_version", sis8300drvbpm_get_fw_version(mSisDevice, &ver_device, &ver_major, &ver_minor));
 	setIntegerParam(P_BPMFirmwareVersion, ver_major << 8 | ver_minor);
@@ -972,8 +971,7 @@ int ADSIS8300bpm::initDevice()
 
 int ADSIS8300bpm::destroyDevice()
 {
-
-	printf("%s::%s: Enter\n", driverName, __func__);
+	D(printf("Enter\n"));
 
 	// XXX Add BPM specific destroy here
 
@@ -982,12 +980,12 @@ int ADSIS8300bpm::destroyDevice()
 
 /** Configuration command, called directly or from iocsh */
 extern "C" int SIS8300BpmConfig(const char *portName, const char *devicePath,
-		int maxAddr, int numTimePoints, int dataType, int maxBuffers, int maxMemory,
+		int maxAddr, int numSamples, int dataType, int maxBuffers, int maxMemory,
 		int priority, int stackSize)
 {
     new ADSIS8300bpm(portName, devicePath,
     		maxAddr,
-    		numTimePoints,
+    		numSamples,
 			(NDDataType_t)dataType,
 			(maxBuffers < 0) ? 0 : maxBuffers,
 			(maxMemory < 0) ? 0 : maxMemory,
@@ -999,7 +997,7 @@ extern "C" int SIS8300BpmConfig(const char *portName, const char *devicePath,
 static const iocshArg SIS8300BpmConfigArg0 = {"Port name",     iocshArgString};
 static const iocshArg SIS8300BpmConfigArg1 = {"Device path",   iocshArgString};
 static const iocshArg SIS8300BpmConfigArg2 = {"# channels",    iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg3 = {"# time points", iocshArgInt};
+static const iocshArg SIS8300BpmConfigArg3 = {"# samples",     iocshArgInt};
 static const iocshArg SIS8300BpmConfigArg4 = {"Data type",     iocshArgInt};
 static const iocshArg SIS8300BpmConfigArg5 = {"maxBuffers",    iocshArgInt};
 static const iocshArg SIS8300BpmConfigArg6 = {"maxMemory",     iocshArgInt};
