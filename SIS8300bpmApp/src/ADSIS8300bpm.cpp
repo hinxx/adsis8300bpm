@@ -170,7 +170,7 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-    getIntegerParam(P_NumTimePoints, &numTimePoints);
+    getIntegerParam(P_NumAiSamples, &numTimePoints);
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -222,7 +222,7 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
     
 	printf("%s::%s: Enter\n", driverName, __func__);
 
-    getIntegerParam(P_NumTimePoints, &numTimePoints);
+    getIntegerParam(P_NumAiSamples, &numTimePoints);
     getIntegerParam(P_NumBPMSamples, &numBPMSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
@@ -392,7 +392,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 	printf("%s::%s: Enter\n", driverName, __func__);
 
     getIntegerParam(NDDataType, (int *)&dataType);
-    getIntegerParam(P_NumTimePoints, &numTimePoints);
+    getIntegerParam(P_NumAiSamples, &numTimePoints);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
     getIntegerParam(P_MemMux10, &memMux10);
