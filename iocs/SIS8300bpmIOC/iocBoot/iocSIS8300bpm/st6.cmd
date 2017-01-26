@@ -54,7 +54,7 @@ epicsEnvSet("BPMCH12",    "DPHA")
 # ADDR 10 .. 11 are for BPM1 and BPM2
 epicsEnvSet("NUM_CH",        "12")
 # Number of samples to acquire
-epicsEnvSet("NUM_SAMPLES",   "1024")
+epicsEnvSet("NUM_SAMPLES",   "260000")
 # The maximum number of time series points in the NDPluginTimeSeries plugin
 epicsEnvSet("TSPOINTS",      "600000")
 
@@ -237,7 +237,7 @@ iocInit()
 # Set some defaults for BPM
 dbpf $(PREFIX)ClockSource 2
 dbpf $(PREFIX)ClockDiv 1
-dbpf $(PREFIX)TrigSource 1
+dbpf $(PREFIX)ClockFreq 88052500
 dbpf $(PREFIX)TrigSetup 0
 dbpf $(PREFIX)RTMType 2
 dbpf $(PREFIX)RTMTempGet 1

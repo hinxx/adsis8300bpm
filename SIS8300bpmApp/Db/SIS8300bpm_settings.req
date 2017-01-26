@@ -2,6 +2,8 @@ $(P)$(R)NearIQM
 $(P)$(R)NearIQN
 $(P)$(R)MemMux
 $(P)$(R)MemMux10
+$(P)$(R)TrigSetup
+$(P)$(R)FilterControl
 $(P)$(R)FilterEnable
 $(P)$(R)FilterCoeff0
 $(P)$(R)FilterCoeff1

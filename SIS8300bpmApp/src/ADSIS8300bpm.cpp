@@ -381,11 +381,10 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     size_t dims[2];
     int numAiSamples;
     int numBPMSamples;
-    int numIQSamples;
     NDDataType_t dataType;
     epicsType *pData;
     int aich;
-    int nearIQN, memMux, memMux10;
+    int nearIQN, memMux;
     int ret;
 
 	D(printf("Enter\n"));
@@ -394,26 +393,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     getIntegerParam(P_NumAiSamples, &numAiSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
-    getIntegerParam(P_MemMux10, &memMux10);
-    setIntegerParam(P_NumBPMSamples, 0);
-    getIntegerParam(P_NumIQSamples, &numIQSamples);
-
-    numBPMSamples = (int)(numAiSamples / nearIQN);
-    /* number of available IQ samples might be less than we expect from above
-     * calculation which is based on requested number of raw samples */
-    if (numBPMSamples > numIQSamples) {
-    	numBPMSamples = numIQSamples;
-    }
-    /* we want to ignore the first couple of samples, arbitrarily value is chosen */
-    numBPMSamples -= 10;
-    if (numBPMSamples < 1) {
-    	E(printf("not enough raw samples requested %d for used near IQ N %d!! Need at least %d raw samples\n",
-    			numAiSamples, nearIQN, 11 * nearIQN));
-    	return -1;
-    }
-    setIntegerParam(P_NumBPMSamples, numBPMSamples);
-	E(printf("nearIQ N %d, num samples %d, num BPM samples %d, memMux %d, memMux10 %d\n",
-			nearIQN, numAiSamples, numBPMSamples, memMux, memMux10));
+    getIntegerParam(P_NumBPMSamples, &numBPMSamples);
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -565,6 +545,10 @@ int ADSIS8300bpm::deviceDone()
 	unsigned int pulseCount;
 	unsigned int sampleCount;
 	unsigned int gop;
+	int numAiSamples;
+    int numBPMSamples;
+    int numIQSamples;
+    int nearIQN;
 
 	D(printf("Enter\n"));
 
@@ -580,10 +564,38 @@ int ADSIS8300bpm::deviceDone()
 	setIntegerParam(P_PulseCount, oldCount);
 	setIntegerParam(P_PulseDone, 1);
 
-	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
+	/* XXX: This is a crude workaround the fact that SAMPLE and IQ_SAMPLE counter
+	 * is being reset and updated *AFTER* the PULSE_DONE interrupt was sent.
+	 *
+	 * Fix firmware!
+	 */
+	for (int i = 0; i < 5000; i++) {
+		SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
+		numIQSamples = sampleCount;
+		SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
+		D(printf("[%i] SAMPLES %10d IQ %10d\n", i, sampleCount, numIQSamples));
+	}
 	setIntegerParam(P_NumSamples, sampleCount);
-	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
-	setIntegerParam(P_NumIQSamples, sampleCount);
+	setIntegerParam(P_NumIQSamples, numIQSamples);
+
+    getIntegerParam(P_NumAiSamples, &numAiSamples);
+    getIntegerParam(P_NearIQN, &nearIQN);
+    numBPMSamples = (int)(numAiSamples / nearIQN);
+    /* number of available IQ samples might be less than we expect from above
+     * calculation which is based on requested number of raw samples */
+    if (numBPMSamples > numIQSamples) {
+    	numBPMSamples = numIQSamples;
+    }
+    /* we want to ignore the first couple of samples, arbitrarily value is chosen */
+    numBPMSamples -= 10;
+    if (numBPMSamples < 1) {
+    	E(printf("not enough raw samples requested %d for used near IQ N %d!! Need at least %d raw samples\n",
+    			numAiSamples, nearIQN, 11 * nearIQN));
+    	return -1;
+    }
+    setIntegerParam(P_NumBPMSamples, numBPMSamples);
+	D(printf("nearIQ N %d, num samples %d, num BPM samples %d\n",
+			nearIQN, numAiSamples, numBPMSamples));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_gop", sis8300drvbpm_get_gop(mSisDevice, gop_all, &gop));
 	if (gop & (1 << gop_X1_pos_div_error)) {
@@ -960,6 +972,8 @@ int ADSIS8300bpm::initDevice()
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 	SIS8300DRV_CALL_RET("sis8300drvbpm_setup_dac", sis8300drvbpm_setup_dac(mSisDevice));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_gop", sis8300drvbpm_clear_gop(mSisDevice));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_pulse_done_count", sis8300drvbpm_clear_pulse_done_count(mSisDevice));
 
     snprintf(message, 128, "firmware %dv%02d compatible with software %dv%02d - %dv%02d",
     		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,

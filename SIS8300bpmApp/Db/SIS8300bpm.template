@@ -148,6 +148,21 @@ record(mbbi, "$(P)$(R)MemMux10_RBV") {
 
 # board setup
 
+# for BPM firmware trigger source is not selectable - always external
+record(mbbo, "$(P)$(R)TrigSource") {
+    field(DISA, "1")
+}
+
+# for BPM firmware trigger line is not selectable - see TrigSetup below
+record(mbbo, "$(P)$(R)TrigLine") {
+    field(DISA, "1")
+}
+
+# for BPM firmware trigger delay is not used
+record(longout, "$(P)$(R)TrigDelay") {
+    field(DISA, "1")
+}
+
 record(bo, "$(P)$(R)TrigSetup") {
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_TRIG_SETUP")
