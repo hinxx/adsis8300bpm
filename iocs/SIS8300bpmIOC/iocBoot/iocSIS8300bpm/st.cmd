@@ -5,7 +5,7 @@ dbLoadDatabase("$(TOP)/dbd/SIS8300bpmDemoApp.dbd")
 SIS8300bpmDemoApp_registerRecordDeviceDriver(pdbbase) 
 
 # Prefix for all records
-epicsEnvSet("PREFIX", "SIS8300:")
+epicsEnvSet("PREFIX", "BPM:")
 # The port name for the detector
 epicsEnvSet("PORT",   "SIS8300")
 # The queue size for all plugins
@@ -54,7 +54,7 @@ epicsEnvSet("BPMCH12",    "DPHA")
 # ADDR 10 .. 11 are for BPM1 and BPM2
 epicsEnvSet("NUM_CH",        "12")
 # Number of samples to acquire
-epicsEnvSet("NUM_SAMPLES",   "260000")
+epicsEnvSet("NUM_SAMPLES",   "300000")
 # The maximum number of time series points in the NDPluginTimeSeries plugin
 epicsEnvSet("TSPOINTS",      "600000")
 
@@ -95,7 +95,7 @@ dbLoadRecords("$(ADCORE)/db/NDStdArrays.template", "P=$(PREFIX),R=image1:,PORT=I
 
 # Time series plugin for converted AI data
 NDTimeSeriesConfigure("TS0", $(QSIZE), 0, "$(PORT)", 0, 10)
-dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS0:,   PORT=TS0,ADDR=0,TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=0,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TimeStep CP MS,ENABLED=1")
+dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS0:,   PORT=TS0,ADDR=0,TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=0,NCHANS=$(TSPOINTS),TIME_LINK=,ENABLED=1")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:0:, PORT=TS0,ADDR=0,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AICH0)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:1:, PORT=TS0,ADDR=1,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AICH1)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:2:, PORT=TS0,ADDR=2,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AICH2)")
@@ -108,8 +108,8 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:8:, PORT
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:9:, PORT=TS0,ADDR=9,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AICH9)")
 
 # Time series plugin for BPM1
-NDTimeSeriesConfigure("TS1", $(QSIZE), 0, "$(PORT)", 0, 12)
-dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS1:,   PORT=TS1,ADDR=0, TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=1,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TimeStep CP MS,ENABLED=1")
+NDTimeSeriesConfigure("TS1", $(QSIZE), 0, "$(PORT)", 1, 12)
+dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS1:,   PORT=TS1,ADDR=0, TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=1,NCHANS=$(TSPOINTS),TIME_LINK=,ENABLED=1")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:0:, PORT=TS1,ADDR=0, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH1)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:1:, PORT=TS1,ADDR=1, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH2)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:2:, PORT=TS1,ADDR=2, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH3)")
@@ -124,8 +124,8 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:10:,PORT
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:11:,PORT=TS1,ADDR=11,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH12)")
 
 # Time series plugin for BPM2
-NDTimeSeriesConfigure("TS2", $(QSIZE), 0, "$(PORT)", 0, 12)
-dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS2:,   PORT=TS2,ADDR=0, TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=2,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TimeStep CP MS,ENABLED=1")
+NDTimeSeriesConfigure("TS2", $(QSIZE), 0, "$(PORT)", 2, 12)
+dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS2:,   PORT=TS2,ADDR=0, TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=2,NCHANS=$(TSPOINTS),TIME_LINK=,ENABLED=1")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:0:, PORT=TS2,ADDR=0, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH1)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:1:, PORT=TS2,ADDR=1, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH2)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:2:, PORT=TS2,ADDR=2, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH3)")
