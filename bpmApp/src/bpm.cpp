@@ -89,44 +89,44 @@ Bpm::Bpm(const char *portName, const char *devicePath,
     mNumArrays = 3;
 
     /* System wide parameters */
-    createParam(BpmFirmwareVersionString,         asynParamInt32, &P_BPMFirmwareVersion);
-    createParam(BpmPulseDoneString,               asynParamInt32, &P_PulseDone);
-    createParam(BpmPulseCountString,              asynParamInt32, &P_PulseCount);
-    createParam(BpmPulseMissedString,             asynParamInt32, &P_PulseMissed);
-    createParam(BpmNearIQMString,                 asynParamInt32, &P_NearIQM);
-    createParam(BpmNearIQNString,                 asynParamInt32, &P_NearIQN);
-    createParam(BpmNumSamplesString,              asynParamInt32, &P_NumSamples);
-    createParam(BpmNumIQSamplesString,            asynParamInt32, &P_NumIQSamples);
-    createParam(BpmNumBPMSamplesString,           asynParamInt32, &P_NumBPMSamples);
-    createParam(BpmMemMuxString,                  asynParamInt32, &P_MemMux);
-    createParam(BpmMemMux10String,                asynParamInt32, &P_MemMux10);
-    createParam(BpmRegReadErrString,              asynParamInt32, &P_RegReadErr);
-    createParam(BpmRegWriteErrString,             asynParamInt32, &P_RegWriteErr);
-    createParam(BpmTrigSetupString,               asynParamInt32, &P_TrigSetup);
-    createParam(BpmFilterControlString,           asynParamInt32, &P_FilterControl);
-    createParam(BpmFilterCoeff0String,          asynParamFloat64, &P_FilterCoeff0);
-    createParam(BpmFilterCoeff1String,          asynParamFloat64, &P_FilterCoeff1);
-    createParam(BpmFilterCoeff2String,          asynParamFloat64, &P_FilterCoeff2);
-    createParam(BpmFilterCoeff3String,          asynParamFloat64, &P_FilterCoeff3);
-    createParam(BpmFilterCoeff4String,          asynParamFloat64, &P_FilterCoeff4);
-    createParam(BpmFilterCoeff5String,          asynParamFloat64, &P_FilterCoeff5);
-    createParam(BpmFilterGainString,            asynParamFloat64, &P_FilterGain);
-    createParam(BpmFilterApplyString,             asynParamInt32, &P_FilterApply);
+    createParam(BpmFwVersionString,               asynParamInt32, &mBpmFwVersion);
+    createParam(BpmPulseDoneString,               asynParamInt32, &mBpmPulseDone);
+    createParam(BpmPulseCountString,              asynParamInt32, &mBpmPulseCount);
+    createParam(BpmPulseMissedString,             asynParamInt32, &mBpmPulseMissed);
+    createParam(BpmNearIQMString,                 asynParamInt32, &mBpmNearIQM);
+    createParam(BpmNearIQNString,                 asynParamInt32, &mBpmNearIQN);
+    createParam(BpmNumSamplesString,              asynParamInt32, &mBpmNumSamples);
+    createParam(BpmNumIQSamplesString,            asynParamInt32, &mBpmNumIQSamples);
+    createParam(BpmNumBPMSamplesString,           asynParamInt32, &mBpmNumBPMSamples);
+    createParam(BpmMemMuxString,                  asynParamInt32, &mBpmMemMux);
+    createParam(BpmMemMux10String,                asynParamInt32, &mBpmMemMux10);
+    createParam(BpmRegReadErrString,              asynParamInt32, &mBpmRegReadErr);
+    createParam(BpmRegWriteErrString,             asynParamInt32, &mBpmRegWriteErr);
+    createParam(BpmTrigSetupString,               asynParamInt32, &mBpmTrigSetup);
+    createParam(BpmFilterControlString,           asynParamInt32, &mBpmFilterControl);
+    createParam(BpmFilterCoeff0String,          asynParamFloat64, &mBpmFilterCoeff0);
+    createParam(BpmFilterCoeff1String,          asynParamFloat64, &mBpmFilterCoeff1);
+    createParam(BpmFilterCoeff2String,          asynParamFloat64, &mBpmFilterCoeff2);
+    createParam(BpmFilterCoeff3String,          asynParamFloat64, &mBpmFilterCoeff3);
+    createParam(BpmFilterCoeff4String,          asynParamFloat64, &mBpmFilterCoeff4);
+    createParam(BpmFilterCoeff5String,          asynParamFloat64, &mBpmFilterCoeff5);
+    createParam(BpmFilterGainString,            asynParamFloat64, &mBpmFilterGain);
+    createParam(BpmFilterApplyString,             asynParamInt32, &mBpmFilterApply);
     /* BPM instance wide parameters (BPM1 or BPM2)*/
     for (i = BPM_BPM1_ADDR; i <= BPM_BPM2_ADDR; i++) {
-		createParam(i, BpmIEnableString,                 asynParamInt32, &P_IEnable);
-		createParam(i, BpmIThrXPosLowString,           asynParamFloat64, &P_IThrXPosLow);
-		createParam(i, BpmIThrXPosHighString,          asynParamFloat64, &P_IThrXPosHigh);
-		createParam(i, BpmIThrYPosLowString,           asynParamFloat64, &P_IThrYPosLow);
-		createParam(i, BpmIThrYPosHighString,          asynParamFloat64, &P_IThrYPosHigh);
-		createParam(i, BpmIThrMagnitudeString,         asynParamFloat64, &P_IThrMagnitude);
-		createParam(i, BpmIThrSelectString,              asynParamInt32, &P_IThrSelect);
-		createParam(i, BpmIIlkControlString,             asynParamInt32, &P_IIlkControl);
-		createParam(i, BpmIIlkClearString,               asynParamInt32, &P_IIlkClear);
-		createParam(i, BpmIIlkStatusString,              asynParamInt32, &P_IIlkStatus);
-		createParam(i, BpmIIlkIRQString,                 asynParamInt32, &P_IIlkIRQ);
-		createParam(i, BpmIDivXPosErrString,             asynParamInt32, &P_IDivXPosErr);
-		createParam(i, BpmIDivYPosErrString,             asynParamInt32, &P_IDivYPosErr);
+		createParam(i, BpmIEnableString,                 asynParamInt32, &mBpmIEnable);
+		createParam(i, BpmIThrXPosLowString,           asynParamFloat64, &mBpmIThrXPosLow);
+		createParam(i, BpmIThrXPosHighString,          asynParamFloat64, &mBpmIThrXPosHigh);
+		createParam(i, BpmIThrYPosLowString,           asynParamFloat64, &mBpmIThrYPosLow);
+		createParam(i, BpmIThrYPosHighString,          asynParamFloat64, &mBpmIThrYPosHigh);
+		createParam(i, BpmIThrMagnitudeString,         asynParamFloat64, &mBpmIThrMagnitude);
+		createParam(i, BpmIThrSelectString,              asynParamInt32, &mBpmIThrSelect);
+		createParam(i, BpmIIlkControlString,             asynParamInt32, &mBpmIIlkControl);
+		createParam(i, BpmIIlkClearString,               asynParamInt32, &mBpmIIlkClear);
+		createParam(i, BpmIIlkStatusString,              asynParamInt32, &mBpmIIlkStatus);
+		createParam(i, BpmIIlkIRQString,                 asynParamInt32, &mBpmIIlkIRQ);
+		createParam(i, BpmIDivXPosErrString,             asynParamInt32, &mBpmIDivXPosErr);
+		createParam(i, BpmIDivYPosErrString,             asynParamInt32, &mBpmIDivYPosErr);
     }
 
     mDoBoardSetupUpdate = false;
@@ -222,10 +222,10 @@ template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 	D(printf("Enter\n"));
 
     getIntegerParam(mSISNumAiSamples, &numAiSamples);
-    getIntegerParam(P_NumBPMSamples, &numBPMSamples);
-    getIntegerParam(P_NearIQN, &nearIQN);
-    getIntegerParam(P_MemMux, &memMux);
-    getIntegerParam(P_MemMux10, &memMux10);
+    getIntegerParam(mBpmNumBPMSamples, &numBPMSamples);
+    getIntegerParam(mBpmNearIQN, &nearIQN);
+    getIntegerParam(mBpmMemMux, &memMux);
+    getIntegerParam(mBpmMemMux10, &memMux10);
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -389,9 +389,9 @@ template <typename epicsType> int Bpm::convertArraysT()
 
     getIntegerParam(NDDataType, (int *)&dataType);
     getIntegerParam(mSISNumAiSamples, &numAiSamples);
-    getIntegerParam(P_NearIQN, &nearIQN);
-    getIntegerParam(P_MemMux, &memMux);
-    getIntegerParam(P_NumBPMSamples, &numBPMSamples);
+    getIntegerParam(mBpmNearIQN, &nearIQN);
+    getIntegerParam(mBpmMemMux, &memMux);
+    getIntegerParam(mBpmNumBPMSamples, &numBPMSamples);
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -513,7 +513,7 @@ int Bpm::armDevice()
 	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_pulse_done_count", sis8300drvbpm_clear_pulse_done_count(mSisDevice));
 	SIS8300DRV_CALL_RET("sis8300drvbpm_arm_device", sis8300drvbpm_arm_device(mSisDevice));
 
-	setIntegerParam(P_PulseDone, 0);
+	setIntegerParam(mBpmPulseDone, 0);
 
 	return 0;
 }
@@ -552,14 +552,14 @@ int Bpm::deviceDone()
 	pulseCount = 0;
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_pulse_done_count", sis8300drvbpm_get_pulse_done_count(mSisDevice, &pulseCount));
 	if (pulseCount != 1) {
-		setIntegerParam(P_PulseMissed, pulseCount - 1);
+		setIntegerParam(mBpmPulseMissed, pulseCount - 1);
 	} else {
-		setIntegerParam(P_PulseMissed, 0);
+		setIntegerParam(mBpmPulseMissed, 0);
 	}
-	getIntegerParam(P_PulseCount, &oldCount);
+	getIntegerParam(mBpmPulseCount, &oldCount);
 	oldCount += pulseCount;
-	setIntegerParam(P_PulseCount, oldCount);
-	setIntegerParam(P_PulseDone, 1);
+	setIntegerParam(mBpmPulseCount, oldCount);
+	setIntegerParam(mBpmPulseDone, 1);
 
 #if 0
 	/* XXX: This is a crude workaround the fact that SAMPLE and IQ_SAMPLE counter
@@ -579,11 +579,11 @@ int Bpm::deviceDone()
 	numIQSamples = sampleCount;
 	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
 	D(printf("SAMPLES %10d IQ %10d\n", sampleCount, numIQSamples));
-	setIntegerParam(P_NumSamples, sampleCount);
-	setIntegerParam(P_NumIQSamples, numIQSamples);
+	setIntegerParam(mBpmNumSamples, sampleCount);
+	setIntegerParam(mBpmNumIQSamples, numIQSamples);
 
     getIntegerParam(mSISNumAiSamples, &numAiSamples);
-    getIntegerParam(P_NearIQN, &nearIQN);
+    getIntegerParam(mBpmNearIQN, &nearIQN);
     numBPMSamples = (int)(numAiSamples / nearIQN);
     /* number of available IQ samples might be less than we expect from above
      * calculation which is based on requested number of raw samples */
@@ -597,46 +597,46 @@ int Bpm::deviceDone()
     			numAiSamples, nearIQN, 11 * nearIQN));
     	return -1;
     }
-    setIntegerParam(P_NumBPMSamples, numBPMSamples);
+    setIntegerParam(mBpmNumBPMSamples, numBPMSamples);
 	D(printf("nearIQ N %d, num samples %d, num BPM samples %d\n",
 			nearIQN, numAiSamples, numBPMSamples));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_gop", sis8300drvbpm_get_gop(mSisDevice, gop_all, &gop));
 	if (gop & (1 << gop_X1_pos_div_error)) {
-		setIntegerParam(BPM_BPM1_ADDR, P_IDivXPosErr, 1);
+		setIntegerParam(BPM_BPM1_ADDR, mBpmIDivXPosErr, 1);
 	} else {
-		setIntegerParam(BPM_BPM1_ADDR, P_IDivXPosErr, 0);
+		setIntegerParam(BPM_BPM1_ADDR, mBpmIDivXPosErr, 0);
 	}
 	if (gop & (1 << gop_Y1_pos_div_error)) {
-		setIntegerParam(BPM_BPM1_ADDR, P_IDivYPosErr, 1);
+		setIntegerParam(BPM_BPM1_ADDR, mBpmIDivYPosErr, 1);
 	} else {
-		setIntegerParam(BPM_BPM1_ADDR, P_IDivYPosErr, 0);
+		setIntegerParam(BPM_BPM1_ADDR, mBpmIDivYPosErr, 0);
 	}
 	if (gop & (1 << gop_X2_pos_div_error)) {
-		setIntegerParam(BPM_BPM2_ADDR, P_IDivXPosErr, 1);
+		setIntegerParam(BPM_BPM2_ADDR, mBpmIDivXPosErr, 1);
 	} else {
-		setIntegerParam(BPM_BPM2_ADDR, P_IDivXPosErr, 0);
+		setIntegerParam(BPM_BPM2_ADDR, mBpmIDivXPosErr, 0);
 	}
 	if (gop & (1 << gop_Y2_pos_div_error)) {
-		setIntegerParam(BPM_BPM2_ADDR, P_IDivYPosErr, 1);
+		setIntegerParam(BPM_BPM2_ADDR, mBpmIDivYPosErr, 1);
 	} else {
-		setIntegerParam(BPM_BPM2_ADDR, P_IDivYPosErr, 0);
+		setIntegerParam(BPM_BPM2_ADDR, mBpmIDivYPosErr, 0);
 	}
 	if (gop & (1 << gop_read_error)) {
-		setIntegerParam(P_RegReadErr, 1);
+		setIntegerParam(mBpmRegReadErr, 1);
 	} else {
-		setIntegerParam(P_RegReadErr, 0);
+		setIntegerParam(mBpmRegReadErr, 0);
 	}
 	if (gop & (1 << gop_write_error)) {
-		setIntegerParam(P_RegWriteErr, 1);
+		setIntegerParam(mBpmRegWriteErr, 1);
 	} else {
-		setIntegerParam(P_RegWriteErr, 0);
+		setIntegerParam(mBpmRegWriteErr, 0);
 	}
 	if (gop & (1 << gop_position1_error)) {
-		setIntegerParam(BPM_BPM1_ADDR, P_IIlkStatus, 1);
+		setIntegerParam(BPM_BPM1_ADDR, mBpmIIlkStatus, 1);
 	}
 	if (gop & (1 << gop_position2_error)) {
-		setIntegerParam(BPM_BPM2_ADDR, P_IIlkStatus, 1);
+		setIntegerParam(BPM_BPM2_ADDR, mBpmIIlkStatus, 1);
 	}
 
 	return 0;
@@ -684,13 +684,13 @@ int Bpm::updateBoardSetup()
 
 	D(printf("Enter\n"));
 
-	getIntegerParam(P_MemMux, &memMux);
-	getIntegerParam(P_MemMux10, &memMux10);
-	getIntegerParam(P_TrigSetup, &trigSetup);
-	getIntegerParam(BPM_BPM1_ADDR, P_IIlkControl, &ilk1Ctrl);
-	getIntegerParam(BPM_BPM2_ADDR, P_IIlkControl, &ilk2Ctrl);
-	getIntegerParam(BPM_BPM1_ADDR, P_IIlkIRQ, &ilk1IRQ);
-	getIntegerParam(BPM_BPM2_ADDR, P_IIlkIRQ, &ilk2IRQ);
+	getIntegerParam(mBpmMemMux, &memMux);
+	getIntegerParam(mBpmMemMux10, &memMux10);
+	getIntegerParam(mBpmTrigSetup, &trigSetup);
+	getIntegerParam(BPM_BPM1_ADDR, mBpmIIlkControl, &ilk1Ctrl);
+	getIntegerParam(BPM_BPM2_ADDR, mBpmIIlkControl, &ilk2Ctrl);
+	getIntegerParam(BPM_BPM1_ADDR, mBpmIIlkIRQ, &ilk1IRQ);
+	getIntegerParam(BPM_BPM2_ADDR, mBpmIIlkIRQ, &ilk2IRQ);
 
 	/* XXX: Handle the rest of the bits in board setup reg!
 	 *      Do not clobber the other bits in board setup reg! */
@@ -712,8 +712,8 @@ int Bpm::updateNearIQ()
 
 	D(printf("Enter\n"));
 
-	getIntegerParam(P_NearIQM, &m);
-	getIntegerParam(P_NearIQN, &n);
+	getIntegerParam(mBpmNearIQM, &m);
+	getIntegerParam(mBpmNearIQN, &n);
 
 	D(printf("New near IQ M = %d, N = %d\n", m, n));
 
@@ -733,12 +733,12 @@ int Bpm::updateFilter()
 	D(printf("Enter\n"));
 
 	if (mDoFilterCoeffUpdate) {
-		getDoubleParam(P_FilterCoeff0, &coeff[0]);
-		getDoubleParam(P_FilterCoeff1, &coeff[1]);
-		getDoubleParam(P_FilterCoeff2, &coeff[2]);
-		getDoubleParam(P_FilterCoeff3, &coeff[3]);
-		getDoubleParam(P_FilterCoeff4, &coeff[4]);
-		getDoubleParam(P_FilterCoeff5, &coeff[5]);
+		getDoubleParam(mBpmFilterCoeff0, &coeff[0]);
+		getDoubleParam(mBpmFilterCoeff1, &coeff[1]);
+		getDoubleParam(mBpmFilterCoeff2, &coeff[2]);
+		getDoubleParam(mBpmFilterCoeff3, &coeff[3]);
+		getDoubleParam(mBpmFilterCoeff4, &coeff[4]);
+		getDoubleParam(mBpmFilterCoeff5, &coeff[5]);
 		SIS8300DRV_CALL_RET("sis8300drvbpm_set_fir_filter_param", sis8300drvbpm_set_fir_filter_param(mSisDevice, coeff, SIS8300BPM_FIR_FILTER_PARAM_NUM));
 
 		gain = 2 * coeff[0] + \
@@ -747,12 +747,12 @@ int Bpm::updateFilter()
 				2 * coeff[4] + \
 				2 * coeff[5] + \
 				coeff[1];
-		setDoubleParam(P_FilterGain, gain);
+		setDoubleParam(mBpmFilterGain, gain);
 		mDoFilterCoeffUpdate = false;
 	}
 
 	if (mDoFilterControlUpdate) {
-		getIntegerParam(P_FilterControl, &filterControl);
+		getIntegerParam(mBpmFilterControl, &filterControl);
 
 		D(printf("New filter control %d\n", filterControl));
 
@@ -789,12 +789,12 @@ int Bpm::updateThreshold(int addr)
 	} else {
 		return -1;
 	}
-	getDoubleParam(addr, P_IThrXPosLow, &xPosLow);
-	getDoubleParam(addr, P_IThrXPosHigh, &xPosHigh);
-	getDoubleParam(addr, P_IThrYPosLow, &yPosLow);
-	getDoubleParam(addr, P_IThrYPosHigh, &yPosHigh);
-	getDoubleParam(addr, P_IThrMagnitude, &magnitude);
-	getIntegerParam(addr, P_IThrSelect, &thrControl);
+	getDoubleParam(addr, mBpmIThrXPosLow, &xPosLow);
+	getDoubleParam(addr, mBpmIThrXPosHigh, &xPosHigh);
+	getDoubleParam(addr, mBpmIThrYPosLow, &yPosLow);
+	getDoubleParam(addr, mBpmIThrYPosHigh, &yPosHigh);
+	getDoubleParam(addr, mBpmIThrMagnitude, &magnitude);
+	getIntegerParam(addr, mBpmIThrSelect, &thrControl);
 
 	/* X position threshold */
 	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosHigh, sis8300drvbpm_Qmn_position, &conv, &err));
@@ -841,30 +841,30 @@ asynStatus Bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
      * status at the end, but that's OK */
     status = setIntegerParam(addr, function, value);
 
-    if (function == P_NearIQM) {
+    if (function == mBpmNearIQM) {
 		mDoNearIQUpdate = true;
-    } else if (function == P_NearIQN) {
+    } else if (function == mBpmNearIQN) {
 		mDoNearIQUpdate = true;
-    } else if (function == P_MemMux) {
+    } else if (function == mBpmMemMux) {
     	mDoBoardSetupUpdate = true;
-    } else if (function == P_MemMux10) {
+    } else if (function == mBpmMemMux10) {
     	mDoBoardSetupUpdate = true;
-    } else if (function == P_FilterControl) {
+    } else if (function == mBpmFilterControl) {
     	mDoFilterControlUpdate = true;
-    } else if (function == P_FilterApply) {
+    } else if (function == mBpmFilterApply) {
     	mDoFilterCoeffUpdate = true;
-    } else if (function == P_IThrSelect) {
+    } else if (function == mBpmIThrSelect) {
     	if (addr == BPM_BPM1_ADDR) {
     		mDoBpm1ThresholdUpdate = true;
     	} else if (addr == BPM_BPM2_ADDR) {
     		mDoBpm2ThresholdUpdate = true;
     	}
-    } else if (function == P_IIlkControl ||
-    		function == P_IIlkIRQ ||
-			function == P_TrigSetup) {
+    } else if (function == mBpmIIlkControl ||
+    		function == mBpmIIlkIRQ ||
+			function == mBpmTrigSetup) {
     	mDoBoardSetupUpdate = true;
-    } else if (function == P_IIlkClear) {
-    	setIntegerParam(addr, P_IIlkStatus, 0);
+    } else if (function == mBpmIIlkClear) {
+    	setIntegerParam(addr, mBpmIIlkStatus, 0);
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < BPM_FIRST_PARAM) {
@@ -904,11 +904,11 @@ asynStatus Bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
      * status at the end, but that's OK */
     status = setDoubleParam(addr, function, value);
 
-    if (function == P_IThrXPosLow  ||
-    	function == P_IThrXPosHigh ||
-		function == P_IThrYPosLow  ||
-		function == P_IThrYPosLow  ||
-		function == P_IThrMagnitude) {
+    if (function == mBpmIThrXPosLow  ||
+    	function == mBpmIThrXPosHigh ||
+		function == mBpmIThrYPosLow  ||
+		function == mBpmIThrYPosLow  ||
+		function == mBpmIThrMagnitude) {
     	if (addr == BPM_BPM1_ADDR) {
     		mDoBpm1ThresholdUpdate = true;
     	} else if (addr == BPM_BPM2_ADDR) {
@@ -961,7 +961,7 @@ int Bpm::initDevice()
 	D(printf("Enter\n"));
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_fw_version", sis8300drvbpm_get_fw_version(mSisDevice, &ver_device, &ver_major, &ver_minor));
-	setIntegerParam(P_BPMFirmwareVersion, ver_major << 8 | ver_minor);
+	setIntegerParam(mBpmFwVersion, ver_major << 8 | ver_minor);
 
     if (ver_major != SIS8300BPM_VERSION_MAJOR ||
         ver_minor < SIS8300BPM_VERSION_MINOR_FIRST ||

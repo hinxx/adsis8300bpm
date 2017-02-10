@@ -35,7 +35,7 @@ typedef enum _BpmChannelIndex {
 #define BPM_IRQ_WAIT_TIME     2000
 
 /* System wide parameters */
-#define BpmFirmwareVersionString                    "BPM_FW_VERSION"
+#define BpmFwVersionString                          "BPM_FW_VERSION"
 #define BpmPulseDoneString                          "BPM_PULSE_DONE"
 #define BpmPulseCountString                         "BPM_PULSE_COUNT"
 #define BpmPulseMissedString                        "BPM_PULSE_MISSED"
@@ -87,45 +87,45 @@ public:
 
 protected:
     /* System wide parameters */
-    int P_BPMFirmwareVersion;
-    #define BPM_FIRST_PARAM P_BPMFirmwareVersion
-    int P_PulseDone;
-    int P_PulseCount;
-    int P_PulseMissed;
-    int P_NearIQM;
-    int P_NearIQN;
-    int P_NumSamples;
-    int P_NumIQSamples;
-    int P_NumBPMSamples;
-    int P_MemMux;
-    int P_MemMux10;
-    int P_TrigSetup;
-    int P_RegReadErr;
-    int P_RegWriteErr;
-    int P_FilterControl;
-    int P_FilterCoeff0;
-    int P_FilterCoeff1;
-    int P_FilterCoeff2;
-    int P_FilterCoeff3;
-    int P_FilterCoeff4;
-    int P_FilterCoeff5;
-    int P_FilterGain;
-    int P_FilterApply;
+    int mBpmFwVersion;
+    #define BPM_FIRST_PARAM mBpmFwVersion
+    int mBpmPulseDone;
+    int mBpmPulseCount;
+    int mBpmPulseMissed;
+    int mBpmNearIQM;
+    int mBpmNearIQN;
+    int mBpmNumSamples;
+    int mBpmNumIQSamples;
+    int mBpmNumBPMSamples;
+    int mBpmMemMux;
+    int mBpmMemMux10;
+    int mBpmTrigSetup;
+    int mBpmRegReadErr;
+    int mBpmRegWriteErr;
+    int mBpmFilterControl;
+    int mBpmFilterCoeff0;
+    int mBpmFilterCoeff1;
+    int mBpmFilterCoeff2;
+    int mBpmFilterCoeff3;
+    int mBpmFilterCoeff4;
+    int mBpmFilterCoeff5;
+    int mBpmFilterGain;
+    int mBpmFilterApply;
     /* BPM instance wide parameters (BPM1 or BPM2)*/
-    int P_IEnable;
-    int P_IThrXPosLow;
-    int P_IThrXPosHigh;
-    int P_IThrYPosLow;
-    int P_IThrYPosHigh;
-    int P_IThrMagnitude;
-    int P_IThrSelect;
-    int P_IIlkControl;
-    int P_IIlkClear;
-    int P_IIlkStatus;
-    int P_IIlkIRQ;
-    int P_IDivXPosErr;
-    int P_IDivYPosErr;
-    #define BPM_LAST_PARAM P_IDivYPosErr
+    int mBpmIEnable;
+    int mBpmIThrXPosLow;
+    int mBpmIThrXPosHigh;
+    int mBpmIThrYPosLow;
+    int mBpmIThrYPosHigh;
+    int mBpmIThrMagnitude;
+    int mBpmIThrSelect;
+    int mBpmIIlkControl;
+    int mBpmIIlkClear;
+    int mBpmIIlkStatus;
+    int mBpmIIlkIRQ;
+    int mBpmIDivXPosErr;
+    int mBpmIDivYPosErr;
+    #define BPM_LAST_PARAM mBpmIDivYPosErr
 
     /* These are the methods that are new to this class */
     template <typename epicsType> int convertArraysT();
@@ -156,6 +156,5 @@ private:
     bool mDoBpm1ThresholdUpdate;
     bool mDoBpm2ThresholdUpdate;
 };
-
 
 #define BPM_NUM_PARAMS ((int)(&BPM_LAST_PARAM - &BPM_FIRST_PARAM + 1))
