@@ -18,18 +18,18 @@
 #include <sis8300drvbpm.h>
 
 typedef enum _BpmChannelIndex {
-	BPMChannelXPos = 0,
-	BPMChannelYPos,
-	BPMChannelMSum,
-	BPMChannelPSum,
-	BPMChannelAMag,
-	BPMChannelBMag,
-	BPMChannelCMag,
-	BPMChannelDMag,
-	BPMChannelAPha,
-	BPMChannelBPha,
-	BPMChannelCPha,
-	BPMChannelDPha,
+	eBPMChannelXPos = 0,
+	eBPMChannelYPos,
+	eBPMChannelMSum,
+	eBPMChannelPSum,
+	eBPMChannelAMag,
+	eBPMChannelBMag,
+	eBPMChannelCMag,
+	eBPMChannelDMag,
+	eBPMChannelAPha,
+	eBPMChannelBPha,
+	eBPMChannelCPha,
+	eBPMChannelDPha,
 } BPMChannelIndex;
 #define BPM_NUM_CHANNELS      12
 #define BPM_IRQ_WAIT_TIME     2000

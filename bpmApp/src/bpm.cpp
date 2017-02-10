@@ -277,83 +277,83 @@ template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 			/* BPM magnitude and phase sum data is here */
 			/* magnitude sum BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal1 + BPMChannelMSum) = converted;
+			*(pVal1 + eBPMChannelMSum) = converted;
 			/* phase sum BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 1), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + BPMChannelPSum) = converted * 180.0 / M_PI;
+			*(pVal1 + eBPMChannelPSum) = converted * 180.0 / M_PI;
 			/* magnitude sum BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 2), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal2 + BPMChannelMSum) = converted;
+			*(pVal2 + eBPMChannelMSum) = converted;
 			/* phase sum BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 3), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + BPMChannelPSum) = converted * 180.0 / M_PI;
+			*(pVal2 + eBPMChannelPSum) = converted * 180.0 / M_PI;
 		} else if ((aich == 6) || ((aich == 9) && (memMux == 2) && (memMux10 == 2))) {
 			/* BPM antenna magnitude data is here */
 			/* antenna magnitude A BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal1 + BPMChannelAMag) = converted;
+			*(pVal1 + eBPMChannelAMag) = converted;
 			/* antenna magnitude A BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 1), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal2 + BPMChannelAMag) = converted;
+			*(pVal2 + eBPMChannelAMag) = converted;
 			/* antenna magnitude B BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 2), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal1 + BPMChannelBMag) = converted;
+			*(pVal1 + eBPMChannelBMag) = converted;
 			/* antenna magnitude B BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 3), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal2 + BPMChannelBMag) = converted;
+			*(pVal2 + eBPMChannelBMag) = converted;
 			/* antenna magnitude C BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 4), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal1 + BPMChannelCMag) = converted;
+			*(pVal1 + eBPMChannelCMag) = converted;
 			/* antenna magnitude C BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 5), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal2 + BPMChannelCMag) = converted;
+			*(pVal2 + eBPMChannelCMag) = converted;
 			/* antenna magnitude D BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 6), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal1 + BPMChannelDMag) = converted;
+			*(pVal1 + eBPMChannelDMag) = converted;
 			/* antenna magnitude D BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 7), sis8300drvbpm_Qmn_magnitude, &converted));
-			*(pVal2 + BPMChannelDMag) = converted;
+			*(pVal2 + eBPMChannelDMag) = converted;
 		} else if ((aich == 7) || ((aich == 9) && (memMux == 2) && (memMux10 == 3))) {
 			/* BPM antenna phase data is here */
 			/* antenna phase A BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + BPMChannelAPha) = converted;
+			*(pVal1 + eBPMChannelAPha) = converted;
 			/* antenna phase A BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 1), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + BPMChannelAPha) = converted;
+			*(pVal2 + eBPMChannelAPha) = converted;
 			/* antenna phase B BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 2), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + BPMChannelBPha) = converted;
+			*(pVal1 + eBPMChannelBPha) = converted;
 			/* antenna phase B BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 3), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + BPMChannelBPha) = converted;
+			*(pVal2 + eBPMChannelBPha) = converted;
 			/* antenna phase C BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 4), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + BPMChannelCPha) = converted;
+			*(pVal1 + eBPMChannelCPha) = converted;
 			/* antenna phase C BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 5), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + BPMChannelCPha) = converted;
+			*(pVal2 + eBPMChannelCPha) = converted;
 			/* antenna phase D BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 6), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + BPMChannelDPha) = converted;
+			*(pVal1 + eBPMChannelDPha) = converted;
 			/* antenna phase D BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 7), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + BPMChannelDPha) = converted;
+			*(pVal2 + eBPMChannelDPha) = converted;
 		} else if ((aich == 8) || ((aich == 9) && (memMux == 2) && (memMux10 == 0))) {
 			/* BPM X & Y position data is here */
 			/* X position BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw), sis8300drvbpm_Qmn_position, &converted));
-			*(pVal1 + BPMChannelXPos) = converted;
+			*(pVal1 + eBPMChannelXPos) = converted;
 //			fprintf(fp, "%f\n", converted);
 			/* Y position BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 1), sis8300drvbpm_Qmn_position, &converted));
-			*(pVal1 + BPMChannelYPos) = converted;
+			*(pVal1 + eBPMChannelYPos) = converted;
 			/* X position BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 2), sis8300drvbpm_Qmn_position, &converted));
-			*(pVal2 + BPMChannelXPos) = converted;
+			*(pVal2 + eBPMChannelXPos) = converted;
 			/* Y position BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 3), sis8300drvbpm_Qmn_position, &converted));
-			*(pVal2 + BPMChannelYPos) = converted;
+			*(pVal2 + eBPMChannelYPos) = converted;
 		} else {
 			E(printf("Should not be here!!!\n"));
 			assert(1 == 0);
