@@ -74,14 +74,12 @@ typedef enum _BpmChannelIndex {
 
 #define ADSIS8300BPM_IRQ_WAIT_TIME      0
 
-/** Struck SIS8300 BPM driver; does 1-D waveforms on 12 channels.
-  * Inherits from ADSIS8300 */
-class epicsShareClass ADSIS8300bpm : public ADSIS8300 {
+class epicsShareClass ADSIS8300bpm : public SIS8300 {
 public:
 	ADSIS8300bpm(const char *portName, const char *devicePath,
 			int maxAddr, int numTimePoints, NDDataType_t dataType,
 			int maxBuffers, size_t maxMemory, int priority, int stackSize);
-	~ADSIS8300bpm();
+	virtual ~ADSIS8300bpm();
 
     /* These are the methods that we override from asynNDArrayDriver */
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);

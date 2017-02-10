@@ -35,7 +35,7 @@
 #include <epicsExport.h>
 
 #include <sis8300bpm_reg.h>
-#include <ADSIS8300.h>
+#include <SIS8300.h>
 #include <ADSIS8300bpm.h>
 
 
@@ -69,7 +69,7 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
 		int maxAddr, int numSamples, NDDataType_t dataType,
 		int maxBuffers, size_t maxMemory, int priority, int stackSize)
 
-    : ADSIS8300(portName, devicePath,
+    : SIS8300(portName, devicePath,
     		maxAddr,
     		NUM_SIS8300BPM_PARAMS,
 			numSamples,
@@ -170,7 +170,7 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 
 	D(printf("Enter\n"));
 
-    getIntegerParam(P_NumAiSamples, &numAiSamples);
+    getIntegerParam(mSISNumAiSamples, &numAiSamples);
 
     /* local NDArray is for raw AI data samples */
     if (! mRawDataArray) {
@@ -208,7 +208,6 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
     return 0;
 }
 
-/** Template function to compute the simulated detector data for any data type */
 template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 {
     int numAiSamples;
@@ -222,7 +221,7 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
     
 	D(printf("Enter\n"));
 
-    getIntegerParam(P_NumAiSamples, &numAiSamples);
+    getIntegerParam(mSISNumAiSamples, &numAiSamples);
     getIntegerParam(P_NumBPMSamples, &numBPMSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
@@ -375,7 +374,6 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
     return 0;
 }
 
-/** Template function to compute the simulated detector data for any data type */
 template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 {
     size_t dims[2];
@@ -390,7 +388,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
 	D(printf("Enter\n"));
 
     getIntegerParam(NDDataType, (int *)&dataType);
-    getIntegerParam(P_NumAiSamples, &numAiSamples);
+    getIntegerParam(mSISNumAiSamples, &numAiSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     getIntegerParam(P_MemMux, &memMux);
     getIntegerParam(P_NumBPMSamples, &numBPMSamples);
@@ -401,7 +399,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     }
 
     /* converted AI data samples of all channel are interleaved */
-    dims[0] = SIS8300DRV_NUM_AI_CHANNELS;
+    dims[0] = SIS8300_NUM_CHANNELS;
     dims[1] = numAiSamples;
 
     /* 0th NDArray is for converted AI data samples */
@@ -410,7 +408,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     }
     this->pArrays[0] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
     pData = (epicsType *)this->pArrays[0]->pData;
-    memset(pData, 0, SIS8300DRV_NUM_AI_CHANNELS * numAiSamples * sizeof(epicsType));
+    memset(pData, 0, SIS8300_NUM_CHANNELS * numAiSamples * sizeof(epicsType));
 
     /* converted BPM data samples of all channels are interleaved */
     dims[0] = ADSIS8300BPM_NUM_CHANNELS;
@@ -432,7 +430,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     pData = (epicsType *)this->pArrays[2]->pData;
     memset(pData, 0, ADSIS8300BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
 
-    for (aich = 0; aich < SIS8300DRV_NUM_AI_CHANNELS; aich++) {
+    for (aich = 0; aich < SIS8300_NUM_CHANNELS; aich++) {
         if (!(mChannelMask & (1 << aich))) {
             continue;
         }
@@ -454,11 +452,12 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     return 0;
 }
 
-/** Computes the new image data */
 int ADSIS8300bpm::acquireArrays()
 {
     int dataType;
     int ret;
+
+	D(printf("Enter\n"));
 
     ret = acquireRawArrays();
     if (ret) {
@@ -525,7 +524,7 @@ int ADSIS8300bpm::disarmDevice()
 
 	SIS8300DRV_CALL_VOID("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 
-	return ADSIS8300::disarmDevice();
+	return SIS8300::disarmDevice();
 }
 
 int ADSIS8300bpm::waitForDevice()
@@ -578,7 +577,7 @@ int ADSIS8300bpm::deviceDone()
 	setIntegerParam(P_NumSamples, sampleCount);
 	setIntegerParam(P_NumIQSamples, numIQSamples);
 
-    getIntegerParam(P_NumAiSamples, &numAiSamples);
+    getIntegerParam(mSISNumAiSamples, &numAiSamples);
     getIntegerParam(P_NearIQN, &nearIQN);
     numBPMSamples = (int)(numAiSamples / nearIQN);
     /* number of available IQ samples might be less than we expect from above
@@ -864,7 +863,7 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
-        	status = ADSIS8300::writeInt32(pasynUser, value);
+        	status = SIS8300::writeInt32(pasynUser, value);
         }
     }
 
@@ -913,7 +912,7 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_SIS8300BPM_PARAM) {
-        	status = ADSIS8300::writeFloat64(pasynUser, value);
+        	status = SIS8300::writeFloat64(pasynUser, value);
         }
     }
 
@@ -944,7 +943,7 @@ void ADSIS8300bpm::report(FILE *fp, int details)
     }
 
     /* Invoke the base class method */
-    ADSIS8300::report(fp, details);
+    SIS8300::report(fp, details);
 }
 
 int ADSIS8300bpm::initDevice()
@@ -965,7 +964,7 @@ int ADSIS8300bpm::initDevice()
         snprintf(message, 128, "firmware %dv%02d incompatible with software %dv%02d - %dv%02d",
         		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
 				SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
-    	ADSIS8300_ERR(message);
+    	SIS8300_ERR(message);
         destroyDevice();
         return -1;
     }
@@ -978,7 +977,7 @@ int ADSIS8300bpm::initDevice()
     snprintf(message, 128, "firmware %dv%02d compatible with software %dv%02d - %dv%02d",
     		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
 			SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
-	ADSIS8300_INF(message);
+	SIS8300_INF(message);
 
 	return 0;
 }
