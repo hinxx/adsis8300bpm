@@ -6,11 +6,11 @@ DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *App))
 DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *app))
 ifeq ($(BUILD_IOCS), YES)
 DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard iocs))
-iocs_DEPEND_DIRS += SIS8300bpmApp
+iocs_DEPEND_DIRS += bpmApp
 endif
 
 DIRS += vendor
-SIS8300bpmApp_DEPEND_DIRS += vendor
+bpmApp_DEPEND_DIRS += vendor
 
 
 include $(TOP)/configure/RULES_TOP

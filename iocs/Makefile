@@ -2,7 +2,7 @@ TOP = ..
 include $(TOP)/configure/CONFIG
 
 ifneq ($(EPICS_LIBCOM_ONLY),YES)
-  DIRS += SIS8300bpmIOC
+  DIRS += bpmIOC
 endif
 
 include $(TOP)/configure/RULES_TOP

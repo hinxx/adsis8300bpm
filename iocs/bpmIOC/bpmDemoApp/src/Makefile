@@ -10,12 +10,12 @@ ifeq (vxWorks,$(findstring vxWorks, $(T_A)))
 CODE_CXXFLAGS=
 endif
 
-PROD_NAME = SIS8300bpmDemoApp
+PROD_NAME = bpmDemoApp
 PROD_IOC = $(PROD_NAME)
 
 # <name>.dbd will be created from <name>Include.dbd
 DBD += $(PROD_NAME).dbd
-$(PROD_NAME)_DBD += SIS8300bpmSupport.dbd
+$(PROD_NAME)_DBD += bpmSupport.dbd
 
 # devlib2 and mrfioc2
 $(PROD_NAME)_DBD += base.dbd
@@ -30,7 +30,7 @@ $(PROD_NAME)_DBD += epicspci.dbd
 PROD_SRCS_DEFAULT += $(PROD_NAME)_registerRecordDeviceDriver.cpp $(PROD_NAME)Main.cpp
 PROD_SRCS_vxWorks += $(PROD_NAME)_registerRecordDeviceDriver.cpp
 
-PROD_LIBS += SIS8300bpm
+PROD_LIBS += bpm
 PROD_LIBS += SIS8300
 # devlib2 and mrfioc2
 PROD_LIBS += evgMrm evrMrm mrmShared mrfCommon epicspci epicsvme

@@ -20,13 +20,13 @@ else
 endif
 #$(warning USR_CPPFLAGS = $(USR_CPPFLAGS))
 
-LIBRARY_IOC = SIS8300bpm
+LIBRARY_IOC = bpm
 
 # EPICS specfic headers and sources
-INC += ADSIS8300bpm.h
-LIB_SRCS += ADSIS8300bpm.cpp
+INC += bpm.h
+LIB_SRCS += bpm.cpp
 
-DBD += SIS8300bpmSupport.dbd
+DBD += bpmSupport.dbd
 
 include $(ADCORE)/ADApp/commonLibraryMakefile
 

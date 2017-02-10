@@ -1,8 +1,8 @@
-ADExample Releases
-===============
+Bpm Releases
+============
 
 The latest untagged master branch can be obtained at
-https://bitbucket.org/hinxx/adsis8300.
+https://bitbucket.org/hinxx/adbpm.
 
 The versions of EPICS base, asyn, and other synApps modules used for each release can be obtained from 
 the EXAMPLE_RELEASE_PATHS.local, EXAMPLE_RELEASE_LIBS.local, and EXAMPLE_RELEASE_PRODS.local
@@ -16,5 +16,5 @@ Release Notes
 R0-1 (September XXX, 2016)
 ==========================
 * Initial alpha support.
-  Based on ADExample/exampleApp/ADCSimDetectorSrc.
+  Based on SIS8300.
   Requires ADCore R2-5 or higher.

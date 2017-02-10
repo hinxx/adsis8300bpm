@@ -1,6 +1,6 @@
-/* ADSIS8300bpm.cpp
+/* Bpm.cpp
  *
- * This is a driver for a Struck SIS8300 BPM digitizer.
+ * This is a driver for a BPM based on Struck SIS8300 digitizer.
  *
  * Author: Hinko Kocevar
  *         ESS ERIC, Lund, Sweden
@@ -8,6 +8,7 @@
  * Created:  September 22, 2016
  *
  */
+
 
 
 #include <stdio.h>
@@ -36,22 +37,22 @@
 
 #include <sis8300bpm_reg.h>
 #include <SIS8300.h>
-#include <ADSIS8300bpm.h>
+#include <bpm.h>
 
 
-static const char *driverName = "ADSIS8300bpm";
+static const char *driverName = "Bpm";
 
 /* asyn addresses:
  * 0 .. 9    AI channels
  * 10        BPM1 channels
  * 11        BPM2 channels
  */
-#define SIS8300BPM_BPM1_ADDR		10
-#define SIS8300BPM_BPM2_ADDR		11
+#define BPM_BPM1_ADDR		10
+#define BPM_BPM2_ADDR		11
 
-/** Constructor for SIS8300bpm; most parameters are simply passed to ADSIS8300::ADSIS8300.
+/** Constructor for Bpm; most parameters are simply passed to SIS8300::SIS8300.
   * After calling the base class constructor this method creates a thread to compute the simulated detector data,
-  * and sets reasonable default values for parameters defined in this class and ADSIS8300.
+  * and sets reasonable default values for parameters defined in this class and SIS8300.
   * \param[in] portName The name of the asyn port driver to be created.
   * \param[in] devicePath The path to the /dev entry.
   * \param[in] maxAddr The maximum  number of asyn addr addresses this driver supports. 1 is minimum.
@@ -65,13 +66,13 @@ static const char *driverName = "ADSIS8300bpm";
   * \param[in] priority The thread priority for the asyn port driver thread if ASYN_CANBLOCK is set in asynFlags.
   * \param[in] stackSize The stack size for the asyn port driver thread if ASYN_CANBLOCK is set in asynFlags.
   */
-ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
+Bpm::Bpm(const char *portName, const char *devicePath,
 		int maxAddr, int numSamples, NDDataType_t dataType,
 		int maxBuffers, size_t maxMemory, int priority, int stackSize)
 
     : SIS8300(portName, devicePath,
     		maxAddr,
-    		NUM_SIS8300BPM_PARAMS,
+    		BPM_NUM_PARAMS,
 			numSamples,
 			dataType,
 			maxBuffers, maxMemory,
@@ -82,8 +83,7 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
 	int i;
     int status = asynSuccess;
 
-    D(printf("%d addresses, %d parameters\n",
-    		maxAddr, NUM_SIS8300BPM_PARAMS));
+    D(printf("%d addresses, %d parameters\n", maxAddr, BPM_NUM_PARAMS));
 
     /* adjust number of NDArrays we need to handle, 0 - AI, 1 - BPM1 and 2 - BPM2 */
     mNumArrays = 3;
@@ -113,7 +113,7 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
     createParam(BpmFilterGainString,            asynParamFloat64, &P_FilterGain);
     createParam(BpmFilterApplyString,             asynParamInt32, &P_FilterApply);
     /* BPM instance wide parameters (BPM1 or BPM2)*/
-    for (i = SIS8300BPM_BPM1_ADDR; i <= SIS8300BPM_BPM2_ADDR; i++) {
+    for (i = BPM_BPM1_ADDR; i <= BPM_BPM2_ADDR; i++) {
 		createParam(i, BpmIEnableString,                 asynParamInt32, &P_IEnable);
 		createParam(i, BpmIThrXPosLowString,           asynParamFloat64, &P_IThrXPosLow);
 		createParam(i, BpmIThrXPosHighString,          asynParamFloat64, &P_IThrXPosHigh);
@@ -148,7 +148,7 @@ ADSIS8300bpm::ADSIS8300bpm(const char *portName, const char *devicePath,
 	I(printf("Init done...\n"));
 }
 
-ADSIS8300bpm::~ADSIS8300bpm() {
+Bpm::~Bpm() {
 	D(printf("Shutdown and freeing up memory...\n"));
 
 	this->lock();
@@ -160,7 +160,7 @@ ADSIS8300bpm::~ADSIS8300bpm() {
 }
 
 /** Template function to compute the simulated detector data for any data type */
-template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
+template <typename epicsType> int Bpm::convertAIArraysT(int aich)
 {
     int numAiSamples;
     epicsType *pData, *pVal;
@@ -200,7 +200,7 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
 
 //		printf("%f ", (double)*pVal);
 //		fprintf(fp, "%f\n", (double)*pVal);
-		pVal += SIS8300DRV_NUM_AI_CHANNELS;
+		pVal += SIS8300_NUM_CHANNELS;
 	}
 	D0(printf("\n"));
 //	fclose(fp);
@@ -208,7 +208,7 @@ template <typename epicsType> int ADSIS8300bpm::convertAIArraysT(int aich)
     return 0;
 }
 
-template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
+template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 {
     int numAiSamples;
     int numBPMSamples;
@@ -366,15 +366,15 @@ template <typename epicsType> int ADSIS8300bpm::convertBPMArraysT(int aich)
 		/* adjust BPM offset for all channels */
 		j++;
 		/* adjust BPM data pointer */
-		pVal1 += ADSIS8300BPM_NUM_CHANNELS;
-		pVal2 += ADSIS8300BPM_NUM_CHANNELS;
+		pVal1 += BPM_NUM_CHANNELS;
+		pVal2 += BPM_NUM_CHANNELS;
 		}
 //		fclose(fp);
 
     return 0;
 }
 
-template <typename epicsType> int ADSIS8300bpm::convertArraysT()
+template <typename epicsType> int Bpm::convertArraysT()
 {
     size_t dims[2];
     int numAiSamples;
@@ -411,7 +411,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     memset(pData, 0, SIS8300_NUM_CHANNELS * numAiSamples * sizeof(epicsType));
 
     /* converted BPM data samples of all channels are interleaved */
-    dims[0] = ADSIS8300BPM_NUM_CHANNELS;
+    dims[0] = BPM_NUM_CHANNELS;
     dims[1] = numBPMSamples;
 
     /* 1st NDArray is for converted BPM1 data samples */
@@ -420,7 +420,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     }
     this->pArrays[1] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
     pData = (epicsType *)this->pArrays[1]->pData;
-    memset(pData, 0, ADSIS8300BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
+    memset(pData, 0, BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
 
     /* 2nd NDArray is for converted BPM2 data samples */
     if (this->pArrays[2]) {
@@ -428,7 +428,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     }
     this->pArrays[2] = pNDArrayPool->alloc(2, dims, dataType, 0, 0);
     pData = (epicsType *)this->pArrays[2]->pData;
-    memset(pData, 0, ADSIS8300BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
+    memset(pData, 0, BPM_NUM_CHANNELS * numBPMSamples * sizeof(epicsType));
 
     for (aich = 0; aich < SIS8300_NUM_CHANNELS; aich++) {
         if (!(mChannelMask & (1 << aich))) {
@@ -452,7 +452,7 @@ template <typename epicsType> int ADSIS8300bpm::convertArraysT()
     return 0;
 }
 
-int ADSIS8300bpm::acquireArrays()
+int Bpm::acquireArrays()
 {
     int dataType;
     int ret;
@@ -496,7 +496,7 @@ int ADSIS8300bpm::acquireArrays()
     }
 }
 
-int ADSIS8300bpm::initDeviceDone()
+int Bpm::initDeviceDone()
 {
 	D(printf("Enter\n"));
 
@@ -505,7 +505,7 @@ int ADSIS8300bpm::initDeviceDone()
 	return 0;
 }
 
-int ADSIS8300bpm::armDevice()
+int Bpm::armDevice()
 {
 	D(printf("Enter\n"));
 
@@ -518,7 +518,7 @@ int ADSIS8300bpm::armDevice()
 	return 0;
 }
 
-int ADSIS8300bpm::disarmDevice()
+int Bpm::disarmDevice()
 {
 	D(printf("Enter\n"));
 
@@ -527,18 +527,16 @@ int ADSIS8300bpm::disarmDevice()
 	return SIS8300::disarmDevice();
 }
 
-int ADSIS8300bpm::waitForDevice()
+int Bpm::waitForDevice()
 {
 	D(printf("Enter\n"));
 
-//	ret = SIS8300DRV_CALL("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_pposition(mSisDevice, SIS8300BPM_IRQ_WAIT_TIME));
-// XXX: Debug!
-	SIS8300DRV_CALL_RET("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_position(mSisDevice, 2000));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_position(mSisDevice, BPM_IRQ_WAIT_TIME));
 
 	return 0;
 }
 
-int ADSIS8300bpm::deviceDone()
+int Bpm::deviceDone()
 {
 	int oldCount;
 	unsigned int pulseCount;
@@ -605,24 +603,24 @@ int ADSIS8300bpm::deviceDone()
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_gop", sis8300drvbpm_get_gop(mSisDevice, gop_all, &gop));
 	if (gop & (1 << gop_X1_pos_div_error)) {
-		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivXPosErr, 1);
+		setIntegerParam(BPM_BPM1_ADDR, P_IDivXPosErr, 1);
 	} else {
-		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivXPosErr, 0);
+		setIntegerParam(BPM_BPM1_ADDR, P_IDivXPosErr, 0);
 	}
 	if (gop & (1 << gop_Y1_pos_div_error)) {
-		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivYPosErr, 1);
+		setIntegerParam(BPM_BPM1_ADDR, P_IDivYPosErr, 1);
 	} else {
-		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IDivYPosErr, 0);
+		setIntegerParam(BPM_BPM1_ADDR, P_IDivYPosErr, 0);
 	}
 	if (gop & (1 << gop_X2_pos_div_error)) {
-		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivXPosErr, 1);
+		setIntegerParam(BPM_BPM2_ADDR, P_IDivXPosErr, 1);
 	} else {
-		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivXPosErr, 0);
+		setIntegerParam(BPM_BPM2_ADDR, P_IDivXPosErr, 0);
 	}
 	if (gop & (1 << gop_Y2_pos_div_error)) {
-		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivYPosErr, 1);
+		setIntegerParam(BPM_BPM2_ADDR, P_IDivYPosErr, 1);
 	} else {
-		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IDivYPosErr, 0);
+		setIntegerParam(BPM_BPM2_ADDR, P_IDivYPosErr, 0);
 	}
 	if (gop & (1 << gop_read_error)) {
 		setIntegerParam(P_RegReadErr, 1);
@@ -635,16 +633,16 @@ int ADSIS8300bpm::deviceDone()
 		setIntegerParam(P_RegWriteErr, 0);
 	}
 	if (gop & (1 << gop_position1_error)) {
-		setIntegerParam(SIS8300BPM_BPM1_ADDR, P_IIlkStatus, 1);
+		setIntegerParam(BPM_BPM1_ADDR, P_IIlkStatus, 1);
 	}
 	if (gop & (1 << gop_position2_error)) {
-		setIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkStatus, 1);
+		setIntegerParam(BPM_BPM2_ADDR, P_IIlkStatus, 1);
 	}
 
 	return 0;
 }
 
-int ADSIS8300bpm::updateParameters()
+int Bpm::updateParameters()
 {
 	int ret = 0;
     bool doShadowUpdate = false;
@@ -662,11 +660,11 @@ int ADSIS8300bpm::updateParameters()
 		ret = updateFilter();
 	}
 	if (mDoBpm1ThresholdUpdate) {
-		ret = updateThreshold(SIS8300BPM_BPM1_ADDR);
+		ret = updateThreshold(BPM_BPM1_ADDR);
 		doShadowUpdate = true;
 	}
 	if (mDoBpm2ThresholdUpdate) {
-		ret = updateThreshold(SIS8300BPM_BPM2_ADDR);
+		ret = updateThreshold(BPM_BPM2_ADDR);
 		doShadowUpdate = true;
 	}
 	if (doShadowUpdate) {
@@ -676,7 +674,7 @@ int ADSIS8300bpm::updateParameters()
 	return ret;
 }
 
-int ADSIS8300bpm::updateBoardSetup()
+int Bpm::updateBoardSetup()
 {
 	int ilk1IRQ, ilk2IRQ;
 	int ilk1Ctrl, ilk2Ctrl;
@@ -689,10 +687,10 @@ int ADSIS8300bpm::updateBoardSetup()
 	getIntegerParam(P_MemMux, &memMux);
 	getIntegerParam(P_MemMux10, &memMux10);
 	getIntegerParam(P_TrigSetup, &trigSetup);
-	getIntegerParam(SIS8300BPM_BPM1_ADDR, P_IIlkControl, &ilk1Ctrl);
-	getIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkControl, &ilk2Ctrl);
-	getIntegerParam(SIS8300BPM_BPM1_ADDR, P_IIlkIRQ, &ilk1IRQ);
-	getIntegerParam(SIS8300BPM_BPM2_ADDR, P_IIlkIRQ, &ilk2IRQ);
+	getIntegerParam(BPM_BPM1_ADDR, P_IIlkControl, &ilk1Ctrl);
+	getIntegerParam(BPM_BPM2_ADDR, P_IIlkControl, &ilk2Ctrl);
+	getIntegerParam(BPM_BPM1_ADDR, P_IIlkIRQ, &ilk1IRQ);
+	getIntegerParam(BPM_BPM2_ADDR, P_IIlkIRQ, &ilk2IRQ);
 
 	/* XXX: Handle the rest of the bits in board setup reg!
 	 *      Do not clobber the other bits in board setup reg! */
@@ -708,7 +706,7 @@ int ADSIS8300bpm::updateBoardSetup()
 	return 0;
 }
 
-int ADSIS8300bpm::updateNearIQ()
+int Bpm::updateNearIQ()
 {
 	int n, m;
 
@@ -726,7 +724,7 @@ int ADSIS8300bpm::updateNearIQ()
 	return 0;
 }
 
-int ADSIS8300bpm::updateFilter()
+int Bpm::updateFilter()
 {
 	epicsFloat64 coeff[SIS8300BPM_FIR_FILTER_PARAM_NUM];
 	epicsFloat64 gain;
@@ -765,7 +763,7 @@ int ADSIS8300bpm::updateFilter()
 	return 0;
 }
 
-int ADSIS8300bpm::updateThreshold(int addr)
+int Bpm::updateThreshold(int addr)
 {
 	double xPosLow, xPosHigh;
 	double yPosLow, yPosHigh;
@@ -780,11 +778,11 @@ int ADSIS8300bpm::updateThreshold(int addr)
 
 	D(printf("Enter\n"));
 
-	if (addr == SIS8300BPM_BPM1_ADDR) {
+	if (addr == BPM_BPM1_ADDR) {
 		thrMagCtrlReg = SIS8300BPM_POS_MAG_CTRL1_REG;
 		thrXValReg = SIS8300BPM_POS_PARAM_X1_REG;
 		thrYValReg = SIS8300BPM_POS_PARAM_Y1_REG;
-	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+	} else if (addr == BPM_BPM2_ADDR) {
 		thrMagCtrlReg = SIS8300BPM_POS_MAG_CTRL2_REG;
 		thrXValReg = SIS8300BPM_POS_PARAM_X2_REG;
 		thrYValReg = SIS8300BPM_POS_PARAM_Y2_REG;
@@ -816,9 +814,9 @@ int ADSIS8300bpm::updateThreshold(int addr)
 	thrVal |= (int)(conv  & 0xFFFF);
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrMagCtrlReg, thrVal));
 
-	if (addr == SIS8300BPM_BPM1_ADDR) {
+	if (addr == BPM_BPM1_ADDR) {
 		mDoBpm1ThresholdUpdate = false;
-	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+	} else if (addr == BPM_BPM2_ADDR) {
 		mDoBpm2ThresholdUpdate = false;
 	}
 
@@ -830,7 +828,7 @@ int ADSIS8300bpm::updateThreshold(int addr)
   * For all parameters it sets the value in the parameter library and calls any registered callbacks..
   * \param[in] pasynUser pasynUser structure that encodes the reason and address.
   * \param[in] value Value to write. */
-asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
+asynStatus Bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
 {
     int function = pasynUser->reason;
     int addr;
@@ -856,9 +854,9 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     } else if (function == P_FilterApply) {
     	mDoFilterCoeffUpdate = true;
     } else if (function == P_IThrSelect) {
-    	if (addr == SIS8300BPM_BPM1_ADDR) {
+    	if (addr == BPM_BPM1_ADDR) {
     		mDoBpm1ThresholdUpdate = true;
-    	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+    	} else if (addr == BPM_BPM2_ADDR) {
     		mDoBpm2ThresholdUpdate = true;
     	}
     } else if (function == P_IIlkControl ||
@@ -869,7 +867,7 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     	setIntegerParam(addr, P_IIlkStatus, 0);
     } else {
         /* If this parameter belongs to a base class call its method */
-        if (function < FIRST_SIS8300BPM_PARAM) {
+        if (function < BPM_FIRST_PARAM) {
         	status = SIS8300::writeInt32(pasynUser, value);
         }
     }
@@ -893,7 +891,7 @@ asynStatus ADSIS8300bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
   * For all parameters it sets the value in the parameter library and calls any registered callbacks..
   * \param[in] pasynUser pasynUser structure that encodes the reason and address.
   * \param[in] value Value to write. */
-asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
+asynStatus Bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 {
     int function = pasynUser->reason;
     int addr;
@@ -911,14 +909,14 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 		function == P_IThrYPosLow  ||
 		function == P_IThrYPosLow  ||
 		function == P_IThrMagnitude) {
-    	if (addr == SIS8300BPM_BPM1_ADDR) {
+    	if (addr == BPM_BPM1_ADDR) {
     		mDoBpm1ThresholdUpdate = true;
-    	} else if (addr == SIS8300BPM_BPM2_ADDR) {
+    	} else if (addr == BPM_BPM2_ADDR) {
     		mDoBpm2ThresholdUpdate = true;
     	}
     } else {
         /* If this parameter belongs to a base class call its method */
-        if (function < FIRST_SIS8300BPM_PARAM) {
+        if (function < BPM_FIRST_PARAM) {
         	status = SIS8300::writeFloat64(pasynUser, value);
         }
     }
@@ -943,7 +941,7 @@ asynStatus ADSIS8300bpm::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
   * \param[in] fp File pointed passed by caller where the output is written to.
   * \param[in] details If >0 then driver details are printed.
   */
-void ADSIS8300bpm::report(FILE *fp, int details)
+void Bpm::report(FILE *fp, int details)
 {
     fprintf(fp, "Struck SIS8300 based BPM\n");
     if (details > 0) {
@@ -953,7 +951,7 @@ void ADSIS8300bpm::report(FILE *fp, int details)
     SIS8300::report(fp, details);
 }
 
-int ADSIS8300bpm::initDevice()
+int Bpm::initDevice()
 {
 	unsigned int ver_device;
 	unsigned int ver_major;
@@ -989,7 +987,7 @@ int ADSIS8300bpm::initDevice()
 	return 0;
 }
 
-int ADSIS8300bpm::destroyDevice()
+int Bpm::destroyDevice()
 {
 	D(printf("Enter\n"));
 
@@ -999,11 +997,11 @@ int ADSIS8300bpm::destroyDevice()
 }
 
 /** Configuration command, called directly or from iocsh */
-extern "C" int SIS8300BpmConfig(const char *portName, const char *devicePath,
+extern "C" int BpmConfig(const char *portName, const char *devicePath,
 		int maxAddr, int numSamples, int dataType, int maxBuffers, int maxMemory,
 		int priority, int stackSize)
 {
-    new ADSIS8300bpm(portName, devicePath,
+    new Bpm(portName, devicePath,
     		maxAddr,
     		numSamples,
 			(NDDataType_t)dataType,
@@ -1014,37 +1012,37 @@ extern "C" int SIS8300BpmConfig(const char *portName, const char *devicePath,
 }
 
 /** Code for iocsh registration */
-static const iocshArg SIS8300BpmConfigArg0 = {"Port name",     iocshArgString};
-static const iocshArg SIS8300BpmConfigArg1 = {"Device path",   iocshArgString};
-static const iocshArg SIS8300BpmConfigArg2 = {"# channels",    iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg3 = {"# samples",     iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg4 = {"Data type",     iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg5 = {"maxBuffers",    iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg6 = {"maxMemory",     iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg7 = {"priority",      iocshArgInt};
-static const iocshArg SIS8300BpmConfigArg8 = {"stackSize",     iocshArgInt};
-static const iocshArg * const SIS8300BpmConfigArgs[] = {&SIS8300BpmConfigArg0,
-                                                     &SIS8300BpmConfigArg1,
-													 &SIS8300BpmConfigArg2,
-													 &SIS8300BpmConfigArg3,
-													 &SIS8300BpmConfigArg4,
-													 &SIS8300BpmConfigArg5,
-													 &SIS8300BpmConfigArg6,
-													 &SIS8300BpmConfigArg7,
-													 &SIS8300BpmConfigArg8};
-static const iocshFuncDef configSIS8300Bpm = {"SIS8300BpmConfig", 9, SIS8300BpmConfigArgs};
-static void configSIS8300BpmCallFunc(const iocshArgBuf *args)
+static const iocshArg configArg0 = {"Port name",     iocshArgString};
+static const iocshArg configArg1 = {"Device path",   iocshArgString};
+static const iocshArg configArg2 = {"# channels",    iocshArgInt};
+static const iocshArg configArg3 = {"# samples",     iocshArgInt};
+static const iocshArg configArg4 = {"Data type",     iocshArgInt};
+static const iocshArg configArg5 = {"maxBuffers",    iocshArgInt};
+static const iocshArg configArg6 = {"maxMemory",     iocshArgInt};
+static const iocshArg configArg7 = {"priority",      iocshArgInt};
+static const iocshArg configArg8 = {"stackSize",     iocshArgInt};
+static const iocshArg * const configArgs[] = {&configArg0,
+                                                     &configArg1,
+													 &configArg2,
+													 &configArg3,
+													 &configArg4,
+													 &configArg5,
+													 &configArg6,
+													 &configArg7,
+													 &configArg8};
+static const iocshFuncDef configSIS8300Bpm = {"BpmConfig", 9, configArgs};
+static void configBpmCallFunc(const iocshArgBuf *args)
 {
-    SIS8300BpmConfig(args[0].sval, args[1].sval, args[2].ival, args[3].ival,
+    BpmConfig(args[0].sval, args[1].sval, args[2].ival, args[3].ival,
     		args[4].ival, args[5].ival, args[6].ival, args[7].ival, args[8].ival);
 }
 
 
-static void SIS8300BpmRegister(void)
+static void BpmRegister(void)
 {
-    iocshRegister(&configSIS8300Bpm, configSIS8300BpmCallFunc);
+    iocshRegister(&configSIS8300Bpm, configBpmCallFunc);
 }
 
 extern "C" {
-epicsExportRegistrar(SIS8300BpmRegister);
+epicsExportRegistrar(BpmRegister);
 }

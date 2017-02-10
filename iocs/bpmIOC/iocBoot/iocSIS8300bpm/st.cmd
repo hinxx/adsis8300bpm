@@ -1,8 +1,8 @@
 < envPaths
 errlogInit(20000)
 
-dbLoadDatabase("$(TOP)/dbd/SIS8300bpmDemoApp.dbd")
-SIS8300bpmDemoApp_registerRecordDeviceDriver(pdbbase) 
+dbLoadDatabase("$(TOP)/dbd/bpmDemoApp.dbd")
+bpmDemoApp_registerRecordDeviceDriver(pdbbase) 
 
 # Prefix for all records
 epicsEnvSet("PREFIX", "BPM:")
@@ -81,11 +81,11 @@ dbLoadRecords("$(SIS8300)/db/SIS8300N.template",       "P=$(PREFIX),R=$(AICH8):,
 dbLoadRecords("$(SIS8300)/db/SIS8300N.template",       "P=$(PREFIX),R=$(AICH9):,  PORT=$(PORT),ADDR=9,TIMEOUT=1,NAME=$(AICH9)")
 
 # BPM related records
-dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpm.template",  "P=$(PREFIX),R=,           PORT=$(PORT),ADDR=0,TIMEOUT=1")
+dbLoadRecords("$(BPM)/db/SIS8300bpm.template",  "P=$(PREFIX),R=,           PORT=$(PORT),ADDR=0,TIMEOUT=1")
 
 # BPM1 and BPM2 related records
-dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):,   PORT=$(PORT),ADDR=10,TIMEOUT=1,NAME=$(BPM1)")
-dbLoadRecords("$(ADSIS8300BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM2):,   PORT=$(PORT),ADDR=11,TIMEOUT=1,NAME=$(BPM2)")
+dbLoadRecords("$(BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM1):,   PORT=$(PORT),ADDR=10,TIMEOUT=1,NAME=$(BPM1)")
+dbLoadRecords("$(BPM)/db/SIS8300bpmN.template", "P=$(PREFIX),R=$(BPM2):,   PORT=$(PORT),ADDR=11,TIMEOUT=1,NAME=$(BPM2)")
 
 # Create a standard arrays plugin, set it to get data from ADSIS8300bpm driver.
 NDStdArraysConfigure("Image1", 3, 0, "$(PORT)", 0)
@@ -226,7 +226,7 @@ dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(S
 #dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=6, F=Trig, ID=1, EVT=3")
 
 set_requestfile_path("$(SIS8300)/SIS8300App/Db")
-set_requestfile_path("$(ADSIS8300BPM)/SIS8300bpmApp/Db")
+set_requestfile_path("$(BPM)/bpmApp/Db")
 
 #asynSetTraceIOMask("$(PORT)",0,2)
 #asynSetTraceMask("$(PORT)",0,255)

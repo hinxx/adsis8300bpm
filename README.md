@@ -1,7 +1,7 @@
-ADSIS8300bpm
-============
+Bpm
+===
 
-The home of the Struck SIS8300 BPM digitizer support for areaDetector software.
+The home of the BPM based on Struck SIS8300 BPM digitizer and areaDetector.
 
 [EPICS](http://www.aps.anl.gov/epics/) 
 
@@ -10,7 +10,7 @@ The home of the Struck SIS8300 BPM digitizer support for areaDetector software.
 It contains this driver and IOC directory.
 
 Additional information:
-* [Documentation for ADSIS8300](???).
+* [Documentation for SIS8300](???).
 * [Documentation for ADCSimDetector](http://cars.uchicago.edu/software/epics/ADCSimDetectorDoc.html).
 * [Release notes and links to source and binary releases](RELEASE.md).
 

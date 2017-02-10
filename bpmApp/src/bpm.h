@@ -1,6 +1,6 @@
-/* ADSIS8300bpm.h
+/* Bpm.h
  *
- * This is a driver for a Struck SIS8300 BPM digitizer.
+ * This is a driver for a BPM based on Struck SIS8300 digitizer.
  *
  * Author: Hinko Kocevar
  *         ESS ERIC, Lund, Sweden
@@ -31,7 +31,8 @@ typedef enum _BpmChannelIndex {
 	BPMChannelCPha,
 	BPMChannelDPha,
 } BPMChannelIndex;
-#define ADSIS8300BPM_NUM_CHANNELS      12
+#define BPM_NUM_CHANNELS      12
+#define BPM_IRQ_WAIT_TIME     2000
 
 /* System wide parameters */
 #define BpmFirmwareVersionString                    "BPM_FW_VERSION"
@@ -72,14 +73,12 @@ typedef enum _BpmChannelIndex {
 #define BpmIDivXPosErrString                        "BPMI_DIV_XPOS_ERR"
 #define BpmIDivYPosErrString                        "BPMI_DIV_YPOS_ERR"
 
-#define ADSIS8300BPM_IRQ_WAIT_TIME      0
-
-class epicsShareClass ADSIS8300bpm : public SIS8300 {
+class epicsShareClass Bpm : public SIS8300 {
 public:
-	ADSIS8300bpm(const char *portName, const char *devicePath,
+	Bpm(const char *portName, const char *devicePath,
 			int maxAddr, int numTimePoints, NDDataType_t dataType,
 			int maxBuffers, size_t maxMemory, int priority, int stackSize);
-	virtual ~ADSIS8300bpm();
+	virtual ~Bpm();
 
     /* These are the methods that we override from asynNDArrayDriver */
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
@@ -89,7 +88,7 @@ public:
 protected:
     /* System wide parameters */
     int P_BPMFirmwareVersion;
-    #define FIRST_SIS8300BPM_PARAM P_BPMFirmwareVersion
+    #define BPM_FIRST_PARAM P_BPMFirmwareVersion
     int P_PulseDone;
     int P_PulseCount;
     int P_PulseMissed;
@@ -126,9 +125,7 @@ protected:
     int P_IIlkIRQ;
     int P_IDivXPosErr;
     int P_IDivYPosErr;
-
-    int P_Dummy2;
-    #define LAST_SIS8300BPM_PARAM P_Dummy2
+    #define BPM_LAST_PARAM P_IDivYPosErr
 
     /* These are the methods that are new to this class */
     template <typename epicsType> int convertArraysT();
@@ -161,4 +158,4 @@ private:
 };
 
 
-#define NUM_SIS8300BPM_PARAMS ((int)(&LAST_SIS8300BPM_PARAM - &FIRST_SIS8300BPM_PARAM + 1))
+#define BPM_NUM_PARAMS ((int)(&BPM_LAST_PARAM - &BPM_FIRST_PARAM + 1))
