@@ -533,7 +533,7 @@ int ADSIS8300bpm::waitForDevice()
 
 //	ret = SIS8300DRV_CALL("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_pposition(mSisDevice, SIS8300BPM_IRQ_WAIT_TIME));
 // XXX: Debug!
-	SIS8300DRV_CALL_RET("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_position(mSisDevice, 1000));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_wait_pulse_done_position", sis8300drvbpm_wait_pulse_done_position(mSisDevice, 2000));
 
 	return 0;
 }
@@ -563,6 +563,7 @@ int ADSIS8300bpm::deviceDone()
 	setIntegerParam(P_PulseCount, oldCount);
 	setIntegerParam(P_PulseDone, 1);
 
+#if 0
 	/* XXX: This is a crude workaround the fact that SAMPLE and IQ_SAMPLE counter
 	 * is being reset and updated *AFTER* the PULSE_DONE interrupt was sent.
 	 *
@@ -574,6 +575,12 @@ int ADSIS8300bpm::deviceDone()
 		SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
 		D(printf("[%i] SAMPLES %10d IQ %10d\n", i, sampleCount, numIQSamples));
 	}
+#endif
+
+	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
+	numIQSamples = sampleCount;
+	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
+	D(printf("SAMPLES %10d IQ %10d\n", sampleCount, numIQSamples));
 	setIntegerParam(P_NumSamples, sampleCount);
 	setIntegerParam(P_NumIQSamples, numIQSamples);
 
