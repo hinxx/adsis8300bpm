@@ -149,13 +149,6 @@ Bpm::Bpm(const char *portName, const char *devicePath,
 }
 
 Bpm::~Bpm() {
-	D(printf("Shutdown and freeing up memory...\n"));
-
-	this->lock();
-	D(printf("Data thread is already down!\n"));
-	destroyDevice();
-
-	this->unlock();
 	I(printf("Shutdown complete!\n"));
 }
 
@@ -983,15 +976,6 @@ int Bpm::initDevice()
     		ver_major, ver_minor, SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_FIRST,
 			SIS8300BPM_VERSION_MAJOR, SIS8300BPM_VERSION_MINOR_LAST);
 	SIS8300_INF(message);
-
-	return 0;
-}
-
-int Bpm::destroyDevice()
-{
-	D(printf("Enter\n"));
-
-	// XXX Add BPM specific destroy here
 
 	return 0;
 }

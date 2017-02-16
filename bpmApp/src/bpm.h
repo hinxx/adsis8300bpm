@@ -133,7 +133,6 @@ protected:
     template <typename epicsType> int convertBPMArraysT(int aich);
     virtual int acquireArrays();
     virtual int initDevice();
-    virtual int destroyDevice();
     virtual int initDeviceDone();
     virtual int armDevice();
     virtual int disarmDevice();
