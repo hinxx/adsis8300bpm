@@ -7,7 +7,7 @@ bpmDemoApp_registerRecordDeviceDriver(pdbbase)
 # Prefix for all records
 epicsEnvSet("PREFIX", "BPM:")
 # The port name for the detector
-epicsEnvSet("PORT",   "SIS8300")
+epicsEnvSet("PORT",   "BPM")
 # The queue size for all plugins
 epicsEnvSet("QSIZE",  "20")
 # The maximim image width; used for row profiles in the NDPluginStats plugin
@@ -64,10 +64,10 @@ asynSetMinTimerPeriod(0.001)
 epicsEnvSet("EPICS_CA_MAX_ARRAY_BYTES", "30000000")
 
 # Create an SIS8300bpm driver
-# SIS8300BpmConfig(const char *portName, const char *devicePath,
+# BpmConfig(const char *portName, const char *devicePath,
 #            int maxAddr, int numSamples, NDDataType_t dataType,
 #            int maxBuffers, size_t maxMemory, int priority, int stackSize)
-SIS8300BpmConfig("$(PORT)", "/dev/sis8300-11", $(NUM_CH), $(NUM_SAMPLES), 7, 0, 0)
+BpmConfig("$(PORT)", "/dev/sis8300-6", $(NUM_CH), $(NUM_SAMPLES), 7, 0, 0)
 dbLoadRecords("$(SIS8300)/db/SIS8300.template",        "P=$(PREFIX),R=,           PORT=$(PORT),ADDR=0,TIMEOUT=1")
 dbLoadRecords("$(SIS8300)/db/SIS8300N.template",       "P=$(PREFIX),R=$(AICH0):,  PORT=$(PORT),ADDR=0,TIMEOUT=1,NAME=$(AICH0)")
 dbLoadRecords("$(SIS8300)/db/SIS8300N.template",       "P=$(PREFIX),R=$(AICH1):,  PORT=$(PORT),ADDR=1,TIMEOUT=1,NAME=$(AICH1)")
