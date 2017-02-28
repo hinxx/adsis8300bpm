@@ -310,28 +310,28 @@ template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 			/* BPM antenna phase data is here */
 			/* antenna phase A BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + eBPMChannelAPha) = converted;
+			*(pVal1 + eBPMChannelAPha) = converted * 180.0 / M_PI;
 			/* antenna phase A BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 1), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + eBPMChannelAPha) = converted;
+			*(pVal2 + eBPMChannelAPha) = converted * 180.0 / M_PI;
 			/* antenna phase B BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 2), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + eBPMChannelBPha) = converted;
+			*(pVal1 + eBPMChannelBPha) = converted * 180.0 / M_PI;
 			/* antenna phase B BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 3), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + eBPMChannelBPha) = converted;
+			*(pVal2 + eBPMChannelBPha) = converted * 180.0 / M_PI;
 			/* antenna phase C BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 4), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + eBPMChannelCPha) = converted;
+			*(pVal1 + eBPMChannelCPha) = converted * 180.0 / M_PI;
 			/* antenna phase C BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 5), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + eBPMChannelCPha) = converted;
+			*(pVal2 + eBPMChannelCPha) = converted * 180.0 / M_PI;
 			/* antenna phase D BPM 1 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 6), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal1 + eBPMChannelDPha) = converted;
+			*(pVal1 + eBPMChannelDPha) = converted * 180.0 / M_PI;
 			/* antenna phase D BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 7), sis8300drvbpm_Qmn_phase, &converted));
-			*(pVal2 + eBPMChannelDPha) = converted;
+			*(pVal2 + eBPMChannelDPha) = converted * 180.0 / M_PI;
 		} else if ((aich == 8) || ((aich == 9) && (memMux == 2) && (memMux10 == 0))) {
 			/* BPM X & Y position data is here */
 			/* X position BPM 1 */
