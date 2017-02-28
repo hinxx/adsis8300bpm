@@ -515,7 +515,10 @@ int Bpm::disarmDevice()
 {
 	D(printf("Enter\n"));
 
-	SIS8300DRV_CALL_VOID("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
+	/* XXX: Calling this here causes major problems in next pulse acquisition!
+	 *      It seems it is not needed.. ask firmware guy for verification.
+	 */
+	//SIS8300DRV_CALL_VOID("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 
 	return SIS8300::disarmDevice();
 }
