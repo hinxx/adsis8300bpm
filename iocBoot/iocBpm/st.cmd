@@ -203,27 +203,15 @@ epicsEnvSet("EVR_PCIFUNCTION"   "0x0")
 mrmEvrSetupPCI($(DEVICE), $(EVR_PCIDOMAIN), $(EVR_PCIBUS), $(EVR_PCIDEVICE), $(EVR_PCIFUNCTION))
 dbLoadRecords("$(MRFIOC2)/db/evr-mtca-300.db", "DEVICE=$(DEVICE), SYS=$(SYS), Link-Clk-SP=88.0525")
 
-# NOT USED ON BPM!
-# PULSE_COMING_EVENT = 1
-#dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=1, CODE=14")
-# MLVDS 0 (RearUniv32)
-#dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=0, F=Trig, ID=0, EVT=1")
-# MLVDS 4 (RearUniv36)
-#dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=4, F=Trig, ID=1, EVT=2")
-
 # PULSE_START_EVENT = 2
 dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=2, CODE=14")
 # MLVDS 1 (RearUniv33)
 dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=1, F=Trig, ID=0, EVT=2")
-# MLVDS 5 (RearUniv37)
-#dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=5, F=Trig, ID=1, EVT=2")
 
 # PULSE_STOP_EVENT = 3
 dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=3, CODE=14")
 # MLVDS 2 (RearUniv34)
 dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=2, F=Trig, ID=0, EVT=3")
-# MLVDS 6 (RearUniv38)
-#dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=6, F=Trig, ID=1, EVT=3")
 
 set_requestfile_path("$(SIS8300)/SIS8300App/Db")
 set_requestfile_path("$(BPM)/bpmApp/Db")
@@ -269,17 +257,6 @@ dbpf $(PREFIX)$(AICH7):ConvOffset 0
 dbpf $(PREFIX)$(AICH8):ConvOffset 0
 dbpf $(PREFIX)$(AICH9):ConvOffset 0
 
-
-# Disable Rear Universal Output 32
-#dbpf $(SYS)-$(DEVICE):RearUniv32-Ena-SP "Disabled"
-# Map Rear Universal Output 32 to pulser 0
-#dbpf $(SYS)-$(DEVICE):RearUniv32-Src-SP 0
-# Map pulser 0 to event 14
-#dbpf $(SYS)-$(DEVICE):Pul0-Evt-Trig0-SP 14
-# Set pulser 1 width to 1 us
-#dbpf $(SYS)-$(DEVICE):Pul0-Width-SP 100
-# event 1 received the SIS8300 will announce pulse
-#dbpf $(SYS)-$(DEVICE):RearUniv32-Ena-SP "Enabled"
 
 # Disable Rear Universal Output 33
 dbpf $(SYS)-$(DEVICE):RearUniv33-Ena-SP "Disabled"
