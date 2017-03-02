@@ -230,7 +230,7 @@ dbpf $(PREFIX)ClockSource 6
 dbpf $(PREFIX)ClockDiv 1
 dbpf $(PREFIX)ClockFreq 88052500
 dbpf $(PREFIX)TrigSetup 0
-dbpf $(PREFIX)RTMType 2
+dbpf $(PREFIX)RTMType 4
 dbpf $(PREFIX)RTMTempGet 1
 dbpf $(PREFIX)Enable 1
 
