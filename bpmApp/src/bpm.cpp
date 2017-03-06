@@ -645,6 +645,11 @@ int Bpm::updateParameters()
 
 	D(printf("Enter\n"));
 
+	ret = SIS8300::updateParameters();
+	if (ret) {
+		return ret;
+	}
+
 	if (mDoNearIQUpdate) {
 		ret = updateNearIQ();
 		doShadowUpdate = true;
