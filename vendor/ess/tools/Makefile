@@ -4,7 +4,7 @@ include $(TOP)/configure/CONFIG
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
 #=============================
 
-#DIRS += xxx
+DIRS += acquisition
 
 include $(TOP)/configure/RULES_DIRS
 #----------------------------------------
