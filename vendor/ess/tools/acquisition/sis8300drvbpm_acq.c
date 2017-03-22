@@ -256,11 +256,11 @@ int main(int argc, char **argv) {
     
     printf("acquisition completed %fs\n", (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / (double) 1000000000);
     
-    if (!verbose && !strlen(datafile_base)) {
+/*    if (!verbose && !strlen(datafile_base)) {
         sis8300drv_close_device(sisuser);
         return 0;
     }
-
+*/
 	unsigned int pulseCount;
 	unsigned int sampleCount;
     int numIQSamples;
@@ -278,11 +278,20 @@ int main(int argc, char **argv) {
 	 *
 	 * Fix firmware!
 	 */
-	for (i = 0; i < 5000; i++) {
-		status = sis8300drv_reg_read(sisuser, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount);
-		numIQSamples = sampleCount;
-		status = sis8300drv_reg_read(sisuser, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount);
-		printf("[%i] SAMPLES %10d IQ %10d\n", i, sampleCount, numIQSamples);
+	unsigned int samples[50000] = {0}, iqsamples[50000] = {0};
+    	struct timespec stamps[50000];
+    clock_gettime(CLOCK_REALTIME, &start);
+	for (i = 0; i < 50000; i++) {
+	    	clock_gettime(CLOCK_REALTIME, &stamps[i]);
+		status = sis8300drv_reg_read(sisuser, SIS8300BPM_IQ_SAMPLE_CNT_REG, &iqsamples[i]);
+		status = sis8300drv_reg_read(sisuser, SIS8300BPM_SAMPLE_CNT_R_REG, &samples[i]);
+	}
+    clock_gettime(CLOCK_REALTIME, &end);
+    
+    printf("haxx completed %fs\n", (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / (double) 1000000000);
+
+	for (i = 0; i < 50000; i++) {
+		printf("[%6i] STAMP %f SAMPLES %10d IQ %10d\n", i, (stamps[i].tv_sec - start.tv_sec) + (stamps[i].tv_nsec - start.tv_nsec) / (double) 1000000000,  samples[i], iqsamples[i]);
 	}
 
 	status = sis8300drv_reg_read(sisuser, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount);
