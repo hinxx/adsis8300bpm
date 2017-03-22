@@ -40,7 +40,7 @@ extern "C" {
 #define SIS8300BPM_HW_ID                    0xCA5E  /** < Unique BPM controller ID */
 #define SIS8300BPM_VERSION_MAJOR            0x00    /** < Library supports this Major FW revision */
 #define SIS8300BPM_VERSION_MINOR_FIRST      0x06    /** < Minor revision - first minor revision in the supported range */
-#define SIS8300BPM_VERSION_MINOR_LAST       0x06    /** < Minor revision - last minor revison in the supported range */
+#define SIS8300BPM_VERSION_MINOR_LAST       0x07    /** < Minor revision - last minor revison in the supported range */
 
 /* ==================================================== */
 /* ================ Basic information ================= */
