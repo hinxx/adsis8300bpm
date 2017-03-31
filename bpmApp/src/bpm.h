@@ -26,11 +26,11 @@ typedef enum _BpmChannelIndex {
 	eBPMChannelBMag,
 	eBPMChannelCMag,
 	eBPMChannelDMag,
-	eBPMChannelRefMag,
 	eBPMChannelAPha,
 	eBPMChannelBPha,
 	eBPMChannelCPha,
 	eBPMChannelDPha,
+	eBPMChannelRefMag,
 	eBPMChannelRefPha
 } BPMChannelIndex;
 #define BPM_NUM_CHANNELS      14
