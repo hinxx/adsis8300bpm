@@ -565,20 +565,6 @@ int Bpm::deviceDone()
 	setIntegerParam(mBpmPulseCount, oldCount);
 	setIntegerParam(mBpmPulseDone, 1);
 
-#if 0
-	/* XXX: This is a crude workaround the fact that SAMPLE and IQ_SAMPLE counter
-	 * is being reset and updated *AFTER* the PULSE_DONE interrupt was sent.
-	 *
-	 * Fix firmware!
-	 */
-	for (int i = 0; i < 5000; i++) {
-		SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
-		numIQSamples = sampleCount;
-		SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
-		D(printf("[%i] SAMPLES %10d IQ %10d\n", i, sampleCount, numIQSamples));
-	}
-#endif
-
 	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_IQ_SAMPLE_CNT_REG, &sampleCount));
 	numIQSamples = sampleCount;
 	SIS8300DRV_CALL_RET("sis8300drv_reg_read", sis8300drv_reg_read(mSisDevice, SIS8300BPM_SAMPLE_CNT_R_REG, &sampleCount));
