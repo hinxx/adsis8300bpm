@@ -131,7 +131,7 @@ protected:
 
     /* These are the methods that are new to this class */
     template <typename epicsType> int convertArraysT();
-    template <typename epicsType> int convertAIArraysT(int aich);
+    template <typename epicsType> int convertAIArraysT(int aich, bool sign);
     template <typename epicsType> int convertBPMArraysT(int aich);
     virtual int acquireArrays();
     virtual int initDevice();

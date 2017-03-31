@@ -153,7 +153,7 @@ Bpm::~Bpm() {
 }
 
 /** Template function to compute the simulated detector data for any data type */
-template <typename epicsType> int Bpm::convertAIArraysT(int aich)
+template <typename epicsType> int Bpm::convertAIArraysT(int aich, bool sign)
 {
     int numAiSamples;
     epicsType *pData, *pVal;
@@ -184,11 +184,15 @@ template <typename epicsType> int Bpm::convertAIArraysT(int aich)
 //	FILE *fp = fopen(fname, "w");
 	D(printf("CH %d [%d] ", aich, numAiSamples));
 	for (i = 0; i < numAiSamples; i++) {
-		negative = (*(pChRaw + i) & (1 << 15)) != 0;
-		if (negative) {
-			*pVal = (epicsType)((double)(*(pChRaw + i) | ~((1 << 16) - 1))/* * convFactor + convOffset*/);
+		if (sign) {
+			negative = (*(pChRaw + i) & (1 << 15)) != 0;
+			if (negative) {
+				*pVal = (epicsType)((double)(*(pChRaw + i) | ~((1 << 16) - 1))/* * convFactor + convOffset*/);
+			} else {
+				*pVal = (epicsType)((double)(*(pChRaw + i))/* * convFactor + convOffset*/);
+			}
 		} else {
-			*pVal = (epicsType)((double)(*(pChRaw + i))/* * convFactor + convOffset*/);
+			*pVal = (epicsType)((double)*(pChRaw + i)/* * convFactor + convOffset*/);
 		}
 
 //		printf("%f ", (double)*pVal);
@@ -443,12 +447,14 @@ template <typename epicsType> int Bpm::convertArraysT()
 
 		if ((aich < 5) || ((aich < 9) && (memMux == 2))) {
 			/* AI data is here */
-			ret = convertAIArraysT<epicsType>(aich);
+			ret = convertAIArraysT<epicsType>(aich, true);
 		} else if ((aich == 9) && (memMux != 2)) {
 			D(printf("Not interested in aich 9 data (memMux != 2)..\n"));
 		} else {
 			/* BPM data is here */
 			ret = convertBPMArraysT<epicsType>(aich);
+			/* Save the interleaved data, too */
+			ret = convertAIArraysT<epicsType>(aich, false);
 		}
 		if (ret) {
 			return ret;
