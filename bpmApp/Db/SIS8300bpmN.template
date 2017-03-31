@@ -131,8 +131,6 @@ record(bi, "$(P)$(R)ThrSelect_RBV") {
     field(ONAM, "MAG Threshold")
 }
 
-# interlock
-
 record(bo, "$(P)$(R)IlkControl") {
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_CONTROL")
