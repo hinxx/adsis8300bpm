@@ -189,26 +189,26 @@ NDFFTConfigure("$(BPM1)FFT11", $(QSIZE), 0, "TS1", 11)
 dbLoadRecords("$(ADCORE)/db/NDFFT.template","P=$(PREFIX),R=$(BPM1):FFT11:,PORT=$(BPM1)FFT11,ADDR=0,TIMEOUT=1,NDARRAY_PORT=TS1,NDARRAY_ADDR=11,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TS:TSAveragingTime_RBV CP MS,ENABLED=0,NAME=$(BPM1):$(BPMCH12)")
 
 
-# Timing MTCA EVR 300
+# Timing PMC 230 EVR
 epicsEnvSet("SYS"               "BPM")
 epicsEnvSet("DEVICE"            "EVR")
 epicsEnvSet("EVR_PCIDOMAIN"     "0x0")
-epicsEnvSet("EVR_PCIBUS"        "0x6")
+epicsEnvSet("EVR_PCIBUS"        "0xa")
 epicsEnvSet("EVR_PCIDEVICE"     "0x0")
 epicsEnvSet("EVR_PCIFUNCTION"   "0x0")
 
 #require mrfioc2,2.7.13
 mrmEvrSetupPCI($(DEVICE), $(EVR_PCIDOMAIN), $(EVR_PCIBUS), $(EVR_PCIDEVICE), $(EVR_PCIFUNCTION))
-dbLoadRecords("$(MRFIOC2)/db/evr-mtca-300.db", "DEVICE=$(DEVICE), SYS=$(SYS), Link-Clk-SP=88.0525")
+dbLoadRecords("$(MRFIOC2)/db/evr-pmc-230.db", "DEVICE=$(DEVICE), SYS=$(SYS), Link-Clk-SP=88.0525")
 
 # PULSE_START_EVENT = 2
 dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=2, CODE=14")
-# MLVDS 1 (RearUniv33)
+# MLVDS 1 (RearUniv1)
 dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=1, F=Trig, ID=0, EVT=2")
 
 # PULSE_STOP_EVENT = 3
 dbLoadRecords("$(MRFIOC2)/db/evr-softEvent.template", "DEVICE=$(DEVICE), SYS=$(SYS), EVT=3, CODE=14")
-# MLVDS 2 (RearUniv34)
+# MLVDS 2 (RearUniv2)
 dbLoadRecords("$(MRFIOC2)/db/evr-pulserMap.template", "DEVICE=$(DEVICE), SYS=$(SYS), PID=2, F=Trig, ID=0, EVT=3")
 
 set_requestfile_path("$(SIS8300)/SIS8300App/Db")
@@ -256,10 +256,10 @@ dbpf $(PREFIX)$(AICH8):ConvOffset 0
 dbpf $(PREFIX)$(AICH9):ConvOffset 0
 
 
-# Disable Rear Universal Output 33
-dbpf $(SYS)-$(DEVICE):RearUniv33-Ena-SP "Disabled"
-# Map Rear Universal Output 33 to pulser 1
-dbpf $(SYS)-$(DEVICE):RearUniv33-Src-SP 1
+# Disable Rear Universal Output 1
+dbpf $(SYS)-$(DEVICE):RearUniv1-Ena-SP "Disabled"
+# Map Rear Universal Output 1 to pulser 1
+dbpf $(SYS)-$(DEVICE):RearUniv1-Src-SP 1
 # Map pulser 1 to event 14
 dbpf $(SYS)-$(DEVICE):Pul1-Evt-Trig0-SP 14
 # Set pulser 1 width to 100 us
@@ -267,20 +267,20 @@ dbpf $(SYS)-$(DEVICE):Pul1-Width-SP 100
 # Set the delay time of the pulser 1 to 0.3 ms
 #dbpf $(SYS)-$(DEVICE):Pul1-Delay-SP 300
 # event 2 received the SIS8300 will start the data acquisition
-dbpf $(SYS)-$(DEVICE):RearUniv33-Ena-SP "Enabled"
+dbpf $(SYS)-$(DEVICE):RearUniv1-Ena-SP "Enabled"
 
-# Disable Rear Universal Output 34
-dbpf $(SYS)-$(DEVICE):RearUniv34-Ena-SP "Disabled"
-# Map Rear Universal Output 34 to pulser 2
-dbpf $(SYS)-$(DEVICE):RearUniv34-Src-SP 2
+# Disable Rear Universal Output 2
+dbpf $(SYS)-$(DEVICE):RearUniv2-Ena-SP "Disabled"
+# Map Rear Universal Output 2 to pulser 2
+dbpf $(SYS)-$(DEVICE):RearUniv2-Src-SP 2
 # Map pulser 2 to event 14
 dbpf $(SYS)-$(DEVICE):Pul2-Evt-Trig0-SP 14
 # Set pulser 2 width to 100 us
 dbpf $(SYS)-$(DEVICE):Pul2-Width-SP 100
-# Set the delay time of the pulser 2 to 3.16 ms (pulse width of 2.86 ms)
+# Set the delay time of the pulser 2 to pulse width of 2.86 ms
 dbpf $(SYS)-$(DEVICE):Pul2-Delay-SP 2860
 # event 3 received the SIS8300 will stop the data acquisition
-dbpf $(SYS)-$(DEVICE):RearUniv34-Ena-SP "Enabled"
+dbpf $(SYS)-$(DEVICE):RearUniv2-Ena-SP "Enabled"
 
 
 # Setup TimeSeries plugins
