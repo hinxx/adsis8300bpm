@@ -26,12 +26,14 @@ typedef enum _BpmChannelIndex {
 	eBPMChannelBMag,
 	eBPMChannelCMag,
 	eBPMChannelDMag,
+	eBPMChannelRefMag,
 	eBPMChannelAPha,
 	eBPMChannelBPha,
 	eBPMChannelCPha,
 	eBPMChannelDPha,
+	eBPMChannelRefPha
 } BPMChannelIndex;
-#define BPM_NUM_CHANNELS      12
+#define BPM_NUM_CHANNELS      14
 #define BPM_IRQ_WAIT_TIME     2000
 
 /* System wide parameters */

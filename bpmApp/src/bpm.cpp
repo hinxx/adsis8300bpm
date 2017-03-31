@@ -306,6 +306,10 @@ template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 			/* antenna magnitude D BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 7), sis8300drvbpm_Qmn_magnitude, &converted));
 			*(pVal2 + eBPMChannelDMag) = converted;
+			/* reference magnitude BPM 1 and BPM 2 */
+			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 8), sis8300drvbpm_Qmn_magnitude, &converted));
+			*(pVal1 + eBPMChannelRefMag) = converted;
+			*(pVal2 + eBPMChannelRefMag) = converted;
 		} else if ((aich == 7) || ((aich == 9) && (memMux == 2) && (memMux10 == 3))) {
 			/* BPM antenna phase data is here */
 			/* antenna phase A BPM 1 */
@@ -332,6 +336,10 @@ template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 			/* antenna phase D BPM 2 */
 			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 7), sis8300drvbpm_Qmn_phase, &converted));
 			*(pVal2 + eBPMChannelDPha) = converted * 180.0 / M_PI;
+			/* reference phase BPM 1 and BPM 2 */
+			SIS8300DRV_CALL_RET("sis8300drvbpm_Qmn_2_double", sis8300drvbpm_Qmn_2_double((epicsUInt32)*(pChRaw + 8), sis8300drvbpm_Qmn_phase, &converted));
+			*(pVal1 + eBPMChannelRefPha) = converted * 180.0 / M_PI;
+			*(pVal2 + eBPMChannelRefPha) = converted * 180.0 / M_PI;
 		} else if ((aich == 8) || ((aich == 9) && (memMux == 2) && (memMux10 == 0))) {
 			/* BPM X & Y position data is here */
 			/* X position BPM 1 */
@@ -963,7 +971,10 @@ int Bpm::initDevice()
 
 	SIS8300DRV_CALL_RET("sis8300drvbpm_get_fw_version", sis8300drvbpm_get_fw_version(mSisDevice, &ver_device, &ver_major, &ver_minor));
 	setIntegerParam(mBpmFwVersion, ver_major << 8 | ver_minor);
-
+/*
+	
+	XXX: Ignore this until dust settles..
+	
     if (ver_major != SIS8300BPM_VERSION_MAJOR ||
         ver_minor < SIS8300BPM_VERSION_MINOR_FIRST ||
         ver_minor > SIS8300BPM_VERSION_MINOR_LAST) {
@@ -974,7 +985,7 @@ int Bpm::initDevice()
         destroyDevice();
         return -1;
     }
-
+*/
 	SIS8300DRV_CALL_RET("sis8300drvbpm_sw_reset", sis8300drvbpm_sw_reset(mSisDevice));
 	SIS8300DRV_CALL_RET("sis8300drvbpm_setup_dac", sis8300drvbpm_setup_dac(mSisDevice));
 	SIS8300DRV_CALL_RET("sis8300drvbpm_clear_gop", sis8300drvbpm_clear_gop(mSisDevice));

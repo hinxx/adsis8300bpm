@@ -718,10 +718,19 @@ $(pv_value)</tooltip>
         <path>NDStdArrays.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <R>image1:</R>
+          <R>Data1:</R>
         </macros>
         <mode>1</mode>
-        <description>Image #1</description>
+        <description>BPM1 data</description>
+      </action>
+      <action type="OPEN_DISPLAY">
+        <path>NDStdArrays.opi</path>
+        <macros>
+          <include_parent_macros>true</include_parent_macros>
+          <R>Data2:</R>
+        </macros>
+        <mode>1</mode>
+        <description>BPM2 data</description>
       </action>
       <action type="OPEN_DISPLAY">
         <path>NDProcess.opi</path>
@@ -731,15 +740,6 @@ $(pv_value)</tooltip>
         </macros>
         <mode>1</mode>
         <description>Process #1</description>
-      </action>
-      <action type="OPEN_DISPLAY">
-        <path>NDTransform.opi</path>
-        <macros>
-          <include_parent_macros>true</include_parent_macros>
-          <R>Trans1:</R>
-        </macros>
-        <mode>1</mode>
-        <description>Transform #1</description>
       </action>
       <action type="OPEN_DISPLAY">
         <path>NDColorConvert.opi</path>
@@ -1066,6 +1066,8 @@ $(pv_value)</tooltip>
           <R9>TS1:9:</R9>
           <R10>TS1:10:</R10>
           <R11>TS1:11:</R11>
+          <R12>TS1:12:</R12>
+          <R13>TS1:13:</R13>
           <T0>X pos</T0>
           <T1>Y pos</T1>
           <T2>Magnitude sum</T2>
@@ -1078,6 +1080,8 @@ $(pv_value)</tooltip>
           <T9>B phase</T9>
           <T10>C phase</T10>
           <T11>D phase</T11>
+          <T12>Reference magnitude</T12>
+          <T13>Reference phase</T13>
         </macros>
         <mode>1</mode>
         <description>Time series BPM1</description>
@@ -1099,6 +1103,8 @@ $(pv_value)</tooltip>
           <R9>TS2:9:</R9>
           <R10>TS2:10:</R10>
           <R11>TS2:11:</R11>
+          <R12>TS2:12:</R12>
+          <R13>TS2:13:</R13>
           <T0>X pos</T0>
           <T1>Y pos</T1>
           <T2>Magnitude sum</T2>
@@ -1111,6 +1117,8 @@ $(pv_value)</tooltip>
           <T9>B phase</T9>
           <T10>C phase</T10>
           <T11>D phase</T11>
+          <T12>Reference magnitude</T12>
+          <T13>Reference phase</T13>
         </macros>
         <mode>1</mode>
         <description>Time series BPM2</description>

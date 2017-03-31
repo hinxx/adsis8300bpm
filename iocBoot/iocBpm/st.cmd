@@ -48,11 +48,14 @@ epicsEnvSet("BPMCH9",     "APHA")
 epicsEnvSet("BPMCH10",    "BPHA")
 epicsEnvSet("BPMCH11",    "CPHA")
 epicsEnvSet("BPMCH12",    "DPHA")
+epicsEnvSet("BPMCH13",    "REFMAG")
+epicsEnvSet("BPMCH14",    "REFPHA")
 
 # This is sum of AI and BPM asyn addresses
 # ADDR 0 .. 9 are for AI
 # ADDR 10 .. 11 are for BPM1 and BPM2
-epicsEnvSet("NUM_CH",        "12")
+epicsEnvSet("NUM_ADDR",        "12")
+epicsEnvSet("NUM_BPM_CH",    "14")
 # Number of samples to acquire
 epicsEnvSet("NUM_SAMPLES",   "300000")
 # The maximum number of time series points in the NDPluginTimeSeries plugin
@@ -67,7 +70,7 @@ epicsEnvSet("EPICS_CA_MAX_ARRAY_BYTES", "30000000")
 # BpmConfig(const char *portName, const char *devicePath,
 #            int maxAddr, int numSamples, NDDataType_t dataType,
 #            int maxBuffers, size_t maxMemory, int priority, int stackSize)
-BpmConfig("$(PORT)", "/dev/sis8300-6", $(NUM_CH), $(NUM_SAMPLES), 7, 0, 0)
+BpmConfig("$(PORT)", "/dev/sis8300-6", $(NUM_ADDR), $(NUM_SAMPLES), 7, 0, 0)
 dbLoadRecords("$(SIS8300)/db/SIS8300.template",        "P=$(PREFIX),R=,           PORT=$(PORT),ADDR=0,TIMEOUT=1")
 dbLoadRecords("$(SIS8300)/db/SIS8300N.template",       "P=$(PREFIX),R=$(AICH0):,  PORT=$(PORT),ADDR=0,TIMEOUT=1,NAME=$(AICH0)")
 dbLoadRecords("$(SIS8300)/db/SIS8300N.template",       "P=$(PREFIX),R=$(AICH1):,  PORT=$(PORT),ADDR=1,TIMEOUT=1,NAME=$(AICH1)")
@@ -108,7 +111,7 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:8:, PORT
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS0:9:, PORT=TS0,ADDR=9,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(AICH9)")
 
 # Time series plugin for BPM1
-NDTimeSeriesConfigure("TS1", $(QSIZE), 0, "$(PORT)", 1, 12)
+NDTimeSeriesConfigure("TS1", $(QSIZE), 0, "$(PORT)", 1, $(NUM_BPM_CH))
 dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS1:,   PORT=TS1,ADDR=0, TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=1,NCHANS=$(TSPOINTS),TIME_LINK=,ENABLED=1")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:0:, PORT=TS1,ADDR=0, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH1)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:1:, PORT=TS1,ADDR=1, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH2)")
@@ -122,9 +125,11 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:8:, PORT
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:9:, PORT=TS1,ADDR=9, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH10)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:10:,PORT=TS1,ADDR=10,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH11)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:11:,PORT=TS1,ADDR=11,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH12)")
+dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:12:,PORT=TS1,ADDR=12,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH13)")
+dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS1:13:,PORT=TS1,ADDR=13,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM1):$(BPMCH14)")
 
 # Time series plugin for BPM2
-NDTimeSeriesConfigure("TS2", $(QSIZE), 0, "$(PORT)", 2, 12)
+NDTimeSeriesConfigure("TS2", $(QSIZE), 0, "$(PORT)", 2, $(NUM_BPM_CH))
 dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template",  "P=$(PREFIX),R=TS2:,   PORT=TS2,ADDR=0, TIMEOUT=1,NDARRAY_PORT=$(PORT),NDARRAY_ADDR=2,NCHANS=$(TSPOINTS),TIME_LINK=,ENABLED=1")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:0:, PORT=TS2,ADDR=0, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH1)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:1:, PORT=TS2,ADDR=1, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH2)")
@@ -138,6 +143,8 @@ dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:8:, PORT
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:9:, PORT=TS2,ADDR=9, TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH10)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:10:,PORT=TS2,ADDR=10,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH11)")
 dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:11:,PORT=TS2,ADDR=11,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH12)")
+dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:12:,PORT=TS2,ADDR=12,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH13)")
+dbLoadRecords("$(ADCORE)/db/NDTimeSeriesN.template", "P=$(PREFIX),R=TS2:13:,PORT=TS2,ADDR=13,TIMEOUT=1,NCHANS=$(TSPOINTS),NAME=$(BPM2):$(BPMCH14)")
 
 # FFT plugins
 NDFFTConfigure("FFT0", $(QSIZE), 0, "TS0", 0)
@@ -187,6 +194,10 @@ NDFFTConfigure("$(BPM1)FFT10", $(QSIZE), 0, "TS1", 10)
 dbLoadRecords("$(ADCORE)/db/NDFFT.template","P=$(PREFIX),R=$(BPM1):FFT10:,PORT=$(BPM1)FFT10,ADDR=0,TIMEOUT=1,NDARRAY_PORT=TS1,NDARRAY_ADDR=10,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TS:TSAveragingTime_RBV CP MS,ENABLED=0,NAME=$(BPM1):$(BPMCH11)")
 NDFFTConfigure("$(BPM1)FFT11", $(QSIZE), 0, "TS1", 11)
 dbLoadRecords("$(ADCORE)/db/NDFFT.template","P=$(PREFIX),R=$(BPM1):FFT11:,PORT=$(BPM1)FFT11,ADDR=0,TIMEOUT=1,NDARRAY_PORT=TS1,NDARRAY_ADDR=11,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TS:TSAveragingTime_RBV CP MS,ENABLED=0,NAME=$(BPM1):$(BPMCH12)")
+NDFFTConfigure("$(BPM1)FFT12", $(QSIZE), 0, "TS1", 12)
+dbLoadRecords("$(ADCORE)/db/NDFFT.template","P=$(PREFIX),R=$(BPM1):FFT12:,PORT=$(BPM1)FFT12,ADDR=0,TIMEOUT=1,NDARRAY_PORT=TS1,NDARRAY_ADDR=12,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TS:TSAveragingTime_RBV CP MS,ENABLED=0,NAME=$(BPM1):$(BPMCH13)")
+NDFFTConfigure("$(BPM1)FFT13", $(QSIZE), 0, "TS1", 13)
+dbLoadRecords("$(ADCORE)/db/NDFFT.template","P=$(PREFIX),R=$(BPM1):FFT13:,PORT=$(BPM1)FFT13,ADDR=0,TIMEOUT=1,NDARRAY_PORT=TS1,NDARRAY_ADDR=13,NCHANS=$(TSPOINTS),TIME_LINK=$(PREFIX)TS:TSAveragingTime_RBV CP MS,ENABLED=0,NAME=$(BPM1):$(BPMCH14)")
 
 
 # Timing MTCA EVR 300
@@ -277,7 +288,7 @@ dbpf $(SYS)-$(DEVICE):RearUniv34-Src-SP 2
 dbpf $(SYS)-$(DEVICE):Pul2-Evt-Trig0-SP 14
 # Set pulser 2 width to 100 us
 dbpf $(SYS)-$(DEVICE):Pul2-Width-SP 100
-# Set the delay time of the pulser 2 to 3.16 ms (pulse width of 2.86 ms)
+# Set the delay time of the pulser 2 to pulse width of 2.86 ms
 dbpf $(SYS)-$(DEVICE):Pul2-Delay-SP 2860
 # event 3 received the SIS8300 will stop the data acquisition
 dbpf $(SYS)-$(DEVICE):RearUniv34-Ena-SP "Enabled"
