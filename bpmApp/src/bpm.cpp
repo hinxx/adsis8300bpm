@@ -251,8 +251,13 @@ template <typename epicsType> int Bpm::convertBPMArraysT(int aich)
 		i++;
 		pChRaw++;
 	}
-
 	D(printf("CH %d [%d] BPM samples %d\n", aich, numAiSamples, numBPMSamples));
+
+	/* first IQ sample was always funky as observed in data plots;
+	 * skip first 3 IQ samples for good measure */
+	i += (3 * nearIQN);
+	pChRaw += (3 * nearIQN);
+	D(printf("Fifth non 0xDEAD sample index %d\n", i));
 
 //	char fname[32];
 //	sprintf(fname, "/tmp/bpm_X1_%d.txt", aich);
@@ -580,8 +585,8 @@ int Bpm::deviceDone()
     if (numBPMSamples > numIQSamples) {
     	numBPMSamples = numIQSamples;
     }
-    /* we want to ignore the first couple of samples, arbitrarily value is chosen */
-    numBPMSamples -= 10;
+    /* we want to ignore the last couple of samples, arbitrarily value is chosen */
+    numBPMSamples -= 5;
     if (numBPMSamples < 1) {
     	E(printf("not enough raw samples requested %d for used near IQ N %d!! Need at least %d raw samples\n",
     			numAiSamples, nearIQN, 11 * nearIQN));
