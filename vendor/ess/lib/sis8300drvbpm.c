@@ -45,7 +45,7 @@ const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_position =
 const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_magnitude =
         { .int_bits_m = 1,  .frac_bits_n = 15, .is_signed = 0 };
 const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_filter_coeff =
-        { .int_bits_m = 16, .frac_bits_n = 0,  .is_signed = 1 };
+        { .int_bits_m = 16, .frac_bits_n = 16,  .is_signed = 1 };
 const sis8300drvbpm_Qmn sis8300drvbpm_Qmn_phase  =
         { .int_bits_m = 3,  .frac_bits_n = 13, .is_signed = 1 };
 
@@ -974,6 +974,7 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
 
 	int i;
 	uint32_t val;
+	int16_t reg_val;
 	double err;
     sis8300drv_dev *sisdevice;
     int status = status_success;
@@ -998,7 +999,7 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
                 SIS8300BPM_FILTER_CTRL_REG, 0x2);
     if (status) {
         pthread_mutex_unlock(&sisdevice->lock);
-        return status_device_access;
+        return status;
     }
 
     for (i = 0; i < param_count; i++) {
@@ -1006,16 +1007,17 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
     			sis8300drvbpm_Qmn_filter_coeff, &val, &err);
 	    if (status) {
 	        pthread_mutex_unlock(&sisdevice->lock);
-	        return status_device_access;
+	        return status;
 	    }
-		printf("%s: Filter param index %d -> %d, %f -> %d\n", __func__,
-				i, bpm_filter_param_map[i], param_vals[i], val);
+	    reg_val = val & 0xFFFF;
+		printf("%s: Filter param index %d -> %d, %f -> %d, err %f, reg val %d\n", __func__,
+				i, bpm_filter_param_map[i], param_vals[i], val, err, reg_val);
 		/* address will internally auto increment */
 	    status = sis8300_reg_write(sisdevice->handle,
-	                SIS8300BPM_FILTER_DATA_REG, val);
+	                SIS8300BPM_FILTER_DATA_REG, reg_val);
 	    if (status) {
 	        pthread_mutex_unlock(&sisdevice->lock);
-	        return status_device_access;
+	        return status;
 	    }
     }
 
@@ -1028,7 +1030,7 @@ int sis8300drvbpm_set_fir_filter_param(sis8300drv_usr *sisuser,
  * @brief Set FIR filter control bit
  *
  * @param [in]  sisuser     User context struct
- * @param [in]  param_val   Enable or diable FIR filter
+ * @param [in]  param_val   Enable or disable FIR filter
  *
  * @return status_success           On successful set
  * @return status_device_access     Can't access device registers.
