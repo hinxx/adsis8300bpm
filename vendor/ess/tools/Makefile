@@ -5,6 +5,7 @@ include $(TOP)/configure/CONFIG
 #=============================
 
 DIRS += acquisition
+DIRS += filter
 
 include $(TOP)/configure/RULES_DIRS
 #----------------------------------------
