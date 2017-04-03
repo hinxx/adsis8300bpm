@@ -183,6 +183,14 @@ record(bi, "$(P)$(R)IlkIRQ_RBV") {
     field(ONAM, "Enabled")
 }
 
+record(bi, "$(P)$(R)IlkIRQ_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_ILK_IRQ")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+}
+
 # board setup
 
 record(bi, "$(P)$(R)DivXPosErr_RBV") {
@@ -199,4 +207,78 @@ record(bi, "$(P)$(R)DivYPosErr_RBV") {
     field(SCAN, "I/O Intr")
     field(ZNAM, "No")
     field(ONAM, "Yes")
+}
+
+# self triggering
+
+record(bo, "$(P)$(R)SelfTrigChA") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_A")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)SelfTrigChA_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_A")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+record(bo, "$(P)$(R)SelfTrigChB") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_B")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)SelfTrigChB_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_B")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+record(bo, "$(P)$(R)SelfTrigChC") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_C")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)SelfTrigChC_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_C")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+record(bo, "$(P)$(R)SelfTrigChD") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_D")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)SelfTrigChD_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_SELF_TRIG_CH_D")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
 }

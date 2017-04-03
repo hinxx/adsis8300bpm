@@ -339,6 +339,70 @@ record(bo, "$(P)$(R)FilterApply") {
     field(VAL,  "0")
 }
 
+# self triggering
+
+record(bo, "$(P)$(R)SelfTrigControl") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_CONTROL")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+}
+
+record(bi, "$(P)$(R)SelfTrigControl_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_CONTROL")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+record(longout, "$(P)$(R)SelfTrigThreshold") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_THRESHOLD")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(longin, "$(P)$(R)SelfTrigThreshold_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_THRESHOLD")
+    field(SCAN, "I/O Intr")
+}
+
+record(bo, "$(P)$(R)SelfTrigChRef") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_CH_REF")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(bi, "$(P)$(R)SelfTrigChRef_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_CH_REF")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+record(longout, "$(P)$(R)SelfTrigIQSamples") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_IQ_SAMPLES")
+    field(VAL,  "0")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL")
+}
+
+record(longin, "$(P)$(R)SelfTrigIQSamples_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_IQ_SAMPLES")
+    field(SCAN, "I/O Intr")
+}
+
 
 
 record(bo, "$(P)$(R)BPM:Enable")

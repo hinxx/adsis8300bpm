@@ -112,6 +112,10 @@ Bpm::Bpm(const char *portName, const char *devicePath,
     createParam(BpmFilterCoeff5String,          asynParamFloat64, &mBpmFilterCoeff5);
     createParam(BpmFilterGainString,            asynParamFloat64, &mBpmFilterGain);
     createParam(BpmFilterApplyString,             asynParamInt32, &mBpmFilterApply);
+    createParam(BpmSelfTrigControlString,         asynParamInt32, &mBpmSelfTrigControl);
+    createParam(BpmSelfTrigThresholdString,       asynParamInt32, &mBpmSelfTrigThreshold);
+    createParam(BpmSelfTrigChRefString,           asynParamInt32, &mBpmSelfTrigChRef);
+    createParam(BpmSelfTrigIQSamplesString,       asynParamInt32, &mBpmSelfTrigIQSamples);
     /* BPM instance wide parameters (BPM1 or BPM2)*/
     for (i = BPM_BPM1_ADDR; i <= BPM_BPM2_ADDR; i++) {
 		createParam(i, BpmIEnableString,                 asynParamInt32, &mBpmIEnable);
@@ -127,6 +131,10 @@ Bpm::Bpm(const char *portName, const char *devicePath,
 		createParam(i, BpmIIlkIRQString,                 asynParamInt32, &mBpmIIlkIRQ);
 		createParam(i, BpmIDivXPosErrString,             asynParamInt32, &mBpmIDivXPosErr);
 		createParam(i, BpmIDivYPosErrString,             asynParamInt32, &mBpmIDivYPosErr);
+		createParam(i, BpmISelfTrigChAString,            asynParamInt32, &mBpmISelfTrigChA);
+		createParam(i, BpmISelfTrigChBString,            asynParamInt32, &mBpmISelfTrigChB);
+		createParam(i, BpmISelfTrigChCString,            asynParamInt32, &mBpmISelfTrigChC);
+		createParam(i, BpmISelfTrigChDString,            asynParamInt32, &mBpmISelfTrigChD);
     }
 
     mDoBoardSetupUpdate = false;
@@ -662,6 +670,9 @@ int Bpm::updateParameters()
 	if (mDoBoardSetupUpdate) {
 		ret = updateBoardSetup();
 	}
+	if (mDoSelfTriggerUpdate) {
+		ret = updateSelfTrigger();
+	}
 	if (mDoFilterControlUpdate || mDoFilterCoeffUpdate) {
 		ret = updateFilter();
 	}
@@ -769,6 +780,51 @@ int Bpm::updateFilter()
 	return 0;
 }
 
+int Bpm::updateSelfTrigger() {
+
+	int param;
+	int count;
+	int tmp;
+
+	D(printf("Enter\n"));
+
+	if (mDoSelfTriggerUpdate) {
+		getIntegerParam(mBpmSelfTrigIQSamples, &count);
+		count &= 0xFFFF;
+		D(printf("New self trigger count: %X\n", count));
+		SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300BPM_SELF_TRIG_CNT_REG, count));
+
+		param = 0;
+		getIntegerParam(BPM_BPM1_ADDR, mBpmISelfTrigChA, &tmp);
+		param |= (tmp << 6);
+		getIntegerParam(BPM_BPM1_ADDR, mBpmISelfTrigChB, &tmp);
+		param |= (tmp << 7);
+		getIntegerParam(BPM_BPM1_ADDR, mBpmISelfTrigChC, &tmp);
+		param |= (tmp << 8);
+		getIntegerParam(BPM_BPM1_ADDR, mBpmISelfTrigChD, &tmp);
+		param |= (tmp << 9);
+		getIntegerParam(mBpmSelfTrigChRef, &tmp);
+		param |= (tmp << 10);
+		getIntegerParam(BPM_BPM2_ADDR, mBpmISelfTrigChA, &tmp);
+		param |= (tmp << 11);
+		getIntegerParam(BPM_BPM2_ADDR, mBpmISelfTrigChB, &tmp);
+		param |= (tmp << 12);
+		getIntegerParam(BPM_BPM2_ADDR, mBpmISelfTrigChC, &tmp);
+		param |= (tmp << 13);
+		getIntegerParam(BPM_BPM2_ADDR, mBpmISelfTrigChD, &tmp);
+		param |= (tmp << 14);
+		getIntegerParam(mBpmSelfTrigThreshold, &tmp);
+		param |= (tmp << 16);
+
+		D(printf("New self trigger values: %X\n", param));
+		SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300BPM_SELF_TRIG_PARAM_REG, param));
+
+		mDoSelfTriggerUpdate = false;
+	}
+
+	return 0;
+}
+
 int Bpm::updateThreshold(int addr)
 {
 	double xPosLow, xPosHigh;
@@ -871,6 +927,15 @@ asynStatus Bpm::writeInt32(asynUser *pasynUser, epicsInt32 value)
     	mDoBoardSetupUpdate = true;
     } else if (function == mBpmIIlkClear) {
     	setIntegerParam(addr, mBpmIIlkStatus, 0);
+    } else if (function == mBpmSelfTrigControl ||
+    		function == mBpmSelfTrigThreshold ||
+			function == mBpmSelfTrigIQSamples ||
+			function == mBpmSelfTrigChRef ||
+			function == mBpmISelfTrigChA ||
+			function == mBpmISelfTrigChB ||
+			function == mBpmISelfTrigChC ||
+			function == mBpmISelfTrigChD) {
+    	mDoSelfTriggerUpdate = true;
     } else {
         /* If this parameter belongs to a base class call its method */
         if (function < BPM_FIRST_PARAM) {

@@ -60,6 +60,10 @@ typedef enum _BpmChannelIndex {
 #define BpmFilterCoeff5String                       "BPM_FILTER_COEFF_5"
 #define BpmFilterGainString                         "BPM_FILTER_GAIN"
 #define BpmFilterApplyString                        "BPM_FILTER_APPLY"
+#define BpmSelfTrigControlString                    "BPM_SELF_TRIG_CONTROL"
+#define BpmSelfTrigThresholdString                  "BPM_SELF_TRIG_THRESHOLD"
+#define BpmSelfTrigChRefString                      "BPM_SELF_TRIG_CH_REF"
+#define BpmSelfTrigIQSamplesString                  "BPM_SELF_TRIG_IQ_SAMPLES"
 /* BPM instance wide parameters (BPM1 or BPM2)*/
 #define BpmIEnableString                            "BPMI_ENABLE"
 #define BpmIThrXPosLowString                        "BPMI_THR_XPOS_LOW"
@@ -74,6 +78,10 @@ typedef enum _BpmChannelIndex {
 #define BpmIIlkIRQString                            "BPMI_ILK_IRQ"
 #define BpmIDivXPosErrString                        "BPMI_DIV_XPOS_ERR"
 #define BpmIDivYPosErrString                        "BPMI_DIV_YPOS_ERR"
+#define BpmISelfTrigChAString                       "BPMI_SELF_TRIG_CH_A"
+#define BpmISelfTrigChBString                       "BPMI_SELF_TRIG_CH_B"
+#define BpmISelfTrigChCString                       "BPMI_SELF_TRIG_CH_C"
+#define BpmISelfTrigChDString                       "BPMI_SELF_TRIG_CH_D"
 
 class epicsShareClass Bpm : public SIS8300 {
 public:
@@ -113,6 +121,10 @@ protected:
     int mBpmFilterCoeff5;
     int mBpmFilterGain;
     int mBpmFilterApply;
+    int mBpmSelfTrigControl;
+    int mBpmSelfTrigThreshold;
+    int mBpmSelfTrigChRef;
+    int mBpmSelfTrigIQSamples;
     /* BPM instance wide parameters (BPM1 or BPM2)*/
     int mBpmIEnable;
     int mBpmIThrXPosLow;
@@ -127,7 +139,11 @@ protected:
     int mBpmIIlkIRQ;
     int mBpmIDivXPosErr;
     int mBpmIDivYPosErr;
-    #define BPM_LAST_PARAM mBpmIDivYPosErr
+    int mBpmISelfTrigChA;
+    int mBpmISelfTrigChB;
+    int mBpmISelfTrigChC;
+    int mBpmISelfTrigChD;
+    #define BPM_LAST_PARAM mBpmISelfTrigChD
 
     /* These are the methods that are new to this class */
     template <typename epicsType> int convertArraysT();
@@ -146,6 +162,7 @@ private:
     int updateBoardSetup();
     int updateNearIQ();
     int updateFilter();
+    int updateSelfTrigger();
     int updateThreshold(int addr);
 
     /* Our data */
@@ -153,6 +170,7 @@ private:
     bool mDoNearIQUpdate;
     bool mDoBoardSetupUpdate;
     bool mDoFilterControlUpdate;
+    bool mDoSelfTriggerUpdate;
     bool mDoFilterCoeffUpdate;
     bool mDoBpm1ThresholdUpdate;
     bool mDoBpm2ThresholdUpdate;
