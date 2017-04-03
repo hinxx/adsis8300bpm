@@ -34,7 +34,7 @@ typedef enum _BpmChannelIndex {
 	eBPMChannelRefPha
 } BPMChannelIndex;
 #define BPM_NUM_CHANNELS      14
-#define BPM_IRQ_WAIT_TIME     2000
+#define BPM_IRQ_WAIT_TIME     0
 
 /* System wide parameters */
 #define BpmFwVersionString                          "BPM_FW_VERSION"
