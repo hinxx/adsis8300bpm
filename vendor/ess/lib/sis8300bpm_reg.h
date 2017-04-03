@@ -71,6 +71,8 @@ extern "C" {
 #define SIS8300BPM_DSP_PARAM_REG                    0x416
 #define SIS8300BPM_FILTER_DATA_REG                  0x417
 #define SIS8300BPM_FILTER_CTRL_REG                  0x418
+#define SIS8300BPM_SELF_TRIG_PARAM_REG              0x419
+#define SIS8300BPM_SELF_TRIG_CNT_REG                0x41A
 
 #ifdef __cplusplus
 }
