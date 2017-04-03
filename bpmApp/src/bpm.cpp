@@ -795,6 +795,8 @@ int Bpm::updateSelfTrigger() {
 		SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, SIS8300BPM_SELF_TRIG_CNT_REG, count));
 
 		param = 0;
+		getIntegerParam(mBpmSelfTrigControl, &tmp);
+		param |= (tmp << 0);
 		getIntegerParam(BPM_BPM1_ADDR, mBpmISelfTrigChA, &tmp);
 		param |= (tmp << 6);
 		getIntegerParam(BPM_BPM1_ADDR, mBpmISelfTrigChB, &tmp);
