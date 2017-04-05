@@ -47,6 +47,7 @@ record(ai, "$(P)$(R)ThrXPosLow_RBV") {
     field(DTYP, "asynFloat64")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_XPOS_LOW")
     field(SCAN, "I/O Intr")
+    field(PREC, "3")
 }
 
 record(ao, "$(P)$(R)ThrXPosHigh") {
@@ -56,6 +57,7 @@ record(ao, "$(P)$(R)ThrXPosHigh") {
     field(DRVH, "0.99")
     field(VAL,  "0.0")
     field(PINI, "YES")
+    field(PREC, "3")
     info(autosaveFields, "VAL")
 }
 
@@ -63,6 +65,7 @@ record(ai, "$(P)$(R)ThrXPosHigh_RBV") {
     field(DTYP, "asynFloat64")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_XPOS_HIGH")
     field(SCAN, "I/O Intr")
+    field(PREC, "3")
 }
 
 record(ao, "$(P)$(R)ThrYPosLow") {
@@ -72,6 +75,7 @@ record(ao, "$(P)$(R)ThrYPosLow") {
     field(DRVH, "0.99")
     field(VAL,  "0.0")
     field(PINI, "YES")
+    field(PREC, "3")
     info(autosaveFields, "VAL")
 }
 
@@ -79,6 +83,7 @@ record(ai, "$(P)$(R)ThrYPosLow_RBV") {
     field(DTYP, "asynFloat64")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_YPOS_LOW")
     field(SCAN, "I/O Intr")
+    field(PREC, "3")
 }
 
 record(ao, "$(P)$(R)ThrYPosHigh") {
@@ -88,6 +93,7 @@ record(ao, "$(P)$(R)ThrYPosHigh") {
     field(DRVH, "0.99")
     field(VAL,  "0.0")
     field(PINI, "YES")
+    field(PREC, "3")
     info(autosaveFields, "VAL")
 }
 
@@ -95,6 +101,7 @@ record(ai, "$(P)$(R)ThrYPosHigh_RBV") {
     field(DTYP, "asynFloat64")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_YPOS_HIGH")
     field(SCAN, "I/O Intr")
+    field(PREC, "3")
 }
 
 record(ao, "$(P)$(R)ThrMagnitude") {
@@ -104,6 +111,7 @@ record(ao, "$(P)$(R)ThrMagnitude") {
     field(DRVH, "1.0")
     field(VAL,  "0.5")
     field(PINI, "YES")
+    field(PREC, "3")
     info(autosaveFields, "VAL")
 }
 
@@ -111,6 +119,7 @@ record(ai, "$(P)$(R)ThrMagnitude_RBV") {
     field(DTYP, "asynFloat64")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPMI_THR_MAGNITUDE")
     field(SCAN, "I/O Intr")
+    field(PREC, "3")
 }
 
 record(bo, "$(P)$(R)ThrSelect") {
