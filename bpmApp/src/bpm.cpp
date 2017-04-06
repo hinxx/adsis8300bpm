@@ -688,6 +688,10 @@ int Bpm::updateParameters()
 		SIS8300DRV_CALL_RET("sis8300drvbpm_update_parameters", sis8300drvbpm_update_parameters(mSisDevice));
 	}
 
+	if (ret == 0) {
+        SIS8300_INF("No error");
+	}
+
 	return ret;
 }
 
@@ -874,7 +878,7 @@ int Bpm::updateThreshold(int addr)
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrYValReg, thrVal));
 	/* magnitude threshold and control */
 	thrVal = (int)(thrControl & 0x1) << 16;
-	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(xPosLow, sis8300drvbpm_Qmn_magnitude, &conv, &err));
+	SIS8300DRV_CALL_RET("sis8300drvbpm_double_2_Qmn", sis8300drvbpm_double_2_Qmn(magnitude, sis8300drvbpm_Qmn_magnitude, &conv, &err));
 	thrVal |= (int)(conv  & 0xFFFF);
 	SIS8300DRV_CALL_RET("sis8300drv_reg_write", sis8300drv_reg_write(mSisDevice, thrMagCtrlReg, thrVal));
 
