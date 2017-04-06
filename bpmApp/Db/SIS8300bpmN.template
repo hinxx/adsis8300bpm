@@ -40,6 +40,7 @@ record(ao, "$(P)$(R)ThrXPosLow") {
     field(DRVH, "0.99")
     field(VAL,  "0.0")
     field(PINI, "YES")
+    field(PREC, "3")
     info(autosaveFields, "VAL")
 }
 
