@@ -6,11 +6,12 @@ DIRS += bpmApp
 DIRS += vendor
 bpmApp_DEPEND_DIRS += vendor
 
-ifeq ($(BUILD_IOCS), YES)
-DIRS += bpmDemoApp
-bpmDemoApp_DEPEND_DIRS += bpmApp
-iocBoot_DEPEND_DIRS += bpmDemoApp
-DIRS += iocBoot
-endif
+# do not build IOCs
+#ifeq ($(BUILD_IOCS), YES)
+#DIRS += bpmDemoApp
+#bpmDemoApp_DEPEND_DIRS += bpmApp
+#iocBoot_DEPEND_DIRS += bpmDemoApp
+#DIRS += iocBoot
+#endif
 
 include $(TOP)/configure/RULES_TOP
