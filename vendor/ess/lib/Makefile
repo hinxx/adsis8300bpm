@@ -4,7 +4,7 @@ include $(TOP)/configure/CONFIG
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
 #=============================
 
-USR_INCLUDES += $(SIS8300)/include
+USR_INCLUDES += $(ADSIS8300)/include
 
 INC += sis8300drvbpm.h sis8300bpm_reg.h
 
