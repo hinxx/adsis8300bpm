@@ -72,7 +72,6 @@ Bpm::Bpm(const char *portName, const char *devicePath,
 
     : SIS8300(portName, devicePath,
     		maxAddr,
-    		BPM_NUM_PARAMS,
 			numSamples,
 			dataType,
 			maxBuffers, maxMemory,
@@ -83,7 +82,7 @@ Bpm::Bpm(const char *portName, const char *devicePath,
 	int i;
     int status = asynSuccess;
 
-    D(printf("%d addresses, %d parameters\n", maxAddr, BPM_NUM_PARAMS));
+    D(printf("%d addresses\n", maxAddr));
 
     /* adjust number of NDArrays we need to handle, 0 - AI, 1 - BPM1 and 2 - BPM2 */
     mNumArrays = 3;

@@ -175,5 +175,3 @@ private:
     bool mDoBpm1ThresholdUpdate;
     bool mDoBpm2ThresholdUpdate;
 };
-
-#define BPM_NUM_PARAMS ((int)(&BPM_LAST_PARAM - &BPM_FIRST_PARAM + 1))
