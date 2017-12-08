@@ -56,7 +56,6 @@ static const char *driverName = "Bpm";
   * \param[in] portName The name of the asyn port driver to be created.
   * \param[in] devicePath The path to the /dev entry.
   * \param[in] maxAddr The maximum  number of asyn addr addresses this driver supports. 1 is minimum.
-  * \param[in] numParams The number of parameters in the derived class.
   * \param[in] numSamples The initial number of samples.
   * \param[in] dataType The initial data type (NDDataType_t) of the arrays that this driver will create.
   * \param[in] maxBuffers The maximum number of NDArray buffers that the NDArrayPool for this driver is

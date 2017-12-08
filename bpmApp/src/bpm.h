@@ -86,7 +86,7 @@ typedef enum _BpmChannelIndex {
 class epicsShareClass Bpm : public SIS8300 {
 public:
 	Bpm(const char *portName, const char *devicePath,
-			int maxAddr, int numTimePoints, NDDataType_t dataType,
+			int maxAddr, int numSamples, NDDataType_t dataType,
 			int maxBuffers, size_t maxMemory, int priority, int stackSize);
 	virtual ~Bpm();
 
